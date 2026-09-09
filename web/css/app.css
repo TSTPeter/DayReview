@@ -1,0 +1,261 @@
+/* Spelling app.
+ *
+ * The design constraints are evidence, not taste. docs/02:
+ *   - generic legibility helps: adequate size, generous letter and line spacing,
+ *     left alignment, short lines
+ *   - special dyslexia fonts do NOT help (g = -0.04, N = 688), and coloured overlays
+ *     do not either (2,690 participants, effects shrink as rigour rises). Font and
+ *     colour are offered below as COMFORT preferences with no claim attached.
+ *   - coherence and seductive detail is the largest reliable multimedia effect, so
+ *     there is no decorative motion, no background music and no celebratory animation
+ *     on the practice screen. Anything expressive happens between items, where it
+ *     costs nothing.
+ *   - tap targets over 44px.
+ *
+ * There is no streak, no day counter, no leaderboard and no badge in this stylesheet,
+ * because there is none in the product. See docs/02 on Deci et al.: engagement-contingent
+ * rewards are the worst class (d = -0.40) in the most vulnerable group.
+ */
+
+:root {
+  --ink: #14181f;
+  --ink-soft: #4a5260;
+  --paper: #fbfaf7;
+  --card: #ffffff;
+  --line: #d9d5cc;
+  --accent: #1f5f4b;      /* used for structure, never for reward */
+  --accent-soft: #e6f0ec;
+  --wrong: #9b2226;
+  --wrong-soft: #fbeaea;
+  --right: #1f5f4b;
+  --right-soft: #e6f0ec;
+  --focus: #0b57d0;
+
+  --font: system-ui, -apple-system, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif;
+  --size: 19px;
+  --track: 0.01em;
+  --leading: 1.65;
+  --measure: 34rem;       /* short lines */
+}
+
+[data-comfort="large"]   { --size: 22px; --leading: 1.8; --track: 0.03em; }
+[data-comfort="largest"] { --size: 26px; --leading: 1.9; --track: 0.05em; }
+
+[data-theme="warm"] { --paper: #f6efe2; --card: #fffaf0; --line: #ddd0b8; }
+[data-theme="dark"] {
+  --ink: #eceff4; --ink-soft: #a8b0bd; --paper: #14181f; --card: #1c222c;
+  --line: #333c4a; --accent: #7fd0b4; --accent-soft: #1d3730;
+  --wrong: #ff9aa0; --wrong-soft: #3a2224; --right: #7fd0b4; --right-soft: #1d3730;
+  --focus: #8ab4f8;
+}
+
+* { box-sizing: border-box; }
+
+html, body {
+  margin: 0;
+  background: var(--paper);
+  color: var(--ink);
+  font-family: var(--font);
+  font-size: var(--size);
+  line-height: var(--leading);
+  letter-spacing: var(--track);
+}
+
+body { padding: 0 1.25rem 4rem; }
+
+main { max-width: var(--measure); margin: 0 auto; text-align: left; }
+
+h1, h2, h3 { line-height: 1.25; letter-spacing: 0; margin: 0 0 0.6rem; font-weight: 650; }
+h1 { font-size: 1.5rem; }
+h2 { font-size: 1.25rem; }
+h3 { font-size: 1rem; color: var(--ink-soft); text-transform: none; }
+p  { margin: 0 0 1rem; max-width: var(--measure); }
+
+.muted { color: var(--ink-soft); }
+.small { font-size: 0.85rem; }
+
+/* ---- chrome ---- */
+
+header.bar {
+  max-width: var(--measure);
+  margin: 0 auto;
+  padding: 1rem 0 0.75rem;
+  display: flex;
+  align-items: center;
+  gap: 0.75rem;
+  justify-content: space-between;
+}
+header.bar .where { font-weight: 650; }
+
+.progress {
+  height: 4px;
+  background: var(--line);
+  border-radius: 2px;
+  overflow: hidden;
+  max-width: var(--measure);
+  margin: 0 auto 1.5rem;
+}
+.progress > i { display: block; height: 100%; background: var(--accent); }
+
+/* ---- screens ---- */
+
+.screen { display: none; }
+.screen.on { display: block; }
+
+.card {
+  background: var(--card);
+  border: 1px solid var(--line);
+  border-radius: 12px;
+  padding: 1.25rem;
+  margin: 0 0 1.25rem;
+}
+
+/* ---- controls: everything tappable clears 44px ---- */
+
+button {
+  font: inherit;
+  letter-spacing: inherit;
+  min-height: 48px;
+  padding: 0.6rem 1.15rem;
+  border-radius: 10px;
+  border: 1px solid var(--line);
+  background: var(--card);
+  color: var(--ink);
+  cursor: pointer;
+}
+button:hover { border-color: var(--ink-soft); }
+button.primary { background: var(--accent); border-color: var(--accent); color: #fff; }
+[data-theme="dark"] button.primary { color: #10201b; }
+button.primary:hover { filter: brightness(1.08); }
+button:disabled { opacity: 0.45; cursor: not-allowed; }
+button.link {
+  min-height: 44px; border: 0; background: none; color: var(--accent);
+  text-decoration: underline; padding: 0.4rem 0;
+}
+
+:where(button, input, select, [tabindex]):focus-visible {
+  outline: 3px solid var(--focus);
+  outline-offset: 2px;
+}
+
+.row { display: flex; flex-wrap: wrap; gap: 0.6rem; align-items: center; }
+.row.end { justify-content: flex-end; }
+
+/* ---- the attempt screen: nothing else on it ---- */
+
+#screen-attempt .prompt-state {
+  font-size: 0.95rem;
+  color: var(--ink-soft);
+  min-height: 1.6em;
+}
+
+input[type="text"], input.spell {
+  font: inherit;
+  font-size: 1.5rem;
+  letter-spacing: 0.06em;
+  width: 100%;
+  min-height: 60px;
+  padding: 0.7rem 0.9rem;
+  border: 2px solid var(--line);
+  border-radius: 10px;
+  background: var(--card);
+  color: var(--ink);
+}
+input.spell:focus { border-color: var(--focus); outline: none; }
+
+/* ---- reveal: the attempt marked against the target ---- */
+
+.marked {
+  font-size: 1.6rem;
+  letter-spacing: 0.09em;
+  word-break: break-word;
+  margin: 0.2rem 0 0.9rem;
+}
+.marked .ok   { color: var(--ink); }
+.marked .bad  { background: var(--wrong-soft); color: var(--wrong); border-radius: 3px;
+                text-decoration: underline; text-decoration-thickness: 2px; }
+/* A gap where a letter should be. It has to be NOTICEABLE: the whole value of
+ * high-information feedback (d = 0.99) over "wrong" (d = 0.24) is that she can see
+ * exactly what the word wanted. It marks the position without supplying the letter. */
+.marked .miss { background: var(--wrong-soft); color: var(--wrong); border-radius: 3px;
+                font-weight: 700; border-bottom: 3px solid var(--wrong); padding: 0 0.1em; }
+
+/* The no-audio fallback shows the sentence with the word blanked. It is prose, so it
+ * reads as prose, not as a spelled-out word. */
+.cloze { font-size: 1.15rem; letter-spacing: 0.01em; line-height: 1.6; margin: 0.4rem 0 1rem; }
+.cloze .gap {
+  display: inline-block; min-width: 5.5em; border-bottom: 3px solid var(--accent);
+  vertical-align: baseline;
+}
+.target { font-size: 1.6rem; letter-spacing: 0.09em; color: var(--right); font-weight: 650; }
+
+.label {
+  display: inline-block; font-size: 0.78rem; letter-spacing: 0.06em;
+  text-transform: uppercase; color: var(--ink-soft); margin-bottom: 0.25rem;
+}
+
+.morphemes { font-size: 1.15rem; letter-spacing: 0.04em; }
+.morphemes b { color: var(--accent); font-weight: 650; }
+
+.siblings { display: flex; flex-wrap: wrap; gap: 0.5rem; }
+.siblings span {
+  border: 1px solid var(--line); border-radius: 999px;
+  padding: 0.3rem 0.8rem; font-size: 0.95rem;
+}
+
+.verdict { display: flex; align-items: baseline; gap: 0.6rem; }
+.verdict.right { color: var(--right); }
+.verdict.wrong { color: var(--wrong); }
+
+/* ---- session end: self-referenced only ---- */
+
+.stat { border-left: 3px solid var(--accent); padding-left: 0.9rem; margin: 0 0 1rem; }
+.stat b { font-size: 1.35rem; display: block; }
+
+/* ---- grown-up view ---- */
+
+table { border-collapse: collapse; width: 100%; font-size: 0.95rem; }
+th, td { text-align: left; padding: 0.45rem 0.6rem; border-bottom: 1px solid var(--line); }
+th { color: var(--ink-soft); font-weight: 600; font-size: 0.82rem; }
+.bar-cell { display: flex; align-items: center; gap: 0.5rem; }
+.bar-cell > i {
+  display: block; height: 8px; border-radius: 4px; background: var(--accent); min-width: 2px;
+}
+
+.note {
+  border-left: 3px solid var(--line);
+  padding: 0.1rem 0 0.1rem 0.9rem;
+  color: var(--ink-soft);
+  margin: 0 0 1rem;
+}
+
+.danger { color: var(--wrong); border-color: var(--wrong); }
+
+/* ---- paper mode ---- */
+
+.paper-banner {
+  background: var(--accent-soft);
+  border: 1px solid var(--accent);
+  border-radius: 10px;
+  padding: 0.9rem 1rem;
+  margin-bottom: 1.25rem;
+}
+
+/* ---- motion ---- */
+/* Nothing on the attempt screen animates at all. The only transition in the app is a
+ * 120ms fade when a screen changes, which sits BETWEEN items rather than during one. */
+
+.screen.on { animation: fade 120ms ease-out; }
+#screen-attempt.on { animation: none; }
+
+@keyframes fade { from { opacity: 0.4; } to { opacity: 1; } }
+
+@media (prefers-reduced-motion: reduce) {
+  .screen.on { animation: none; }
+  * { transition: none !important; }
+}
+
+@media (max-width: 480px) {
+  :root { --size: 18px; }
+  body { padding: 0 0.9rem 3rem; }
+}

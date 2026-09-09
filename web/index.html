@@ -1,0 +1,247 @@
+<!doctype html>
+<html lang="en-GB" data-comfort="default" data-theme="light">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>Spelling</title>
+<meta name="description" content="Year 5/6 statutory spelling practice, built on the evidence.">
+<link rel="icon" href="data:image/svg+xml,%3Csvg xmlns=%27http://www.w3.org/2000/svg%27 viewBox=%270 0 32 32%27%3E%3Crect width=%2732%27 height=%2732%27 rx=%277%27 fill=%27%231f5f4b%27/%3E%3Ctext x=%2716%27 y=%2723%27 font-size=%2720%27 font-family=%27serif%27 fill=%27%23fff%27 text-anchor=%27middle%27%3ESp%3C/text%3E%3C/svg%3E">
+<link rel="manifest" href="manifest.json">
+<meta name="theme-color" content="#1f5f4b">
+<link rel="stylesheet" href="css/app.css">
+</head>
+<body>
+
+<header class="bar">
+  <span class="where">Spelling</span>
+  <span id="attempt-count" class="small muted"></span>
+</header>
+<div class="progress" id="progress"><i style="width:0"></i></div>
+
+<main>
+
+<!-- ============================================ home -->
+<section id="screen-home" class="screen on">
+  <h1>Ready when you are</h1>
+  <p id="home-summary" class="muted"></p>
+  <div class="row">
+    <button id="btn-practise" class="primary">Practise</button>
+    <button id="btn-probe">Take the challenge</button>
+  </div>
+  <p id="home-probe-note" class="small muted" style="margin-top:1rem"></p>
+  <p style="margin-top:2rem"><button id="btn-grownup" class="link">Grown-up view</button></p>
+</section>
+
+<!-- ============================================ 1. attempt
+     Nothing on this screen but the prompt and the box. No word, no picture, no motion,
+     no score, no timer. docs/02: coherence and seductive detail is the largest reliable
+     multimedia effect, and the removal condition is the one that wins. -->
+<section id="screen-attempt" class="screen">
+  <h1>Listen, then spell it</h1>
+  <p id="attempt-state" class="prompt-state" aria-live="polite"></p>
+  <p id="attempt-cloze" class="cloze" hidden></p>
+  <p id="attempt-noaudio" class="note small" hidden>
+    This device has no speech voice installed, so the app is showing the sentence with
+    the word blanked out instead of reading it aloud. Install a British English voice in
+    your system settings to get the proper dictation.
+  </p>
+  <label for="attempt-input" class="label">Type the word</label>
+  <input id="attempt-input" class="spell" type="text" autocomplete="off"
+         autocapitalize="none" autocorrect="off" spellcheck="false"
+         enterkeyhint="done" aria-describedby="attempt-state">
+  <div class="row" style="margin-top:1rem">
+    <button id="attempt-submit" class="primary" disabled>Check it</button>
+    <button id="attempt-replay">Hear it again</button>
+  </div>
+</section>
+
+<!-- ============================================ 2. reveal -->
+<section id="screen-reveal" class="screen">
+  <p id="reveal-verdict" class="verdict"></p>
+  <div class="card">
+    <span class="label">What you wrote</span>
+    <div id="reveal-marked" class="marked"></div>
+    <div id="reveal-target-wrap">
+      <span class="label">The word</span>
+      <div id="reveal-target" class="target"></div>
+    </div>
+    <p id="reveal-detail" class="muted" style="margin-top:0.75rem"></p>
+  </div>
+
+  <div class="card">
+    <span class="label">How it is built</span>
+    <p id="reveal-morph" class="morphemes"></p>
+    <span class="label">Where it comes from</span>
+    <p id="reveal-origin" class="muted"></p>
+    <span class="label">Why</span>
+    <p id="reveal-why"></p>
+    <span class="label">Same family</span>
+    <div id="reveal-siblings" class="siblings"></div>
+  </div>
+
+  <!-- docs/03: at most one item in five, four options, one tap, never after a failure -->
+  <div class="card" id="reveal-strategy" hidden>
+    <p><strong>How did you work that out?</strong></p>
+    <div class="row" id="strategy-options"></div>
+  </div>
+
+  <div class="row">
+    <button id="reveal-next" class="primary">Next word</button>
+    <button id="reveal-rule-btn">Show me the rule</button>
+  </div>
+</section>
+
+<!-- ============================================ 3. rule card -->
+<section id="screen-rule" class="screen">
+  <h1 id="rule-name"></h1>
+  <p id="rule-explain"></p>
+  <div class="card">
+    <span class="label">Worked example</span>
+    <p id="rule-worked" class="morphemes"></p>
+    <p id="rule-why" class="muted"></p>
+  </div>
+  <div class="card">
+    <span class="label">Words that use it</span>
+    <div id="rule-siblings" class="siblings"></div>
+  </div>
+  <button id="rule-back" class="primary">Back</button>
+</section>
+
+<!-- ============================================ 4. session end
+     Self-referenced progress only: rules cracked, words moved up. No streak, no day
+     count, no leaderboard, no badge. docs/02, on Deci et al.: engagement-contingent
+     rewards are the worst class (d = -0.40) and children fare worse than adults. The
+     ICO Children's code standard 13 points the same way. -->
+<section id="screen-end" class="screen">
+  <h1>Done for now</h1>
+  <div class="stat"><b id="end-right"></b><span class="muted">spelled correctly</span></div>
+  <div class="stat"><b id="end-moved"></b><span class="muted">words moved further apart, so they come back later</span></div>
+  <div class="stat">
+    <span class="muted">Rules you got clean:</span>
+    <div id="end-cracked" class="siblings" style="margin-top:0.4rem"></div>
+  </div>
+  <p id="end-next" class="note"></p>
+  <div class="row">
+    <button id="end-home" class="primary">Finish</button>
+    <button id="end-grownup" class="link">Grown-up view</button>
+  </div>
+</section>
+
+<!-- ============================================ 5. diagnostic, on paper -->
+<section id="screen-probe-intro" class="screen">
+  <h1>The challenge</h1>
+  <p>Twenty-four words. No marks, no score, nothing to get wrong. It just tells the app
+     what to teach you.</p>
+  <div class="paper-banner">
+    <p style="margin:0"><strong>This one is done on paper.</strong> The app reads each word
+       out in a sentence. Write it with a pencil, then a grown-up types your answers in
+       afterwards.</p>
+  </div>
+  <p class="small muted">Why paper: typing makes one particular kind of spelling mistake
+     look about six times worse than it is, and that is exactly the kind this is measuring.
+     Handwriting gives the honest number.</p>
+  <button id="probe-start" class="primary">Start</button>
+</section>
+
+<section id="screen-probe-dictate" class="screen">
+  <h1 id="probe-count"></h1>
+  <p class="muted">Listen, then write it on your paper.</p>
+  <p id="probe-cloze" class="cloze" hidden></p>
+  <button id="probe-next" class="primary" disabled>Written it, next word</button>
+</section>
+
+<section id="screen-paper-entry" class="screen">
+  <h1>Type in what she wrote</h1>
+  <p class="muted">Exactly as written, including the mistakes. That is the whole point:
+     the mistakes are the data.</p>
+  <div id="paper-list"></div>
+  <button id="paper-submit" class="primary">Save and see the profile</button>
+</section>
+
+<!-- ============================================ 6. grown-up view -->
+<section id="screen-grownup" class="screen">
+  <h1>Grown-up view</h1>
+  <p class="small muted" id="gu-items"></p>
+
+  <div class="card">
+    <span class="label">Phonological reliance</span>
+    <p><b id="gu-phon" style="font-size:1.6rem"></b></p>
+    <p class="small muted">Share of her errors that read aloud correctly. You want this
+       falling: it means she is moving from sound to orthography. The cohort study this
+       reproduces ran at about 84%.</p>
+  </div>
+
+  <div class="card">
+    <span class="label">Orthographic choice</span>
+    <p><b id="gu-ortho" style="font-size:1.6rem"></b></p>
+    <p class="small muted">Share of her correct spellings that needed a choice between
+       several legal spellings of one sound. Our definition is structural, the study's was
+       expert judgement, so do not compare this number with their 14%. Watch the trend.</p>
+  </div>
+
+  <div class="card">
+    <span class="label">Delayed accuracy</span>
+    <p><b id="gu-delayed" style="font-size:1.3rem"></b></p>
+    <p class="small muted">Not session score. Accuracy 7 and 28 days after a word was
+       first seen, which is the outcome that ladders up to a dictated test a week later.</p>
+  </div>
+
+  <div class="card">
+    <span class="label">Transfer</span>
+    <p><b id="gu-transfer" style="font-size:1.3rem"></b></p>
+    <p class="small muted">Taught words against untaught words using the same rules. A big
+       gap means she is learning words, not rules. The interleaving trial found gains on
+       trained words and no transfer to untrained ones, so expect this to lag.</p>
+  </div>
+
+  <div id="gu-narrative"></div>
+
+  <div class="card">
+    <span class="label">Rule strength, weakest first</span>
+    <table><tbody id="gu-patterns"></tbody></table>
+  </div>
+
+  <div class="card">
+    <span class="label">Typing fluency</span>
+    <p id="gu-fluency" class="small"></p>
+    <p class="small muted">A child hunting for keys is being assessed on typing, not
+       spelling. If this is slow, shift the balance towards paper rounds.</p>
+  </div>
+
+  <div class="card">
+    <span class="label">Comfort</span>
+    <p class="small muted">Preferences only. There is no evidence that special fonts or
+       coloured overlays improve reading, and this app makes no such claim.</p>
+    <div class="row">
+      <label for="comfort-size" class="small">Text size</label>
+      <select id="comfort-size">
+        <option value="default">Default</option>
+        <option value="large">Large</option>
+        <option value="largest">Largest</option>
+      </select>
+      <label for="comfort-theme" class="small">Background</label>
+      <select id="comfort-theme">
+        <option value="light">Light</option>
+        <option value="warm">Warm</option>
+        <option value="dark">Dark</option>
+      </select>
+    </div>
+  </div>
+
+  <div class="card">
+    <span class="label">Her data</span>
+    <p class="small muted">Everything stays on this device. Nothing is uploaded anywhere.</p>
+    <div class="row">
+      <button id="gu-export">Export everything</button>
+      <button id="gu-delete" class="danger">Delete everything</button>
+    </div>
+  </div>
+
+  <button id="gu-home" class="primary">Back</button>
+</section>
+
+</main>
+
+<script type="module" src="js/app.js"></script>
+</body>
+</html>

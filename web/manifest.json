@@ -1,0 +1,10 @@
+{
+  "name": "Spelling",
+  "short_name": "Spelling",
+  "start_url": "./",
+  "display": "standalone",
+  "background_color": "#fbfaf7",
+  "theme_color": "#1f5f4b",
+  "orientation": "portrait",
+  "icons": []
+}
