@@ -1,9 +1,10 @@
 /*
  * End-to-end browser check.
  *
+ *   npm install && npx playwright install chromium
  *   python3 serve.py --port 8137 &
- *   node tests/browser/run.mjs            (needs playwright-core and a Chromium)
- *   CHROME=/path/to/chrome node tests/browser/run.mjs
+ *   node tests/browser/run.mjs
+ *   CHROME=/path/to/chrome node tests/browser/run.mjs   (to point at another build)
  *
  * The Python suite proves the engine is right. This proves the app in front of a child
  * actually behaves the way docs/02 says it must, which is a different claim: that the
@@ -14,11 +15,26 @@
  * Headless Chromium ships no speech voices, so this also exercises the no-audio path,
  * which is the one a borrowed device is most likely to hit.
  */
+import { existsSync } from "node:fs";
 import { chromium } from "playwright-core";
 
 const BASE = process.env.BASE || "http://localhost:8137/";
-const EXECUTABLE = process.env.CHROME
-  || "/opt/pw-browsers/chromium-1194/chrome-linux/chrome";
+
+// Find a Chromium: an explicit CHROME wins, then whatever `playwright install` put in
+// place, then a preinstalled one. Undefined lets Playwright pick for itself.
+function resolveExecutable() {
+  if (process.env.CHROME) return process.env.CHROME;
+  try {
+    const p = chromium.executablePath();
+    if (p && existsSync(p)) return p;
+  } catch { /* no registry-installed browser */ }
+  for (const p of ["/opt/pw-browsers/chromium-1194/chrome-linux/chrome",
+                   "/opt/pw-browsers/chromium/chrome-linux/chrome"]) {
+    if (existsSync(p)) return p;
+  }
+  return undefined;
+}
+const EXECUTABLE = resolveExecutable();
 
 let failures = 0;
 const check = (name, ok, detail = "") => {
@@ -37,7 +53,8 @@ const readAttempts = (page) => page.evaluate(async () => {
   });
 });
 
-const browser = await chromium.launch({ executablePath: EXECUTABLE });
+const browser = await chromium.launch(
+  EXECUTABLE ? { executablePath: EXECUTABLE } : {});
 const ctx = await browser.newContext({ viewport: { width: 420, height: 900 } });
 const page = await ctx.newPage();
 const errors = [];

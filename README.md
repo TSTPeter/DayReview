@@ -27,12 +27,22 @@ python3 -m unittest discover -s tests -t .     # 92 tests, no dependencies
 python3 engine/demo.py                          # classifier coverage over the corpus
 ```
 
-The browser suite needs Chromium and `playwright-core`:
+The browser suite drives the real app in Chromium and asserts the `docs/02`
+guarantees — that the target word is never on screen while she types, that the
+session-end screen has no streak or day count, that the paper probe records
+`dictation_paper`, and that a session survives losing the network:
 
 ```bash
+npm install && npx playwright install chromium
 python3 serve.py --port 8137 &
 node tests/browser/run.mjs
 ```
+
+`package.json` exists only for that harness. The app ships no dependencies: `web/` is
+vanilla JS and `engine/` is pure Python with an empty import list.
+
+Both suites run on every pull request via `.github/workflows/tests.yml`, which also
+fails if `web/data/*.json` has drifted out of step with the word model.
 
 ## What is here
 

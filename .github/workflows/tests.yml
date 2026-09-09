@@ -1,0 +1,73 @@
+# The engine is the domain core, so it is the thing CI has to protect.
+#
+# The parity job matters most. docs/05 decision 1 says the front end never reimplements
+# the engine; running with no server forces a browser-side classifier, and the README
+# calls the parity suite a build blocker. A build blocker that nothing runs is not one,
+# which is what this file fixes.
+
+name: tests
+
+on:
+  push:
+    branches: [main]
+  pull_request:
+  workflow_dispatch:
+
+jobs:
+  engine:
+    name: engine and parity
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.11"
+      # Node is not a dependency of the app. It is here because tests/test_parity.py
+      # shells out to it to run the browser implementation against the Python one.
+      - uses: actions/setup-node@v4
+        with:
+          node-version: "22"
+
+      - name: Unit, golden-file and cross-language parity tests
+        run: python3 -m unittest discover -s tests -t . -v
+
+      - name: Classifier coverage over the curated corpus
+        run: python3 engine/demo.py
+
+      # If words.py or sentences.py changed and export.py was not re-run, the front end
+      # silently serves stale data. Cheap to catch, confusing to debug.
+      - name: web/data is in step with the word model
+        run: |
+          python3 engine/export.py
+          if ! git diff --quiet -- web/data; then
+            echo "::error::web/data is stale. Run: python3 engine/export.py"
+            git --no-pager diff --stat -- web/data
+            exit 1
+          fi
+
+  browser:
+    name: six screens in a real browser
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.11"
+      - uses: actions/setup-node@v4
+        with:
+          node-version: "22"
+
+      - name: Install the test harness
+        run: |
+          npm install --no-audit --no-fund
+          npx playwright install --with-deps chromium
+
+      - name: Serve and drive the app
+        run: |
+          python3 engine/export.py
+          python3 serve.py --port 8137 &
+          for i in $(seq 1 30); do
+            curl -sf http://localhost:8137/index.html >/dev/null && break
+            sleep 1
+          done
+          node tests/browser/run.mjs
