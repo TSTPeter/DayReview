@@ -207,3 +207,39 @@ class TestLadder(unittest.TestCase):
 
 if __name__ == "__main__":
     unittest.main()
+
+
+class TestExportedProbes(unittest.TestCase):
+    """The browser reads precomputed probes instead of re-deriving the selection rule."""
+
+    def setUp(self):
+        import json
+        root = pathlib.Path(__file__).resolve().parents[1]
+        self.data = json.loads((root / "web" / "data" / "words.json").read_text())
+
+    def test_export_ships_a_probe_for_every_half_term(self):
+        self.assertEqual(sorted(self.data["probes"]), [str(i) for i in range(6)])
+
+    def test_every_exported_probe_is_twenty_four_words(self):
+        for run, words in self.data["probes"].items():
+            with self.subTest(run=run):
+                self.assertEqual(len(words), 24)
+                self.assertEqual(len(set(words)), 24)
+
+    def test_exported_probes_match_the_engine(self):
+        # If these drift, the child practises a different probe in the browser than the
+        # profile code assumes, and two probes stop being comparable.
+        for run in range(6):
+            with self.subTest(run=run):
+                self.assertEqual(self.data["probes"][str(run)],
+                                 [i["word"] for i in probe.build(run)])
+
+    def test_every_probe_word_is_resolvable_by_the_browser(self):
+        known = {w["word"] for w in self.data["words"]} | {w["word"] for w in self.data["off_list"]}
+        for run, words in self.data["probes"].items():
+            for w in words:
+                with self.subTest(run=run, word=w):
+                    self.assertIn(w, known)
+
+    def test_consecutive_runs_sample_differently(self):
+        self.assertNotEqual(self.data["probes"]["0"], self.data["probes"]["1"])

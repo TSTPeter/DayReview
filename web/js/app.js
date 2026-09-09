@@ -346,22 +346,14 @@ async function endSession() {
 
 function startProbe() {
   app.mode = "probe";
-  const run = Number(localStorage.getItem("probe_run") || "0");
-  const on = [];
-  const byPattern = {};
-  for (const w of app.data.words) {
-    const p = w.patterns[0];
-    if (!app.data.probe_patterns.includes(p)) continue;
-    (byPattern[p] = byPattern[p] || []).push(w);
-  }
-  for (const p of app.data.probe_patterns) {
-    const pool = byPattern[p] || [];
-    for (let i = 0; i < 2 && pool.length; i++) {
-      const pick = pool[(run * 2 + i) % pool.length];
-      if (!on.includes(pick)) on.push(pick);
-    }
-  }
-  app.probeItems = [...on, ...app.data.off_list];
+  // The word list comes precomputed from engine/probe.py via export.py. Re-deriving the
+  // selection rule here would be a third implementation with nothing holding it to the
+  // Python one. docs/03 wants a different sample each half term, so the run number
+  // advances after each completed probe and wraps around the year.
+  const runs = Object.keys(app.data.probes).length;
+  const run = Number(localStorage.getItem("probe_run") || "0") % runs;
+  const words = app.data.probes[String(run)] || [];
+  app.probeItems = words.map((w) => app.byWord.get(w)).filter(Boolean);
   app.paperIndex = 0;
   show("probe-intro");
 }
