@@ -171,6 +171,45 @@ const guText = await p2.innerText("#screen-grownup");
 check("dashboard makes no dyslexia-font or overlay claim",
       /no evidence that special fonts or coloured overlays/i.test(guText));
 
+console.log("\n— state survives a reload —");
+// The most load-bearing untested behaviour there was. Spacing is worth about 10.6
+// percentage points (Cepeda et al., 254 studies) and it is the only thing in this app
+// with an effect size that large. If Leitner state did not survive a reload, every word
+// would return to box 1 every day and the scheduler would be decoration.
+const beforeReload = await page.evaluate(async () => {
+  const db = await new Promise((r) => { const q = indexedDB.open("spelling", 1);
+    q.onsuccess = () => r(q.result); });
+  return await new Promise((r) => {
+    const t = db.transaction("kv", "readonly").objectStore("kv").get("scheduler_state");
+    t.onsuccess = () => r(t.result ? t.result.value : null);
+  });
+});
+const pushedOut = Object.entries(beforeReload || {})
+  .filter(([, v]) => v.seen > 0).map(([w]) => w);
+check("practised words are recorded in scheduler state", pushedOut.length > 0,
+      `${pushedOut.length} words seen`);
+check("a missed word is due later, not today",
+      pushedOut.every((w) => beforeReload[w].due > new Date().toISOString().slice(0, 10)));
+
+await page.reload({ waitUntil: "networkidle" });
+await page.waitForSelector("#screen-home.on");
+const afterReload = await page.evaluate(async () => {
+  const db = await new Promise((r) => { const q = indexedDB.open("spelling", 1);
+    q.onsuccess = () => r(q.result); });
+  const get = (store, key) => new Promise((r) => {
+    const t = db.transaction(store, "readonly").objectStore(store);
+    const q = key === undefined ? t.getAll() : t.get(key);
+    q.onsuccess = () => r(q.result);
+  });
+  return { sched: await get("kv", "scheduler_state"), pat: await get("kv", "pattern_state"),
+           attempts: (await get("attempts")).length };
+});
+check("scheduler state survives a reload",
+      JSON.stringify(afterReload.sched && afterReload.sched.value) === JSON.stringify(beforeReload));
+check("pattern state survives a reload", !!(afterReload.pat && afterReload.pat.value));
+check("the attempt log survives a reload", afterReload.attempts >= 10,
+      `${afterReload.attempts} rows`);
+
 console.log("\n— offline —");
 await page.bringToFront();
 await page.waitForFunction(() => navigator.serviceWorker.controller !== null, null, { timeout: 10000 })
