@@ -61,6 +61,11 @@ engine/                    the domain core. Pure Python, no I/O, no dependencies
   export.py                emits web/data/*.json
   demo.py                  coverage harness and a worked session
 web/                       the six screens. Vanilla JS, no framework, offline-capable
+  css/paper.css            the paper-cut design system, tablet first
+  js/rewards.js            the garden: mastery pieces and unexpected curios
+  js/sfx.js                synthesised reinforcement stings
+  js/dashboard.js          calendar heatmap, consistency, rule strength
+  js/sync.js               Firebase aggregates only, off by default
 db/schema.sql              the Postgres schema this grows into
 tests/                     unit, golden-file and cross-language parity suites
 ```
@@ -74,6 +79,24 @@ ports of `classify.py` and `schedule.py`. They are held to the Python implementa
 `tests/test_schedule_parity.py`, which replays the golden-file session through the browser
 scheduler. If either goes red, browser-collected data can no longer be pooled with
 anything scored in Python. Treat it as a build blocker.
+
+## The app
+
+Paper-cut-out visual style, built for an iPad held in two hands: layered sugar
+paper, torn edges, 60px tap targets, portrait and landscape. Still vanilla JS
+with no framework, no build step and no runtime dependencies.
+
+Her progress shows as a **garden**: one cut-paper piece per spelling rule she
+cracks, permanent, with no score and no target. Occasionally something turns up
+unannounced. Why it works that way, and what was deliberately not built, is in
+[`docs/11-engagement.md`](docs/11-engagement.md).
+
+Sound is four short stings synthesised in the browser, played on the reveal and
+never while she is typing.
+
+Firebase sync is **off by default** and carries aggregates only — counts and
+percentages. What she actually writes never leaves the device. Copy
+`web/data/firebase.example.json` to `web/data/firebase.json` to enable it.
 
 ## Three things this app deliberately does not have
 
@@ -89,6 +112,12 @@ claim attached.
 **No adaptivity switched on.** The one trial that isolated it found no advantage over a
 well-built fixed sequence. The ladder is built, flagged, and off until the M7 experiment
 says otherwise.
+
+**No score, no streak, no soundtrack.** Expected rewards reduce persistence
+(engagement-contingent d = -0.40, worse in children); unexpected ones do not
+(d = 0.01). So mastery is visible and rewards are surprises. Consistency and
+daily-use plotting are real and live in the grown-up view, where they inform an
+adult instead of nudging a child.
 
 ## Scope
 

@@ -7,3 +7,6 @@ words.json
 words.csv
 engine/words.json
 engine/words.csv
+
+# Real Firebase config: never commit. See web/data/firebase.example.json
+web/data/firebase.json

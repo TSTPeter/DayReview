@@ -2,13 +2,15 @@
 <html lang="en-GB" data-comfort="default" data-theme="light">
 <head>
 <meta charset="utf-8">
-<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover, maximum-scale=5">
 <title>Spelling</title>
 <meta name="description" content="Year 5/6 statutory spelling practice, built on the evidence.">
-<link rel="icon" href="data:image/svg+xml,%3Csvg xmlns=%27http://www.w3.org/2000/svg%27 viewBox=%270 0 32 32%27%3E%3Crect width=%2732%27 height=%2732%27 rx=%277%27 fill=%27%231f5f4b%27/%3E%3Ctext x=%2716%27 y=%2723%27 font-size=%2720%27 font-family=%27serif%27 fill=%27%23fff%27 text-anchor=%27middle%27%3ESp%3C/text%3E%3C/svg%3E">
+<link rel="icon" href="data:image/svg+xml,%3Csvg xmlns=%27http://www.w3.org/2000/svg%27 viewBox=%270 0 32 32%27%3E%3Crect width=%2732%27 height=%2732%27 rx=%277%27 fill=%27%232f7d72%27/%3E%3Ctext x=%2716%27 y=%2723%27 font-size=%2720%27 font-family=%27serif%27 fill=%27%23fff%27 text-anchor=%27middle%27%3ESp%3C/text%3E%3C/svg%3E">
 <link rel="manifest" href="manifest.json">
-<meta name="theme-color" content="#1f5f4b">
-<link rel="stylesheet" href="css/app.css">
+<meta name="theme-color" content="#f7f1e3">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-status-bar-style" content="default">
+<link rel="stylesheet" href="css/paper.css">
 </head>
 <body>
 
@@ -16,7 +18,7 @@
   <span class="where">Spelling</span>
   <span id="attempt-count" class="small muted"></span>
 </header>
-<div class="progress" id="progress"><i style="width:0"></i></div>
+<div class="progress"><div class="progress-track"><i id="progress-bar" style="width:0"></i></div></div>
 
 <main>
 
@@ -28,14 +30,23 @@
     <button id="btn-practise" class="primary">Practise</button>
     <button id="btn-probe">Take the challenge</button>
   </div>
-  <p id="home-probe-note" class="small muted" style="margin-top:1rem"></p>
-  <p style="margin-top:2rem"><button id="btn-grownup" class="link">Grown-up view</button></p>
+
+  <!-- Her garden. Self-referenced mastery made visible: a piece per rule
+       cracked, permanent, with no target and no count-to-go. -->
+  <div class="world sheet torn" style="margin-top:1.6rem" id="home-world-wrap">
+    <span class="tab teal">Your garden</span>
+    <div id="home-world"></div>
+  </div>
+
+  <p id="home-probe-note" class="small muted"></p>
+  <p style="margin-top:1.5rem"><button id="btn-grownup" class="link">Grown-up view</button></p>
 </section>
 
 <!-- ============================================ 1. attempt
-     Nothing on this screen but the prompt and the box. No word, no picture, no motion,
-     no score, no timer. docs/02: coherence and seductive detail is the largest reliable
-     multimedia effect, and the removal condition is the one that wins. -->
+     The plainest surface in the app, on purpose. No garden, no characters,
+     no sound, no motion, no score. docs/02: the multimedia condition that
+     wins is the one with the decoration removed, and this is the moment of
+     retrieval. Everything expressive waits for the reveal. -->
 <section id="screen-attempt" class="screen">
   <h1>Listen, then spell it</h1>
   <p id="attempt-state" class="prompt-state" aria-live="polite"></p>
@@ -45,11 +56,11 @@
     the word blanked out instead of reading it aloud. Install a British English voice in
     your system settings to get the proper dictation.
   </p>
-  <label for="attempt-input" class="label">Type the word</label>
+  <label for="attempt-input" class="tab">Type the word</label>
   <input id="attempt-input" class="spell" type="text" autocomplete="off"
          autocapitalize="none" autocorrect="off" spellcheck="false"
-         enterkeyhint="done" aria-describedby="attempt-state">
-  <div class="row" style="margin-top:1rem">
+         enterkeyhint="done" inputmode="text" aria-describedby="attempt-state">
+  <div class="row" style="margin-top:1.2rem">
     <button id="attempt-submit" class="primary" disabled>Check it</button>
     <button id="attempt-replay">Hear it again</button>
   </div>
@@ -58,29 +69,32 @@
 <!-- ============================================ 2. reveal -->
 <section id="screen-reveal" class="screen">
   <p id="reveal-verdict" class="verdict"></p>
-  <div class="card">
-    <span class="label">What you wrote</span>
-    <div id="reveal-marked" class="marked"></div>
-    <div id="reveal-target-wrap">
-      <span class="label">The word</span>
-      <div id="reveal-target" class="target"></div>
+  <div class="two-col">
+    <div class="sheet torn tilt-l">
+      <span class="tab">What you wrote</span>
+      <div id="reveal-marked" class="marked"></div>
+      <div id="reveal-target-wrap">
+        <span class="tab teal">The word</span>
+        <div id="reveal-target" class="target"></div>
+      </div>
+      <p id="reveal-detail" class="muted" style="margin-top:.8rem"></p>
     </div>
-    <p id="reveal-detail" class="muted" style="margin-top:0.75rem"></p>
+
+    <div class="sheet kraft tilt-r">
+      <span class="tab plum">How it is built</span>
+      <p id="reveal-morph" class="morphemes"></p>
+      <span class="tab">Where it comes from</span>
+      <p id="reveal-origin" class="muted"></p>
+      <span class="tab">Why</span>
+      <p id="reveal-why"></p>
+      <span class="tab">Same family</span>
+      <div id="reveal-siblings" class="siblings"></div>
+    </div>
   </div>
 
-  <div class="card">
-    <span class="label">How it is built</span>
-    <p id="reveal-morph" class="morphemes"></p>
-    <span class="label">Where it comes from</span>
-    <p id="reveal-origin" class="muted"></p>
-    <span class="label">Why</span>
-    <p id="reveal-why"></p>
-    <span class="label">Same family</span>
-    <div id="reveal-siblings" class="siblings"></div>
-  </div>
-
-  <!-- docs/03: at most one item in five, four options, one tap, never after a failure -->
-  <div class="card" id="reveal-strategy" hidden>
+  <!-- docs/03: at most one item in five, four options, one tap, never after
+       a failure. -->
+  <div class="sheet" id="reveal-strategy" hidden>
     <p><strong>How did you work that out?</strong></p>
     <div class="row" id="strategy-options"></div>
   </div>
@@ -95,31 +109,43 @@
 <section id="screen-rule" class="screen">
   <h1 id="rule-name"></h1>
   <p id="rule-explain"></p>
-  <div class="card">
-    <span class="label">Worked example</span>
+  <div class="sheet torn tilt-r">
+    <span class="tab mustard">Worked example</span>
     <p id="rule-worked" class="morphemes"></p>
     <p id="rule-why" class="muted"></p>
   </div>
-  <div class="card">
-    <span class="label">Words that use it</span>
+  <div class="sheet kraft">
+    <span class="tab">Words that use it</span>
     <div id="rule-siblings" class="siblings"></div>
   </div>
   <button id="rule-back" class="primary">Back</button>
 </section>
 
 <!-- ============================================ 4. session end
-     Self-referenced progress only: rules cracked, words moved up. No streak, no day
-     count, no leaderboard, no badge. docs/02, on Deci et al.: engagement-contingent
-     rewards are the worst class (d = -0.40) and children fare worse than adults. The
-     ICO Children's code standard 13 points the same way. -->
+     Self-referenced only. Rules cracked, words moved further apart. No
+     streak, no day count, no score, no leaderboard, no "come back tomorrow". -->
 <section id="screen-end" class="screen">
   <h1>Done for now</h1>
-  <div class="stat"><b id="end-right"></b><span class="muted">spelled correctly</span></div>
-  <div class="stat"><b id="end-moved"></b><span class="muted">words moved further apart, so they come back later</span></div>
-  <div class="stat">
-    <span class="muted">Rules you got clean:</span>
-    <div id="end-cracked" class="siblings" style="margin-top:0.4rem"></div>
+
+  <!-- Unlocks appear here, between items, never during one, and never
+       announced in advance. Unexpected rewards are the one class Deci et al.
+       found does no harm (d = 0.01). -->
+  <div id="end-unlocks"></div>
+
+  <div class="sheet torn">
+    <div class="stat"><b id="end-right"></b><span class="muted">spelled correctly</span></div>
+    <div class="stat"><b id="end-moved"></b><span class="muted">words moved further apart, so they come back later</span></div>
+    <div class="stat">
+      <span class="muted">Rules you got clean:</span>
+      <div id="end-cracked" class="siblings" style="margin-top:.45rem"></div>
+    </div>
   </div>
+
+  <div class="world sheet">
+    <span class="tab teal">Your garden</span>
+    <div id="end-world"></div>
+  </div>
+
   <p id="end-next" class="note"></p>
   <div class="row">
     <button id="end-home" class="primary">Finish</button>
@@ -132,7 +158,8 @@
   <h1>The challenge</h1>
   <p>Twenty-four words. No marks, no score, nothing to get wrong. It just tells the app
      what to teach you.</p>
-  <div class="paper-banner">
+  <div class="sheet kraft torn">
+    <span class="tab coral">Pencil and paper</span>
     <p style="margin:0"><strong>This one is done on paper.</strong> The app reads each word
        out in a sentence. Write it with a pencil, then a grown-up types your answers in
        afterwards.</p>
@@ -163,77 +190,96 @@
   <h1>Grown-up view</h1>
   <p class="small muted" id="gu-items"></p>
 
-  <div class="card">
-    <span class="label">Phonological reliance</span>
-    <p><b id="gu-phon" style="font-size:1.6rem"></b></p>
-    <p class="small muted">Share of her errors that read aloud correctly. You want this
-       falling: it means she is moving from sound to orthography. The cohort study this
-       reproduces ran at about 84%.</p>
+  <!-- Habit metrics live HERE and nowhere else. -->
+  <div class="sheet torn">
+    <span class="tab teal">Practice, day by day</span>
+    <div id="gu-calendar"></div>
+    <div id="gu-legend" style="margin-top:.6rem"></div>
+    <p id="gu-consistency" style="margin-top:.9rem"></p>
+    <p class="small muted">Gaps are visible on purpose. This is a description for you,
+       not a streak for her: a reset-to-zero counter is the mechanic the evidence and
+       the ICO Children's code both warn against.</p>
+    <p><button id="gu-table-toggle" class="link">Show the numbers instead</button></p>
+    <div id="gu-table" hidden></div>
   </div>
 
-  <div class="card">
-    <span class="label">Orthographic choice</span>
-    <p><b id="gu-ortho" style="font-size:1.6rem"></b></p>
-    <p class="small muted">Share of her correct spellings that needed a choice between
-       several legal spellings of one sound. Our definition is structural, the study's was
-       expert judgement, so do not compare this number with their 14%. Watch the trend.</p>
-  </div>
-
-  <div class="card">
-    <span class="label">Delayed accuracy</span>
-    <p><b id="gu-delayed" style="font-size:1.3rem"></b></p>
-    <p class="small muted">Not session score. Accuracy 7 and 28 days after a word was
-       first seen, which is the outcome that ladders up to a dictated test a week later.</p>
-  </div>
-
-  <div class="card">
-    <span class="label">Transfer</span>
-    <p><b id="gu-transfer" style="font-size:1.3rem"></b></p>
-    <p class="small muted">Taught words against untaught words using the same rules. A big
-       gap means she is learning words, not rules. The interleaving trial found gains on
-       trained words and no transfer to untrained ones, so expect this to lag.</p>
+  <div class="two-col">
+    <div class="sheet">
+      <span class="tab">Phonological reliance</span>
+      <p><b id="gu-phon" style="font-size:1.8rem"></b></p>
+      <p class="small muted">Share of her errors that read aloud correctly. You want this
+         falling: it means she is moving from sound to orthography. The cohort study this
+         reproduces ran at about 84%.</p>
+    </div>
+    <div class="sheet">
+      <span class="tab">Orthographic choice</span>
+      <p><b id="gu-ortho" style="font-size:1.8rem"></b></p>
+      <p class="small muted">Share of her correct spellings that needed a choice between
+         several legal spellings of one sound. Our definition is structural, the study's was
+         expert judgement, so do not compare this with their 14%. Watch the trend.</p>
+    </div>
+    <div class="sheet">
+      <span class="tab">Delayed accuracy</span>
+      <p><b id="gu-delayed" style="font-size:1.4rem"></b></p>
+      <p class="small muted">Not session score. Accuracy 7 and 28 days after a word was
+         first seen, which is the outcome that ladders up to a dictated test a week later.</p>
+    </div>
+    <div class="sheet">
+      <span class="tab">Transfer</span>
+      <p><b id="gu-transfer" style="font-size:1.4rem"></b></p>
+      <p class="small muted">Taught words against untaught words using the same rules. A big
+         gap means she is learning words, not rules. Expect this to lag.</p>
+    </div>
   </div>
 
   <div id="gu-narrative"></div>
 
-  <div class="card">
-    <span class="label">Rule strength, weakest first</span>
+  <div class="sheet kraft">
+    <span class="tab">Rule strength, weakest first</span>
     <table><tbody id="gu-patterns"></tbody></table>
   </div>
 
-  <div class="card">
-    <span class="label">Typing fluency</span>
+  <div class="sheet">
+    <span class="tab">Typing fluency</span>
     <p id="gu-fluency" class="small"></p>
     <p class="small muted">A child hunting for keys is being assessed on typing, not
        spelling. If this is slow, shift the balance towards paper rounds.</p>
   </div>
 
-  <div class="card">
-    <span class="label">Comfort</span>
-    <p class="small muted">Preferences only. There is no evidence that special fonts or
-       coloured overlays improve reading, and this app makes no such claim.</p>
+  <div class="sheet">
+    <span class="tab">Sound and comfort</span>
     <div class="row">
+      <label for="opt-sound" class="small">Sound</label>
+      <select id="opt-sound"><option value="on">On</option><option value="off">Off</option></select>
       <label for="comfort-size" class="small">Text size</label>
       <select id="comfort-size">
         <option value="default">Default</option>
         <option value="large">Large</option>
         <option value="largest">Largest</option>
       </select>
-      <label for="comfort-theme" class="small">Background</label>
+      <label for="comfort-theme" class="small">Paper</label>
       <select id="comfort-theme">
         <option value="light">Light</option>
         <option value="warm">Warm</option>
         <option value="dark">Dark</option>
       </select>
     </div>
+    <p class="small muted">Comfort preferences only. There is no evidence that special
+       fonts or coloured overlays improve reading, and this app makes no such claim.</p>
   </div>
 
-  <div class="card">
-    <span class="label">Her data</span>
-    <p class="small muted">Everything stays on this device. Nothing is uploaded anywhere.</p>
+  <div class="sheet">
+    <span class="tab coral">Her data</span>
+    <div class="row" style="margin-bottom:.6rem">
+      <label for="opt-sync" class="small">Sync to Firebase</label>
+      <select id="opt-sync"><option value="off">Off</option><option value="on">On</option></select>
+    </div>
+    <p class="small muted" id="gu-sync-state"></p>
+    <p class="small muted">What she types stays on this device. If sync is on, only counts
+       and percentages leave it — never a word she wrote, never her keystrokes.</p>
     <div class="row">
       <button id="gu-export">Export everything</button>
-      <button id="gu-delete" class="danger">Delete everything</button>
+      <button id="gu-delete" class="warm">Delete everything</button>
     </div>
   </div>
 

@@ -58,6 +58,8 @@ const browser = await chromium.launch(
 const ctx = await browser.newContext({ viewport: { width: 420, height: 900 } });
 const page = await ctx.newPage();
 const errors = [];
+const requestLog = [];
+page.on("request", (r) => requestLog.push(r.url()));
 page.on("pageerror", (e) => errors.push("pageerror: " + e.message));
 page.on("console", (m) => {
   if (m.type() === "error" && !/favicon/i.test(m.text())) errors.push("console: " + m.text());
@@ -145,7 +147,7 @@ for (let i = 0; i < 24; i++) {
 await p2.waitForSelector("#screen-paper-entry.on", { timeout: 10000 });
 const inputCount = await p2.locator("#paper-list input").count();
 check("paper entry offers 24 boxes", inputCount === 24, `got ${inputCount}`);
-const labels = await p2.locator("#paper-list .label").allTextContents();
+const labels = await p2.locator("#paper-list .tab").allTextContents();
 for (let i = 0; i < inputCount; i++) {
   const w = labels[i].replace(/^\d+\.\s*/, "");
   await p2.locator("#paper-list input").nth(i).fill(i % 2 ? w : w.slice(0, -1));
@@ -221,6 +223,110 @@ const offlineOk = await page.waitForSelector("#screen-home.on", { timeout: 10000
   .then(() => true).catch(() => false);
 check("app loads with the network off", offlineOk);
 await ctx.setOffline(false);
+
+console.log("\n— engagement layer: what she must NEVER see —");
+// The whole design rests on Deci et al.: expected rewards reduce persistence
+// (engagement-contingent d = -0.40, worse in children). If a score or a
+// streak ever reaches a child-facing screen, that finding has been violated
+// and this check is the thing that catches it.
+const CHILD_SCREENS = ["home", "attempt", "reveal", "rule", "end",
+                       "probe-intro", "probe-dictate"];
+const BANNED = /\b(\d+\s*(pts|points|xp|coins?|gems?|stars? earned)|streak|day \d+|\d+ days? in a row|level \d+|leaderboard|rank(ed)? #?\d+)\b/i;
+const leaks = await page.evaluate((ids) => {
+  const found = [];
+  for (const id of ids) {
+    const el = document.querySelector(`#screen-${id}`);
+    if (!el) continue;
+    const prev = el.style.display;
+    el.style.display = "block";
+    found.push([id, el.innerText]);
+    el.style.display = prev;
+  }
+  return found;
+}, CHILD_SCREENS);
+for (const [id, text] of leaks) {
+  const hit = text.match(BANNED);
+  check(`no score or streak on the ${id} screen`, !hit, hit ? `found "${hit[0]}"` : "");
+}
+// Open it on THIS page first: it has only been rendered in the probe context
+// so far, so its fields are still empty here.
+await page.click("#end-grownup").catch(() => page.click("#btn-grownup"));
+await page.waitForSelector("#screen-grownup.on");
+check("the grown-up view is where consistency lives",
+      /Practised on \d+ of the last \d+ days|No practice recorded yet/
+        .test(await page.innerText("#screen-grownup")));
+check("the grown-up view plots daily use",
+      (await page.locator("#gu-calendar svg rect").count()) > 20,
+      `${await page.locator("#gu-calendar svg rect").count()} day cells`);
+check("the heatmap has a legend", (await page.locator("#gu-legend i").count()) >= 5);
+check("a table view exists for the pale steps",
+      (await page.locator("#gu-table-toggle").count()) === 1);
+
+console.log("\n— the garden —");
+// A piece is earned by cracking a RULE (3 consecutive correct), never by
+// answering, showing up, or elapsed time.
+const gardenFresh = await page.evaluate(() =>
+  document.querySelector("#home-world").innerText);
+check("garden starts empty and promises nothing",
+      /starts empty/i.test(gardenFresh) && !/\d+\s*\/\s*\d+/.test(gardenFresh),
+      gardenFresh.trim().slice(0, 60));
+
+const crackedCount = await page.evaluate(async () => {
+  // Seed three consecutive correct attempts on one word, then recount.
+  const data = await fetch("data/words.json").then((r) => r.json());
+  const w = data.words[0];
+  const db = await new Promise((r) => { const q = indexedDB.open("spelling", 1);
+    q.onsuccess = () => r(q.result); });
+  for (let i = 0; i < 3; i++) {
+    await new Promise((r) => {
+      const t = db.transaction("attempts", "readwrite").objectStore("attempts");
+      t.add({ word: w.word, attempt_text: w.word, correct: true,
+              created_at: new Date(Date.now() + i * 1000).toISOString(),
+              prompt_mode: "audio_sentence", error_patterns: [] }).onsuccess = r;
+    });
+  }
+  const mod = await import("./js/rewards.js");
+  const all = await new Promise((r) => {
+    const t = db.transaction("attempts", "readonly").objectStore("attempts").getAll();
+    t.onsuccess = () => r(t.result);
+  });
+  const byWord = new Map([...data.words, ...data.off_list].map((x) => [x.word, x]));
+  return { cracked: [...mod.crackedPatterns(all, byWord)].length,
+           patterns: w.patterns.length };
+});
+check("three consecutive correct cracks that word's rules",
+      crackedCount.cracked >= crackedCount.patterns,
+      `${crackedCount.cracked} cracked`);
+
+console.log("\n— privacy defaults —");
+const syncDefault = await page.evaluate(async () => {
+  const db = await new Promise((r) => { const q = indexedDB.open("spelling", 1);
+    q.onsuccess = () => r(q.result); });
+  return await new Promise((r) => {
+    const t = db.transaction("kv", "readonly").objectStore("kv").get("sync_enabled");
+    t.onsuccess = () => r(t.result ? t.result.value : false);
+  });
+});
+check("sync is OFF by default (ICO standard 7, high privacy by default)", !syncDefault);
+const calledFirebase = requestLog.some((u) => /firebase|googleapis|gstatic/.test(u));
+check("no call to Firebase or Google on a default launch", !calledFirebase);
+
+console.log("\n— tablet —");
+for (const [name, w, h] of [["iPad portrait", 820, 1180], ["iPad landscape", 1180, 820]]) {
+  await page.setViewportSize({ width: w, height: h });
+  await page.click("#gu-home").catch(() => {});
+  await page.waitForSelector("#screen-home.on").catch(() => {});
+  const overflow = await page.evaluate(() =>
+    document.documentElement.scrollWidth > document.documentElement.clientWidth + 1);
+  check(`${name}: no horizontal overflow`, !overflow);
+  const small = await page.evaluate(() =>
+    [...document.querySelectorAll("#screen-home button")]
+      .filter((b) => b.offsetParent !== null)
+      .map((b) => Math.min(b.getBoundingClientRect().width, b.getBoundingClientRect().height))
+      .filter((d) => d < 44).length);
+  check(`${name}: every tap target clears 44px`, small === 0, `${small} too small`);
+}
+await page.setViewportSize({ width: 420, height: 900 });
 
 console.log("\n— console —");
 check("no page errors", errors.length === 0, errors.join(" | "));
