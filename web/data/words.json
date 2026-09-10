@@ -1,0 +1,3305 @@
+{
+ "generated_by": "engine/export.py",
+ "list": "dfe-y5y6-statutory",
+ "patterns": {
+  "assimilated-prefix": "A prefix changes its last letter to match the next sound: ad+com becomes ac+com.",
+  "double-consonant": "Two of the same letter, usually where a prefix meets a base.",
+  "single-consonant": "Looks like it should double, but does not.",
+  "doubling-1-1-1": "One syllable, one short vowel, one final consonant: double before a vowel suffix.",
+  "silent-letter": "A letter you cannot hear, usually kept from the older form of the word.",
+  "schwa": "An unstressed vowel that sounds like 'uh', so the letter has to be remembered.",
+  "ie-ei": "The i/e pair, decided by the root, not by a rhyme.",
+  "soft-c-g": "c or g sounding soft because e, i or y follows.",
+  "sh-spelling": "The /sh/ sound spelled ci, ti, si or ss.",
+  "suffix-ant-ent": "The -ant/-ent choice, set by the Latin verb it came from.",
+  "suffix-ance-ence": "The -ance/-ence choice, same rule as -ant/-ent.",
+  "suffix-ary-ery": "The -ary/-ery/-ory ending, usually a schwa.",
+  "suffix-able-ible": "The -able/-ible choice.",
+  "keep-e": "Keep the silent e when adding -ly.",
+  "base-change": "The base loses or changes a letter when the suffix goes on.",
+  "greek-marker": "Greek loan markers: ph, ch as /k/, y as short i, rh, ps.",
+  "french-ending": "A French ending kept whole: -eur, -que, -ant, -et.",
+  "ough": "The ough family, one spelling, many sounds.",
+  "ou-spelling": "ou doing an unexpected job.",
+  "homophone-trap": "A real word sits next door and sounds the same.",
+  "unique": "A one-off. Learn it as itself."
+ },
+ "probe_patterns": [
+  "double-consonant",
+  "schwa",
+  "assimilated-prefix",
+  "sh-spelling",
+  "silent-letter",
+  "single-consonant",
+  "base-change",
+  "greek-marker"
+ ],
+ "probes": {
+  "0": [
+   "attached",
+   "committee",
+   "average",
+   "bargain",
+   "accommodate",
+   "accompany",
+   "ancient",
+   "conscience",
+   "environment",
+   "foreign",
+   "determined",
+   "develop",
+   "curiosity",
+   "disastrous",
+   "physical",
+   "programme",
+   "possession",
+   "separate",
+   "irregular",
+   "delicious",
+   "knowledge",
+   "useful",
+   "beautiful",
+   "chemistry"
+  ],
+  "1": [
+   "communicate",
+   "community",
+   "category",
+   "cemetery",
+   "according",
+   "aggressive",
+   "conscious",
+   "dictionary",
+   "government",
+   "language",
+   "equipment",
+   "harass",
+   "explanation",
+   "forty",
+   "rhyme",
+   "rhythm",
+   "possession",
+   "separate",
+   "irregular",
+   "delicious",
+   "knowledge",
+   "useful",
+   "beautiful",
+   "chemistry"
+  ],
+  "2": [
+   "embarrass",
+   "exaggerate",
+   "competition",
+   "controversy",
+   "apparent",
+   "appreciate",
+   "especially",
+   "ancient",
+   "muscle",
+   "parliament",
+   "necessary",
+   "recommend",
+   "hindrance",
+   "lightning",
+   "stomach",
+   "symbol",
+   "possession",
+   "separate",
+   "irregular",
+   "delicious",
+   "knowledge",
+   "useful",
+   "beautiful",
+   "chemistry"
+  ],
+  "3": [
+   "excellent",
+   "interrupt",
+   "definite",
+   "desperate",
+   "correspond",
+   "immediate",
+   "conscience",
+   "conscious",
+   "recognise",
+   "signature",
+   "determined",
+   "develop",
+   "pronunciation",
+   "curiosity",
+   "system",
+   "physical",
+   "possession",
+   "separate",
+   "irregular",
+   "delicious",
+   "knowledge",
+   "useful",
+   "beautiful",
+   "chemistry"
+  ],
+  "4": [
+   "marvellous",
+   "profession",
+   "familiar",
+   "identity",
+   "occupy",
+   "occur",
+   "dictionary",
+   "especially",
+   "vehicle",
+   "environment",
+   "equipment",
+   "harass",
+   "disastrous",
+   "explanation",
+   "programme",
+   "rhyme",
+   "possession",
+   "separate",
+   "irregular",
+   "delicious",
+   "knowledge",
+   "useful",
+   "beautiful",
+   "chemistry"
+  ],
+  "5": [
+   "attached",
+   "committee",
+   "individual",
+   "interfere",
+   "opportunity",
+   "sufficient",
+   "ancient",
+   "conscience",
+   "foreign",
+   "government",
+   "necessary",
+   "recommend",
+   "forty",
+   "hindrance",
+   "rhythm",
+   "stomach",
+   "possession",
+   "separate",
+   "irregular",
+   "delicious",
+   "knowledge",
+   "useful",
+   "beautiful",
+   "chemistry"
+  ]
+ },
+ "words": [
+  {
+   "word": "accommodate",
+   "syll": "ac-com-mo-date",
+   "lang": "Latin",
+   "root": "ad + com + modus",
+   "gloss": "measure, fit",
+   "morph": "ac+com+mod+ate",
+   "traps": [
+    "cc",
+    "mm"
+   ],
+   "patterns": [
+    "assimilated-prefix",
+    "double-consonant"
+   ],
+   "errors": [
+    "accomodate",
+    "acommodate",
+    "acomodate"
+   ],
+   "why": "Two prefixes stack up, so two doubles: ad becomes ac, then com keeps its m.",
+   "family": [
+    "accompany",
+    "accord",
+    "commodity",
+    "modify"
+   ],
+   "on_list": true
+  },
+  {
+   "word": "accompany",
+   "syll": "ac-com-pa-ny",
+   "lang": "Latin",
+   "root": "ad + com + panis",
+   "gloss": "with bread",
+   "morph": "ac+com+pan+y",
+   "traps": [
+    "cc"
+   ],
+   "patterns": [
+    "assimilated-prefix",
+    "double-consonant",
+    "single-consonant"
+   ],
+   "errors": [
+    "acompany",
+    "accompanie"
+   ],
+   "why": "A companion shares bread with you. Double c from ad, single p from panis.",
+   "family": [
+    "accommodate",
+    "company",
+    "companion",
+    "pantry"
+   ],
+   "on_list": true
+  },
+  {
+   "word": "according",
+   "syll": "ac-cord-ing",
+   "lang": "Latin",
+   "root": "ad + cor, cordis",
+   "gloss": "heart",
+   "morph": "ac+cord+ing",
+   "traps": [
+    "cc"
+   ],
+   "patterns": [
+    "assimilated-prefix",
+    "double-consonant"
+   ],
+   "errors": [
+    "acording",
+    "accordeing"
+   ],
+   "why": "To accord is to bring hearts together, so cord, with cc from ad.",
+   "family": [
+    "accord",
+    "cordial",
+    "record",
+    "courage"
+   ],
+   "on_list": true
+  },
+  {
+   "word": "achieve",
+   "syll": "a-chieve",
+   "lang": "French",
+   "root": "a chief",
+   "gloss": "to a head",
+   "morph": "a+chieve",
+   "traps": [
+    "ie"
+   ],
+   "patterns": [
+    "ie-ei"
+   ],
+   "errors": [
+    "acheive",
+    "achive",
+    "acheve"
+   ],
+   "why": "You bring a thing to a head, to a chief. The i comes before the e.",
+   "family": [
+    "chief",
+    "mischief",
+    "believe",
+    "relieve"
+   ],
+   "on_list": true
+  },
+  {
+   "word": "aggressive",
+   "syll": "ag-gres-sive",
+   "lang": "Latin",
+   "root": "ad + gradi, gressus",
+   "gloss": "to step",
+   "morph": "ag+gress+ive",
+   "traps": [
+    "gg",
+    "ss"
+   ],
+   "patterns": [
+    "assimilated-prefix",
+    "double-consonant"
+   ],
+   "errors": [
+    "agressive",
+    "aggresive"
+   ],
+   "why": "Ad becomes ag before gress, to step at someone. Then gress keeps its ss.",
+   "family": [
+    "progress",
+    "congress",
+    "digress",
+    "gradual"
+   ],
+   "on_list": true
+  },
+  {
+   "word": "amateur",
+   "syll": "am-a-teur",
+   "lang": "French",
+   "root": "amator, amare",
+   "gloss": "to love",
+   "morph": "amat+eur",
+   "traps": [
+    "eur"
+   ],
+   "patterns": [
+    "french-ending",
+    "schwa"
+   ],
+   "errors": [
+    "amature",
+    "amatuer",
+    "ammateur"
+   ],
+   "why": "An amateur does it for love. The -eur ending is French and stays whole.",
+   "family": [
+    "amorous",
+    "entrepreneur",
+    "chauffeur",
+    "grandeur"
+   ],
+   "on_list": true
+  },
+  {
+   "word": "ancient",
+   "syll": "an-cient",
+   "lang": "French",
+   "root": "ante",
+   "gloss": "before",
+   "morph": "anci+ent",
+   "traps": [
+    "cie"
+   ],
+   "patterns": [
+    "sh-spelling",
+    "suffix-ant-ent"
+   ],
+   "errors": [
+    "anceint",
+    "anchient",
+    "ancint"
+   ],
+   "why": "The /sh/ here is spelled ci, the same trick as in sufficient.",
+   "family": [
+    "sufficient",
+    "efficient",
+    "conscience",
+    "antique"
+   ],
+   "on_list": true
+  },
+  {
+   "word": "apparent",
+   "syll": "ap-par-ent",
+   "lang": "Latin",
+   "root": "ad + parere",
+   "gloss": "to appear",
+   "morph": "ap+par+ent",
+   "traps": [
+    "pp",
+    "ent"
+   ],
+   "patterns": [
+    "assimilated-prefix",
+    "double-consonant",
+    "suffix-ant-ent"
+   ],
+   "errors": [
+    "aparent",
+    "apparant"
+   ],
+   "why": "It appears, so ad plus parere gives pp. Latin -ent verbs take -ent.",
+   "family": [
+    "appear",
+    "apparition",
+    "transparent",
+    "parent"
+   ],
+   "on_list": true
+  },
+  {
+   "word": "appreciate",
+   "syll": "ap-pre-ci-ate",
+   "lang": "Latin",
+   "root": "ad + pretium",
+   "gloss": "price",
+   "morph": "ap+preci+ate",
+   "traps": [
+    "pp",
+    "ci"
+   ],
+   "patterns": [
+    "assimilated-prefix",
+    "double-consonant",
+    "sh-spelling"
+   ],
+   "errors": [
+    "apreciate",
+    "appriciate"
+   ],
+   "why": "To appreciate is to set a price on it. Price gives the ci.",
+   "family": [
+    "price",
+    "precious",
+    "appraise",
+    "depreciate"
+   ],
+   "on_list": true
+  },
+  {
+   "word": "attached",
+   "syll": "at-tached",
+   "lang": "French",
+   "root": "atachier",
+   "gloss": "to fasten",
+   "morph": "at+tach+ed",
+   "traps": [
+    "tt"
+   ],
+   "patterns": [
+    "double-consonant"
+   ],
+   "errors": [
+    "atached",
+    "attatched"
+   ],
+   "why": "Ad becomes at before tach. One t would make a different word.",
+   "family": [
+    "attach",
+    "attack",
+    "detach",
+    "attain"
+   ],
+   "on_list": true
+  },
+  {
+   "word": "available",
+   "syll": "a-vail-a-ble",
+   "lang": "Latin",
+   "root": "ad + valere",
+   "gloss": "to be strong, worth",
+   "morph": "a+vail+able",
+   "traps": [
+    "ai",
+    "able"
+   ],
+   "patterns": [
+    "suffix-able-ible",
+    "schwa"
+   ],
+   "errors": [
+    "avaliable",
+    "availible",
+    "availabe"
+   ],
+   "why": "Avail means to be of worth. Add -able because avail is a whole word.",
+   "family": [
+    "value",
+    "valid",
+    "prevail",
+    "valuable"
+   ],
+   "on_list": true
+  },
+  {
+   "word": "average",
+   "syll": "av-er-age",
+   "lang": "Arabic",
+   "root": "awar",
+   "gloss": "damage to cargo",
+   "morph": "aver+age",
+   "traps": [
+    "er",
+    "age"
+   ],
+   "patterns": [
+    "schwa"
+   ],
+   "errors": [
+    "avrage",
+    "averige",
+    "avarage"
+   ],
+   "why": "A sea-trade word for sharing damage costs. The middle e is a lazy 'uh'.",
+   "family": [
+    "courage",
+    "damage",
+    "village",
+    "voyage"
+   ],
+   "on_list": true
+  },
+  {
+   "word": "awkward",
+   "syll": "awk-ward",
+   "lang": "Old Norse",
+   "root": "afugr + -ward",
+   "gloss": "turned the wrong way",
+   "morph": "awk+ward",
+   "traps": [
+    "wkw"
+   ],
+   "patterns": [
+    "unique"
+   ],
+   "errors": [
+    "akward",
+    "awkard",
+    "awkwerd"
+   ],
+   "why": "Norse afugr means back to front, plus -ward, direction. Three letters, w-k-w.",
+   "family": [
+    "backward",
+    "forward",
+    "toward",
+    "wayward"
+   ],
+   "on_list": true
+  },
+  {
+   "word": "bargain",
+   "syll": "bar-gain",
+   "lang": "French",
+   "root": "bargaignier",
+   "gloss": "to haggle",
+   "morph": "bar+gain",
+   "traps": [
+    "ain"
+   ],
+   "patterns": [
+    "schwa"
+   ],
+   "errors": [
+    "bargin",
+    "bargian",
+    "barganin"
+   ],
+   "why": "The ending is -ain, the same lazy ending as captain and mountain.",
+   "family": [
+    "captain",
+    "mountain",
+    "villain",
+    "certain"
+   ],
+   "on_list": true
+  },
+  {
+   "word": "bruise",
+   "syll": "bruise",
+   "lang": "Old English",
+   "root": "brysan",
+   "gloss": "to crush",
+   "morph": "-",
+   "traps": [
+    "ui",
+    "se"
+   ],
+   "patterns": [
+    "ou-spelling"
+   ],
+   "errors": [
+    "bruse",
+    "bruze",
+    "brusie"
+   ],
+   "why": "Old English crushing plus a French spelling, so ui, and s not z.",
+   "family": [
+    "cruise",
+    "juice",
+    "fruit",
+    "suit"
+   ],
+   "on_list": true
+  },
+  {
+   "word": "category",
+   "syll": "cat-e-go-ry",
+   "lang": "Greek",
+   "root": "kategoria",
+   "gloss": "a statement, an accusation",
+   "morph": "categor+y",
+   "traps": [
+    "e",
+    "ory"
+   ],
+   "patterns": [
+    "schwa",
+    "suffix-ary-ery"
+   ],
+   "errors": [
+    "catagory",
+    "catergory",
+    "catogory"
+   ],
+   "why": "Greek word for a public statement. The middle e and the -ory are both schwa.",
+   "family": [
+    "categorise",
+    "allegory",
+    "memory",
+    "territory"
+   ],
+   "on_list": true
+  },
+  {
+   "word": "cemetery",
+   "syll": "cem-e-ter-y",
+   "lang": "Greek",
+   "root": "koimeterion",
+   "gloss": "sleeping place",
+   "morph": "cemeter+y",
+   "traps": [
+    "e",
+    "ery"
+   ],
+   "patterns": [
+    "schwa",
+    "suffix-ary-ery"
+   ],
+   "errors": [
+    "cemetary",
+    "cemetry",
+    "cematery"
+   ],
+   "why": "Greek for a sleeping place. Three e's in a row of syllables, no a anywhere.",
+   "family": [
+    "monastery",
+    "mystery",
+    "stationery",
+    "bakery"
+   ],
+   "on_list": true
+  },
+  {
+   "word": "committee",
+   "syll": "com-mit-tee",
+   "lang": "Latin",
+   "root": "com + mittere",
+   "gloss": "to send with",
+   "morph": "com+mitt+ee",
+   "traps": [
+    "mm",
+    "tt",
+    "ee"
+   ],
+   "patterns": [
+    "double-consonant",
+    "doubling-1-1-1"
+   ],
+   "errors": [
+    "commitee",
+    "comittee",
+    "committe"
+   ],
+   "why": "Commit doubles its t before -ee. Two m, two t, two e, in that order.",
+   "family": [
+    "commit",
+    "submit",
+    "transmit",
+    "mission"
+   ],
+   "on_list": true
+  },
+  {
+   "word": "communicate",
+   "syll": "com-mu-ni-cate",
+   "lang": "Latin",
+   "root": "communis",
+   "gloss": "common, shared",
+   "morph": "commun+ic+ate",
+   "traps": [
+    "mm"
+   ],
+   "patterns": [
+    "double-consonant",
+    "single-consonant"
+   ],
+   "errors": [
+    "comunicate",
+    "communciate"
+   ],
+   "why": "From common. Double m from com plus mun, then a single n.",
+   "family": [
+    "community",
+    "common",
+    "communion",
+    "municipal"
+   ],
+   "on_list": true
+  },
+  {
+   "word": "community",
+   "syll": "com-mu-ni-ty",
+   "lang": "Latin",
+   "root": "communis",
+   "gloss": "common, shared",
+   "morph": "commun+ity",
+   "traps": [
+    "mm"
+   ],
+   "patterns": [
+    "double-consonant"
+   ],
+   "errors": [
+    "comunity",
+    "comunnity"
+   ],
+   "why": "Same root as common and communicate, so the same double m.",
+   "family": [
+    "communicate",
+    "common",
+    "commune",
+    "municipal"
+   ],
+   "on_list": true
+  },
+  {
+   "word": "competition",
+   "syll": "com-pe-ti-tion",
+   "lang": "Latin",
+   "root": "com + petere",
+   "gloss": "to seek together",
+   "morph": "com+pet+ition",
+   "traps": [
+    "e",
+    "tition"
+   ],
+   "patterns": [
+    "schwa",
+    "sh-spelling"
+   ],
+   "errors": [
+    "compitition",
+    "competion",
+    "competiton"
+   ],
+   "why": "Compete keeps its e even though you cannot hear it. Then -ition.",
+   "family": [
+    "compete",
+    "petition",
+    "appetite",
+    "repetition"
+   ],
+   "on_list": true
+  },
+  {
+   "word": "conscience",
+   "syll": "con-science",
+   "lang": "Latin",
+   "root": "com + scire",
+   "gloss": "to know with",
+   "morph": "con+sci+ence",
+   "traps": [
+    "sci",
+    "ence"
+   ],
+   "patterns": [
+    "sh-spelling",
+    "suffix-ance-ence"
+   ],
+   "errors": [
+    "consience",
+    "concience",
+    "conshence"
+   ],
+   "why": "Hidden inside is science, to know. Knowing with yourself.",
+   "family": [
+    "science",
+    "conscious",
+    "omniscient",
+    "scientist"
+   ],
+   "on_list": true
+  },
+  {
+   "word": "conscious",
+   "syll": "con-scious",
+   "lang": "Latin",
+   "root": "com + scire",
+   "gloss": "to know with",
+   "morph": "con+sci+ous",
+   "traps": [
+    "sci",
+    "ous"
+   ],
+   "patterns": [
+    "sh-spelling"
+   ],
+   "errors": [
+    "concious",
+    "conscius",
+    "conshus"
+   ],
+   "why": "Same hidden science as conscience, then -ous for the adjective.",
+   "family": [
+    "conscience",
+    "science",
+    "subconscious",
+    "scientific"
+   ],
+   "on_list": true
+  },
+  {
+   "word": "controversy",
+   "syll": "con-tro-ver-sy",
+   "lang": "Latin",
+   "root": "contra + vertere",
+   "gloss": "to turn against",
+   "morph": "contro+vers+y",
+   "traps": [
+    "o",
+    "vers"
+   ],
+   "patterns": [
+    "schwa"
+   ],
+   "errors": [
+    "contraversy",
+    "controvesy",
+    "contraversey"
+   ],
+   "why": "Contra means against, vers means turn. Turned against each other.",
+   "family": [
+    "convert",
+    "reverse",
+    "adverse",
+    "version"
+   ],
+   "on_list": true
+  },
+  {
+   "word": "convenience",
+   "syll": "con-ven-ience",
+   "lang": "Latin",
+   "root": "com + venire",
+   "gloss": "to come together",
+   "morph": "con+veni+ence",
+   "traps": [
+    "ience"
+   ],
+   "patterns": [
+    "suffix-ance-ence"
+   ],
+   "errors": [
+    "convienence",
+    "conveniance",
+    "convience"
+   ],
+   "why": "Things that come together suit you. Venire gives -ien, then -ence.",
+   "family": [
+    "convene",
+    "intervene",
+    "avenue",
+    "event"
+   ],
+   "on_list": true
+  },
+  {
+   "word": "correspond",
+   "syll": "cor-re-spond",
+   "lang": "Latin",
+   "root": "com + respondere",
+   "gloss": "to answer together",
+   "morph": "cor+respond",
+   "traps": [
+    "rr"
+   ],
+   "patterns": [
+    "assimilated-prefix",
+    "double-consonant"
+   ],
+   "errors": [
+    "corespond",
+    "correspound"
+   ],
+   "why": "Com becomes cor before respond, so two r's meet in the middle.",
+   "family": [
+    "respond",
+    "response",
+    "sponsor",
+    "correlate"
+   ],
+   "on_list": true
+  },
+  {
+   "word": "criticise",
+   "syll": "crit-i-cise",
+   "lang": "Greek",
+   "root": "kritikos",
+   "gloss": "able to judge",
+   "morph": "critic+ise",
+   "traps": [
+    "c",
+    "ise"
+   ],
+   "patterns": [
+    "soft-c-g"
+   ],
+   "errors": [
+    "critisise",
+    "critiscise",
+    "criticice"
+   ],
+   "why": "From critic. The c stays c, and British English takes -ise.",
+   "family": [
+    "critic",
+    "crisis",
+    "criterion",
+    "critical"
+   ],
+   "on_list": true
+  },
+  {
+   "word": "curiosity",
+   "syll": "cu-ri-os-i-ty",
+   "lang": "Latin",
+   "root": "cura",
+   "gloss": "care",
+   "morph": "curi+os+ity",
+   "traps": [
+    "ios"
+   ],
+   "patterns": [
+    "base-change"
+   ],
+   "errors": [
+    "curiousity",
+    "curiosty",
+    "curiocity"
+   ],
+   "why": "Curious loses its u when it becomes curiosity. Care, not carelessness.",
+   "family": [
+    "curious",
+    "cure",
+    "accurate",
+    "secure"
+   ],
+   "on_list": true
+  },
+  {
+   "word": "definite",
+   "syll": "def-i-nite",
+   "lang": "Latin",
+   "root": "de + finis",
+   "gloss": "boundary, end",
+   "morph": "de+fin+ite",
+   "traps": [
+    "i",
+    "ite"
+   ],
+   "patterns": [
+    "schwa"
+   ],
+   "errors": [
+    "definate",
+    "definante",
+    "defenite"
+   ],
+   "why": "Finis means end, so there is a finite hiding inside. Never an a.",
+   "family": [
+    "finish",
+    "final",
+    "infinite",
+    "define"
+   ],
+   "on_list": true
+  },
+  {
+   "word": "desperate",
+   "syll": "des-per-ate",
+   "lang": "Latin",
+   "root": "de + sperare",
+   "gloss": "to hope",
+   "morph": "de+sper+ate",
+   "traps": [
+    "per"
+   ],
+   "patterns": [
+    "schwa"
+   ],
+   "errors": [
+    "desparate",
+    "desperete"
+   ],
+   "why": "Despair is inside it, hope gone. Sperare gives -per-, never -par-.",
+   "family": [
+    "despair",
+    "prosper",
+    "desperation",
+    "aspire"
+   ],
+   "on_list": true
+  },
+  {
+   "word": "determined",
+   "syll": "de-ter-mined",
+   "lang": "Latin",
+   "root": "de + terminus",
+   "gloss": "limit, boundary",
+   "morph": "de+termin+ed",
+   "traps": [
+    "r",
+    "min"
+   ],
+   "patterns": [
+    "single-consonant"
+   ],
+   "errors": [
+    "determind",
+    "detirmined",
+    "determinded"
+   ],
+   "why": "You set a limit, a terminus. One r, and -mined like the word mine.",
+   "family": [
+    "terminate",
+    "term",
+    "exterminate",
+    "terminal"
+   ],
+   "on_list": true
+  },
+  {
+   "word": "develop",
+   "syll": "de-vel-op",
+   "lang": "French",
+   "root": "desveloper",
+   "gloss": "to unwrap",
+   "morph": "de+velop",
+   "traps": [
+    "p"
+   ],
+   "patterns": [
+    "single-consonant"
+   ],
+   "errors": [
+    "developp",
+    "develope",
+    "devlop"
+   ],
+   "why": "Envelope wraps up, develop unwraps. No e on the end, no double p.",
+   "family": [
+    "envelope",
+    "envelop",
+    "development",
+    "developer"
+   ],
+   "on_list": true
+  },
+  {
+   "word": "dictionary",
+   "syll": "dic-tion-ar-y",
+   "lang": "Latin",
+   "root": "dicere",
+   "gloss": "to say",
+   "morph": "dict+ion+ary",
+   "traps": [
+    "tion",
+    "ary"
+   ],
+   "patterns": [
+    "sh-spelling",
+    "suffix-ary-ery"
+   ],
+   "errors": [
+    "dictionery",
+    "dictonary",
+    "dictionry"
+   ],
+   "why": "A book of sayings. Dict means say, so dictate and predict are cousins.",
+   "family": [
+    "dictate",
+    "predict",
+    "verdict",
+    "contradict"
+   ],
+   "on_list": true
+  },
+  {
+   "word": "disastrous",
+   "syll": "di-sas-trous",
+   "lang": "Latin",
+   "root": "dis + astrum",
+   "gloss": "bad star",
+   "morph": "dis+astr+ous",
+   "traps": [
+    "astr"
+   ],
+   "patterns": [
+    "base-change"
+   ],
+   "errors": [
+    "disasterous",
+    "disastorous"
+   ],
+   "why": "Disaster loses its e before -ous. An ill-starred event.",
+   "family": [
+    "disaster",
+    "astronomy",
+    "asterisk",
+    "astronaut"
+   ],
+   "on_list": true
+  },
+  {
+   "word": "embarrass",
+   "syll": "em-bar-rass",
+   "lang": "French",
+   "root": "embarrasser",
+   "gloss": "to block, to bar",
+   "morph": "em+barr+ass",
+   "traps": [
+    "rr",
+    "ss"
+   ],
+   "patterns": [
+    "double-consonant"
+   ],
+   "errors": [
+    "embarass",
+    "embarras",
+    "embarrase"
+   ],
+   "why": "Really Red and Super Shy. Two r, two s, unlike harass.",
+   "family": [
+    "harass",
+    "bar",
+    "barrier",
+    "embargo"
+   ],
+   "on_list": true
+  },
+  {
+   "word": "environment",
+   "syll": "en-vi-ron-ment",
+   "lang": "French",
+   "root": "environ",
+   "gloss": "around",
+   "morph": "environ+ment",
+   "traps": [
+    "nm"
+   ],
+   "patterns": [
+    "silent-letter"
+   ],
+   "errors": [
+    "enviroment",
+    "envirnoment",
+    "enviornment"
+   ],
+   "why": "Environ means around. Keep its n, then add -ment. You cannot hear it.",
+   "family": [
+    "environs",
+    "government",
+    "environmental",
+    "iron"
+   ],
+   "on_list": true
+  },
+  {
+   "word": "equipment",
+   "syll": "e-quip-ment",
+   "lang": "French",
+   "root": "equiper",
+   "gloss": "to fit out a ship",
+   "morph": "equip+ment",
+   "traps": [
+    "p"
+   ],
+   "patterns": [
+    "single-consonant",
+    "doubling-1-1-1"
+   ],
+   "errors": [
+    "equiptment",
+    "equipement",
+    "equippment"
+   ],
+   "why": "-ment starts with a consonant, so equip does not double. Compare equipped.",
+   "family": [
+    "equip",
+    "equipped",
+    "shipment",
+    "commitment"
+   ],
+   "on_list": true
+  },
+  {
+   "word": "equipped",
+   "syll": "e-quipped",
+   "lang": "French",
+   "root": "equiper",
+   "gloss": "to fit out a ship",
+   "morph": "equip+ped",
+   "traps": [
+    "pp"
+   ],
+   "patterns": [
+    "doubling-1-1-1",
+    "double-consonant"
+   ],
+   "errors": [
+    "equiped",
+    "equippd"
+   ],
+   "why": "-ed starts with a vowel, so the p doubles. Compare equipment.",
+   "family": [
+    "equip",
+    "equipment",
+    "shipped",
+    "stopped"
+   ],
+   "on_list": true
+  },
+  {
+   "word": "especially",
+   "syll": "es-pe-cial-ly",
+   "lang": "Latin",
+   "root": "specialis",
+   "gloss": "of a kind",
+   "morph": "e+speci+al+ly",
+   "traps": [
+    "ci",
+    "ll"
+   ],
+   "patterns": [
+    "sh-spelling",
+    "double-consonant"
+   ],
+   "errors": [
+    "expecially",
+    "especialy",
+    "especally"
+   ],
+   "why": "Special plus -ly, so two l's. The /sh/ is ci, from species.",
+   "family": [
+    "special",
+    "species",
+    "specific",
+    "specially"
+   ],
+   "on_list": true
+  },
+  {
+   "word": "exaggerate",
+   "syll": "ex-ag-ger-ate",
+   "lang": "Latin",
+   "root": "ex + agger",
+   "gloss": "a heap",
+   "morph": "ex+agger+ate",
+   "traps": [
+    "gg"
+   ],
+   "patterns": [
+    "double-consonant"
+   ],
+   "errors": [
+    "exagerate",
+    "exagurate",
+    "exadgerate"
+   ],
+   "why": "Agger is a heap. To exaggerate is to heap it up, so gg.",
+   "family": [
+    "aggregate",
+    "exaggeration",
+    "gesture",
+    "exert"
+   ],
+   "on_list": true
+  },
+  {
+   "word": "excellent",
+   "syll": "ex-cel-lent",
+   "lang": "Latin",
+   "root": "ex + cellere",
+   "gloss": "to rise above",
+   "morph": "ex+cell+ent",
+   "traps": [
+    "ll",
+    "ent"
+   ],
+   "patterns": [
+    "double-consonant",
+    "suffix-ant-ent"
+   ],
+   "errors": [
+    "excelent",
+    "excellant",
+    "exelent"
+   ],
+   "why": "Excel doubles its l before -ent. Rising above the rest.",
+   "family": [
+    "excel",
+    "excellence",
+    "cellar",
+    "exceed"
+   ],
+   "on_list": true
+  },
+  {
+   "word": "existence",
+   "syll": "ex-ist-ence",
+   "lang": "Latin",
+   "root": "ex + sistere",
+   "gloss": "to stand out",
+   "morph": "ex+ist+ence",
+   "traps": [
+    "ence"
+   ],
+   "patterns": [
+    "suffix-ance-ence"
+   ],
+   "errors": [
+    "existance",
+    "existince",
+    "exsistence"
+   ],
+   "why": "To exist is to stand out. Latin -ere verbs take -ence, not -ance.",
+   "family": [
+    "exist",
+    "insist",
+    "resist",
+    "persistence"
+   ],
+   "on_list": true
+  },
+  {
+   "word": "explanation",
+   "syll": "ex-pla-na-tion",
+   "lang": "Latin",
+   "root": "ex + planus",
+   "gloss": "flat, clear",
+   "morph": "ex+plan+ation",
+   "traps": [
+    "plan"
+   ],
+   "patterns": [
+    "base-change"
+   ],
+   "errors": [
+    "explaination",
+    "explanaition",
+    "explantion"
+   ],
+   "why": "Explain loses its i here. Making something flat and plain.",
+   "family": [
+    "explain",
+    "plain",
+    "plane",
+    "explanatory"
+   ],
+   "on_list": true
+  },
+  {
+   "word": "familiar",
+   "syll": "fa-mil-iar",
+   "lang": "Latin",
+   "root": "familia",
+   "gloss": "household",
+   "morph": "famili+ar",
+   "traps": [
+    "iar"
+   ],
+   "patterns": [
+    "schwa"
+   ],
+   "errors": [
+    "familar",
+    "familliar",
+    "femiliar"
+   ],
+   "why": "Family plus -ar. Known to the household.",
+   "family": [
+    "family",
+    "familiarity",
+    "familial",
+    "peculiar"
+   ],
+   "on_list": true
+  },
+  {
+   "word": "foreign",
+   "syll": "for-eign",
+   "lang": "French",
+   "root": "foris",
+   "gloss": "outside, out of doors",
+   "morph": "foreign",
+   "traps": [
+    "eig",
+    "g"
+   ],
+   "patterns": [
+    "silent-letter",
+    "ie-ei"
+   ],
+   "errors": [
+    "foriegn",
+    "forign",
+    "foreighn"
+   ],
+   "why": "From outside. The g was added later by copying reign, so it is silent.",
+   "family": [
+    "sovereign",
+    "reign",
+    "forest",
+    "forfeit"
+   ],
+   "on_list": true
+  },
+  {
+   "word": "forty",
+   "syll": "for-ty",
+   "lang": "Old English",
+   "root": "feowertig",
+   "gloss": "four tens",
+   "morph": "for+ty",
+   "traps": [
+    "or"
+   ],
+   "patterns": [
+    "base-change"
+   ],
+   "errors": [
+    "fourty",
+    "fourthy"
+   ],
+   "why": "Four keeps its u, forty drops it. English changed its mind in the 1500s.",
+   "family": [
+    "four",
+    "fourteen",
+    "fourth",
+    "fortieth"
+   ],
+   "on_list": true
+  },
+  {
+   "word": "frequently",
+   "syll": "fre-quent-ly",
+   "lang": "Latin",
+   "root": "frequens",
+   "gloss": "crowded, repeated",
+   "morph": "frequent+ly",
+   "traps": [
+    "qu",
+    "ent"
+   ],
+   "patterns": [
+    "suffix-ant-ent"
+   ],
+   "errors": [
+    "frequantly",
+    "freqently",
+    "frequenly"
+   ],
+   "why": "Frequens means crowded. Latin -ens becomes English -ent.",
+   "family": [
+    "frequent",
+    "frequency",
+    "sequence",
+    "consequence"
+   ],
+   "on_list": true
+  },
+  {
+   "word": "government",
+   "syll": "gov-ern-ment",
+   "lang": "French",
+   "root": "gubernare",
+   "gloss": "to steer a ship",
+   "morph": "govern+ment",
+   "traps": [
+    "nm"
+   ],
+   "patterns": [
+    "silent-letter"
+   ],
+   "errors": [
+    "goverment",
+    "govenment",
+    "govermant"
+   ],
+   "why": "Govern plus -ment. Keep the n, even though nobody says it.",
+   "family": [
+    "govern",
+    "governor",
+    "environment",
+    "gubernatorial"
+   ],
+   "on_list": true
+  },
+  {
+   "word": "guarantee",
+   "syll": "guar-an-tee",
+   "lang": "French",
+   "root": "garant",
+   "gloss": "a warrant",
+   "morph": "guar+antee",
+   "traps": [
+    "gua",
+    "ee"
+   ],
+   "patterns": [
+    "french-ending"
+   ],
+   "errors": [
+    "garantee",
+    "guarentee",
+    "guarante"
+   ],
+   "why": "Guard and guarantee share the gua. The ending is -tee, like referee.",
+   "family": [
+    "guard",
+    "guardian",
+    "warranty",
+    "referee"
+   ],
+   "on_list": true
+  },
+  {
+   "word": "harass",
+   "syll": "ha-rass",
+   "lang": "French",
+   "root": "harasser",
+   "gloss": "to set a dog on",
+   "morph": "har+ass",
+   "traps": [
+    "r",
+    "ss"
+   ],
+   "patterns": [
+    "single-consonant"
+   ],
+   "errors": [
+    "harrass",
+    "harras",
+    "harrassed"
+   ],
+   "why": "One r, two s. The opposite pattern to embarrass, which has both doubled.",
+   "family": [
+    "embarrass",
+    "harassment",
+    "harried",
+    "assail"
+   ],
+   "on_list": true
+  },
+  {
+   "word": "hindrance",
+   "syll": "hin-drance",
+   "lang": "Old English",
+   "root": "hindrian",
+   "gloss": "to hold back",
+   "morph": "hindr+ance",
+   "traps": [
+    "dr",
+    "ance"
+   ],
+   "patterns": [
+    "base-change",
+    "suffix-ance-ence"
+   ],
+   "errors": [
+    "hinderance",
+    "hindrence"
+   ],
+   "why": "Hinder loses its e before -ance. Say it: hin-drance, two syllables.",
+   "family": [
+    "hinder",
+    "remembrance",
+    "entrance",
+    "encumbrance"
+   ],
+   "on_list": true
+  },
+  {
+   "word": "identity",
+   "syll": "i-den-ti-ty",
+   "lang": "Latin",
+   "root": "idem",
+   "gloss": "the same",
+   "morph": "ident+ity",
+   "traps": [
+    "ti"
+   ],
+   "patterns": [
+    "schwa"
+   ],
+   "errors": [
+    "identiy",
+    "indentity",
+    "identety"
+   ],
+   "why": "Idem means the same. Your identity is what stays the same. No n after i.",
+   "family": [
+    "identical",
+    "identify",
+    "idem",
+    "identification"
+   ],
+   "on_list": true
+  },
+  {
+   "word": "immediate",
+   "syll": "im-me-di-ate",
+   "lang": "Latin",
+   "root": "in + medius",
+   "gloss": "middle",
+   "morph": "im+medi+ate",
+   "traps": [
+    "mm",
+    "iate"
+   ],
+   "patterns": [
+    "assimilated-prefix",
+    "double-consonant"
+   ],
+   "errors": [
+    "imediate",
+    "immediat",
+    "immeadiate"
+   ],
+   "why": "In becomes im before m: nothing in the middle, so it happens now.",
+   "family": [
+    "immediately",
+    "mediate",
+    "medium",
+    "middle"
+   ],
+   "on_list": true
+  },
+  {
+   "word": "immediately",
+   "syll": "im-me-di-ate-ly",
+   "lang": "Latin",
+   "root": "in + medius",
+   "gloss": "middle",
+   "morph": "im+medi+ate+ly",
+   "traps": [
+    "mm",
+    "ely"
+   ],
+   "patterns": [
+    "keep-e",
+    "double-consonant"
+   ],
+   "errors": [
+    "immediatly",
+    "imediately",
+    "immeadiately"
+   ],
+   "why": "Keep the e of immediate before -ly. Same rule as definitely and sincerely.",
+   "family": [
+    "immediate",
+    "definitely",
+    "sincerely",
+    "completely"
+   ],
+   "on_list": true
+  },
+  {
+   "word": "individual",
+   "syll": "in-di-vid-u-al",
+   "lang": "Latin",
+   "root": "in + dividere",
+   "gloss": "not dividable",
+   "morph": "in+divid+ual",
+   "traps": [
+    "ual"
+   ],
+   "patterns": [
+    "schwa"
+   ],
+   "errors": [
+    "indavidual",
+    "indevidual",
+    "invidual"
+   ],
+   "why": "Not divisible: divide is inside it. Then the -ual ending, like usual.",
+   "family": [
+    "divide",
+    "division",
+    "individually",
+    "usual"
+   ],
+   "on_list": true
+  },
+  {
+   "word": "interfere",
+   "syll": "in-ter-fere",
+   "lang": "French",
+   "root": "inter + ferire",
+   "gloss": "to strike between",
+   "morph": "inter+fere",
+   "traps": [
+    "fere"
+   ],
+   "patterns": [
+    "schwa"
+   ],
+   "errors": [
+    "interfear",
+    "intefere",
+    "interfeer"
+   ],
+   "why": "To strike between two things. The ending is -fere, not -fear.",
+   "family": [
+    "interference",
+    "interrupt",
+    "interval",
+    "transfer"
+   ],
+   "on_list": true
+  },
+  {
+   "word": "interrupt",
+   "syll": "in-ter-rupt",
+   "lang": "Latin",
+   "root": "inter + rumpere",
+   "gloss": "to break between",
+   "morph": "inter+rupt",
+   "traps": [
+    "rr"
+   ],
+   "patterns": [
+    "double-consonant"
+   ],
+   "errors": [
+    "interupt",
+    "interrup",
+    "intterupt"
+   ],
+   "why": "Inter ends in r, rupt starts with r. Break between, so two r's.",
+   "family": [
+    "rupture",
+    "erupt",
+    "corrupt",
+    "abrupt"
+   ],
+   "on_list": true
+  },
+  {
+   "word": "language",
+   "syll": "lan-guage",
+   "lang": "French",
+   "root": "lingua",
+   "gloss": "tongue",
+   "morph": "langu+age",
+   "traps": [
+    "gua",
+    "age"
+   ],
+   "patterns": [
+    "silent-letter",
+    "schwa"
+   ],
+   "errors": [
+    "langauge",
+    "languge",
+    "langige"
+   ],
+   "why": "Lingua is a tongue. The u after g is silent, the -age is a lazy 'ij'.",
+   "family": [
+    "linguist",
+    "bilingual",
+    "tongue",
+    "guard"
+   ],
+   "on_list": true
+  },
+  {
+   "word": "leisure",
+   "syll": "lei-sure",
+   "lang": "French",
+   "root": "licere",
+   "gloss": "to be allowed",
+   "morph": "leis+ure",
+   "traps": [
+    "ei",
+    "sure"
+   ],
+   "patterns": [
+    "ie-ei"
+   ],
+   "errors": [
+    "liesure",
+    "lesure",
+    "leasure"
+   ],
+   "why": "Time you are allowed. This one is e before i, unlike achieve.",
+   "family": [
+    "seizure",
+    "pleasure",
+    "measure",
+    "licence"
+   ],
+   "on_list": true
+  },
+  {
+   "word": "lightning",
+   "syll": "light-ning",
+   "lang": "Old English",
+   "root": "lihtan",
+   "gloss": "to make light",
+   "morph": "lightn+ing",
+   "traps": [
+    "tn"
+   ],
+   "patterns": [
+    "base-change",
+    "homophone-trap"
+   ],
+   "errors": [
+    "lightening",
+    "lighting",
+    "lightnening"
+   ],
+   "why": "Lightning drops the e of lighten. Lightening means getting brighter.",
+   "family": [
+    "light",
+    "lighten",
+    "frighten",
+    "brighten"
+   ],
+   "on_list": true
+  },
+  {
+   "word": "marvellous",
+   "syll": "mar-vel-lous",
+   "lang": "French",
+   "root": "mirabilia",
+   "gloss": "wonderful things",
+   "morph": "marvel+lous",
+   "traps": [
+    "ll",
+    "ous"
+   ],
+   "patterns": [
+    "double-consonant"
+   ],
+   "errors": [
+    "marvelous",
+    "marvellus",
+    "marvelious"
+   ],
+   "why": "British English doubles the l of marvel before -ous. American English does not.",
+   "family": [
+    "marvel",
+    "miracle",
+    "admire",
+    "mirror"
+   ],
+   "on_list": true
+  },
+  {
+   "word": "mischievous",
+   "syll": "mis-chie-vous",
+   "lang": "French",
+   "root": "meschief",
+   "gloss": "bad outcome",
+   "morph": "mis+chiev+ous",
+   "traps": [
+    "ie",
+    "vous"
+   ],
+   "patterns": [
+    "ie-ei",
+    "base-change"
+   ],
+   "errors": [
+    "mischievious",
+    "mischevious",
+    "mischeivous"
+   ],
+   "why": "Three syllables, not four. Mischief plus -ous, and no extra i.",
+   "family": [
+    "mischief",
+    "chief",
+    "achieve",
+    "grievous"
+   ],
+   "on_list": true
+  },
+  {
+   "word": "muscle",
+   "syll": "mus-cle",
+   "lang": "Latin",
+   "root": "musculus",
+   "gloss": "little mouse",
+   "morph": "muscl+e",
+   "traps": [
+    "sc",
+    "cle"
+   ],
+   "patterns": [
+    "silent-letter",
+    "homophone-trap"
+   ],
+   "errors": [
+    "mussle",
+    "muscel",
+    "musle"
+   ],
+   "why": "A flexing muscle looked like a mouse under the skin. Muscular shows the c.",
+   "family": [
+    "muscular",
+    "mussel",
+    "mouse",
+    "corpuscle"
+   ],
+   "on_list": true
+  },
+  {
+   "word": "necessary",
+   "syll": "nec-es-sar-y",
+   "lang": "Latin",
+   "root": "necesse",
+   "gloss": "unavoidable",
+   "morph": "necess+ary",
+   "traps": [
+    "c",
+    "ss",
+    "ary"
+   ],
+   "patterns": [
+    "single-consonant",
+    "double-consonant",
+    "suffix-ary-ery"
+   ],
+   "errors": [
+    "neccessary",
+    "necesary",
+    "nessesary"
+   ],
+   "why": "One collar, two sleeves: one c, two s. Then -ary.",
+   "family": [
+    "necessity",
+    "necessarily",
+    "accessory",
+    "cease"
+   ],
+   "on_list": true
+  },
+  {
+   "word": "neighbour",
+   "syll": "neigh-bour",
+   "lang": "Old English",
+   "root": "neah + gebur",
+   "gloss": "near dweller",
+   "morph": "neigh+bour",
+   "traps": [
+    "eigh",
+    "our"
+   ],
+   "patterns": [
+    "ie-ei",
+    "ou-spelling"
+   ],
+   "errors": [
+    "nieghbour",
+    "neighbor",
+    "naighbour"
+   ],
+   "why": "The person who dwells near. Same eigh as eight and weigh.",
+   "family": [
+    "eight",
+    "weigh",
+    "weight",
+    "harbour"
+   ],
+   "on_list": true
+  },
+  {
+   "word": "nuisance",
+   "syll": "nui-sance",
+   "lang": "French",
+   "root": "nocere",
+   "gloss": "to harm",
+   "morph": "nuis+ance",
+   "traps": [
+    "ui",
+    "ance"
+   ],
+   "patterns": [
+    "suffix-ance-ence",
+    "ou-spelling"
+   ],
+   "errors": [
+    "nuisence",
+    "nusance",
+    "nuisanse"
+   ],
+   "why": "Something that harms you a little. French ui, then -ance.",
+   "family": [
+    "innocent",
+    "noxious",
+    "annoyance",
+    "juice"
+   ],
+   "on_list": true
+  },
+  {
+   "word": "occupy",
+   "syll": "oc-cu-py",
+   "lang": "Latin",
+   "root": "ob + capere",
+   "gloss": "to seize",
+   "morph": "oc+cup+y",
+   "traps": [
+    "cc",
+    "p"
+   ],
+   "patterns": [
+    "assimilated-prefix",
+    "double-consonant",
+    "single-consonant"
+   ],
+   "errors": [
+    "ocupy",
+    "occuppy"
+   ],
+   "why": "Ob becomes oc before c. To seize a space. One p.",
+   "family": [
+    "occur",
+    "occasion",
+    "capture",
+    "occupation"
+   ],
+   "on_list": true
+  },
+  {
+   "word": "occur",
+   "syll": "oc-cur",
+   "lang": "Latin",
+   "root": "ob + currere",
+   "gloss": "to run towards",
+   "morph": "oc+cur",
+   "traps": [
+    "cc",
+    "r"
+   ],
+   "patterns": [
+    "assimilated-prefix",
+    "doubling-1-1-1"
+   ],
+   "errors": [
+    "ocur",
+    "occurr",
+    "occure"
+   ],
+   "why": "Ob becomes oc, then curr means run. One r here, two in occurred.",
+   "family": [
+    "occurred",
+    "current",
+    "recur",
+    "excursion"
+   ],
+   "on_list": true
+  },
+  {
+   "word": "opportunity",
+   "syll": "op-por-tu-ni-ty",
+   "lang": "Latin",
+   "root": "ob + portus",
+   "gloss": "towards the harbour",
+   "morph": "op+portun+ity",
+   "traps": [
+    "pp",
+    "r"
+   ],
+   "patterns": [
+    "assimilated-prefix",
+    "double-consonant"
+   ],
+   "errors": [
+    "oportunity",
+    "opperchunity",
+    "opportuinty"
+   ],
+   "why": "A wind blowing towards the harbour. Ob becomes op before port.",
+   "family": [
+    "port",
+    "import",
+    "portable",
+    "transport"
+   ],
+   "on_list": true
+  },
+  {
+   "word": "parliament",
+   "syll": "par-lia-ment",
+   "lang": "French",
+   "root": "parler",
+   "gloss": "to speak",
+   "morph": "parli+ament",
+   "traps": [
+    "lia"
+   ],
+   "patterns": [
+    "silent-letter"
+   ],
+   "errors": [
+    "parlament",
+    "parliment",
+    "parlement"
+   ],
+   "why": "A place for speaking, from French parler. The hidden i is the giveaway.",
+   "family": [
+    "parley",
+    "parlour",
+    "parole",
+    "parliamentary"
+   ],
+   "on_list": true
+  },
+  {
+   "word": "persuade",
+   "syll": "per-suade",
+   "lang": "Latin",
+   "root": "per + suadere",
+   "gloss": "to urge thoroughly",
+   "morph": "per+suade",
+   "traps": [
+    "sua"
+   ],
+   "patterns": [
+    "schwa"
+   ],
+   "errors": [
+    "perswade",
+    "pursuade",
+    "persaude"
+   ],
+   "why": "Per means thoroughly. Never spell it pur-, and never swade.",
+   "family": [
+    "persuasion",
+    "dissuade",
+    "suave",
+    "perfect"
+   ],
+   "on_list": true
+  },
+  {
+   "word": "physical",
+   "syll": "phys-i-cal",
+   "lang": "Greek",
+   "root": "physis",
+   "gloss": "nature",
+   "morph": "physic+al",
+   "traps": [
+    "ph",
+    "y"
+   ],
+   "patterns": [
+    "greek-marker"
+   ],
+   "errors": [
+    "fisical",
+    "physicle",
+    "phisical"
+   ],
+   "why": "Greek gives ph for /f/ and y for short i. Nature, as in the body.",
+   "family": [
+    "physics",
+    "physician",
+    "physiology",
+    "physique"
+   ],
+   "on_list": true
+  },
+  {
+   "word": "prejudice",
+   "syll": "prej-u-dice",
+   "lang": "Latin",
+   "root": "prae + judicium",
+   "gloss": "judgement before",
+   "morph": "pre+judic+e",
+   "traps": [
+    "j",
+    "dice"
+   ],
+   "patterns": [
+    "soft-c-g"
+   ],
+   "errors": [
+    "predjudice",
+    "prejadice",
+    "prejudise"
+   ],
+   "why": "Judging before you know. Judge is inside it, with no d before the j.",
+   "family": [
+    "judge",
+    "judicial",
+    "prejudge",
+    "judgement"
+   ],
+   "on_list": true
+  },
+  {
+   "word": "privilege",
+   "syll": "priv-i-lege",
+   "lang": "Latin",
+   "root": "privus + lex",
+   "gloss": "private law",
+   "morph": "privi+lege",
+   "traps": [
+    "lege"
+   ],
+   "patterns": [
+    "soft-c-g"
+   ],
+   "errors": [
+    "priviledge",
+    "privelege",
+    "privilage"
+   ],
+   "why": "A private law, just for you. Lex means law, so -lege, no d.",
+   "family": [
+    "legal",
+    "legislate",
+    "private",
+    "legislation"
+   ],
+   "on_list": true
+  },
+  {
+   "word": "profession",
+   "syll": "pro-fes-sion",
+   "lang": "Latin",
+   "root": "pro + fateri",
+   "gloss": "to declare publicly",
+   "morph": "pro+fess+ion",
+   "traps": [
+    "ss",
+    "ion"
+   ],
+   "patterns": [
+    "double-consonant",
+    "sh-spelling"
+   ],
+   "errors": [
+    "proffesion",
+    "professon",
+    "profesion"
+   ],
+   "why": "You profess, you declare. One f, two s, like confess.",
+   "family": [
+    "professor",
+    "confess",
+    "profess",
+    "possession"
+   ],
+   "on_list": true
+  },
+  {
+   "word": "programme",
+   "syll": "pro-gramme",
+   "lang": "Greek",
+   "root": "pro + gramma",
+   "gloss": "written before",
+   "morph": "pro+gramme",
+   "traps": [
+    "mm",
+    "amme"
+   ],
+   "patterns": [
+    "greek-marker",
+    "double-consonant"
+   ],
+   "errors": [
+    "program",
+    "programe",
+    "progrmme"
+   ],
+   "why": "Gramma means writing, as in grammar and diagram. British English keeps -mme.",
+   "family": [
+    "grammar",
+    "diagram",
+    "telegram",
+    "anagram"
+   ],
+   "on_list": true
+  },
+  {
+   "word": "pronunciation",
+   "syll": "pro-nun-ci-a-tion",
+   "lang": "Latin",
+   "root": "pro + nuntiare",
+   "gloss": "to announce",
+   "morph": "pro+nunci+ation",
+   "traps": [
+    "nun",
+    "ci"
+   ],
+   "patterns": [
+    "base-change",
+    "sh-spelling"
+   ],
+   "errors": [
+    "pronounciation",
+    "pronunciaton",
+    "prounciation"
+   ],
+   "why": "Pronounce has ou, pronunciation does not. The noun lost it in Latin.",
+   "family": [
+    "pronounce",
+    "announce",
+    "denounce",
+    "enunciate"
+   ],
+   "on_list": true
+  },
+  {
+   "word": "queue",
+   "syll": "queue",
+   "lang": "French",
+   "root": "cauda",
+   "gloss": "tail",
+   "morph": "queue",
+   "traps": [
+    "ueue"
+   ],
+   "patterns": [
+    "french-ending",
+    "unique"
+   ],
+   "errors": [
+    "que",
+    "queu",
+    "quewe"
+   ],
+   "why": "A tail of people. One letter doing the work, with four just queueing behind.",
+   "family": [
+    "cue",
+    "barbecue",
+    "tail",
+    "query"
+   ],
+   "on_list": true
+  },
+  {
+   "word": "recognise",
+   "syll": "rec-og-nise",
+   "lang": "Latin",
+   "root": "re + cognoscere",
+   "gloss": "to know again",
+   "morph": "re+cogn+ise",
+   "traps": [
+    "g",
+    "ise"
+   ],
+   "patterns": [
+    "silent-letter"
+   ],
+   "errors": [
+    "reconise",
+    "recognize",
+    "reconize"
+   ],
+   "why": "To know again. Cogn means know, so the g must be there even if you skip it.",
+   "family": [
+    "cognition",
+    "incognito",
+    "recognition",
+    "diagnose"
+   ],
+   "on_list": true
+  },
+  {
+   "word": "recommend",
+   "syll": "rec-om-mend",
+   "lang": "Latin",
+   "root": "re + com + mandare",
+   "gloss": "to entrust again",
+   "morph": "re+com+mend",
+   "traps": [
+    "c",
+    "mm"
+   ],
+   "patterns": [
+    "single-consonant",
+    "double-consonant"
+   ],
+   "errors": [
+    "reccomend",
+    "recomend",
+    "reccommend"
+   ],
+   "why": "Re plus commend. One c, two m, because the double belongs to commend.",
+   "family": [
+    "commend",
+    "command",
+    "mandate",
+    "demand"
+   ],
+   "on_list": true
+  },
+  {
+   "word": "relevant",
+   "syll": "rel-e-vant",
+   "lang": "Latin",
+   "root": "re + levare",
+   "gloss": "to lift up",
+   "morph": "relev+ant",
+   "traps": [
+    "e",
+    "ant"
+   ],
+   "patterns": [
+    "schwa",
+    "suffix-ant-ent"
+   ],
+   "errors": [
+    "relevent",
+    "relavent",
+    "relevunt"
+   ],
+   "why": "It lifts the point up. Levare also gives lever and elevate.",
+   "family": [
+    "relieve",
+    "elevate",
+    "lever",
+    "relevance"
+   ],
+   "on_list": true
+  },
+  {
+   "word": "restaurant",
+   "syll": "res-tau-rant",
+   "lang": "French",
+   "root": "restaurer",
+   "gloss": "to restore",
+   "morph": "restaur+ant",
+   "traps": [
+    "au",
+    "ant"
+   ],
+   "patterns": [
+    "french-ending"
+   ],
+   "errors": [
+    "restrant",
+    "restaraunt",
+    "resturant"
+   ],
+   "why": "A place that restores you. Restore plus a French -ant ending.",
+   "family": [
+    "restore",
+    "restaurateur",
+    "restoration",
+    "assistant"
+   ],
+   "on_list": true
+  },
+  {
+   "word": "rhyme",
+   "syll": "rhyme",
+   "lang": "Greek",
+   "root": "rhythmos",
+   "gloss": "measured flow",
+   "morph": "rhyme",
+   "traps": [
+    "rh",
+    "y"
+   ],
+   "patterns": [
+    "greek-marker"
+   ],
+   "errors": [
+    "rime",
+    "ryme",
+    "rhime"
+   ],
+   "why": "Rhyme borrowed its rh and y from rhythm, its Greek cousin.",
+   "family": [
+    "rhythm",
+    "rhetoric",
+    "rhinoceros",
+    "rhubarb"
+   ],
+   "on_list": true
+  },
+  {
+   "word": "rhythm",
+   "syll": "rhy-thm",
+   "lang": "Greek",
+   "root": "rhythmos",
+   "gloss": "flow",
+   "morph": "rhythm",
+   "traps": [
+    "rh",
+    "y",
+    "thm"
+   ],
+   "patterns": [
+    "greek-marker"
+   ],
+   "errors": [
+    "rythm",
+    "rhythem",
+    "rythem"
+   ],
+   "why": "No a, e, i, o or u anywhere. Both y's are doing vowel work.",
+   "family": [
+    "rhyme",
+    "myth",
+    "gym",
+    "hymn"
+   ],
+   "on_list": true
+  },
+  {
+   "word": "sacrifice",
+   "syll": "sac-ri-fice",
+   "lang": "Latin",
+   "root": "sacer + facere",
+   "gloss": "to make holy",
+   "morph": "sacri+fice",
+   "traps": [
+    "i",
+    "fice"
+   ],
+   "patterns": [
+    "soft-c-g"
+   ],
+   "errors": [
+    "sacrafice",
+    "sacrifise",
+    "sacrefice"
+   ],
+   "why": "To make holy. Facere, to make, becomes -fice, as in office.",
+   "family": [
+    "sacred",
+    "sacrament",
+    "office",
+    "factory"
+   ],
+   "on_list": true
+  },
+  {
+   "word": "secretary",
+   "syll": "sec-re-tar-y",
+   "lang": "Latin",
+   "root": "secretum",
+   "gloss": "a secret",
+   "morph": "secret+ary",
+   "traps": [
+    "e",
+    "ary"
+   ],
+   "patterns": [
+    "schwa",
+    "suffix-ary-ery"
+   ],
+   "errors": [
+    "secratary",
+    "secertary",
+    "secretery"
+   ],
+   "why": "The keeper of secrets. Secret is whole inside it, then -ary.",
+   "family": [
+    "secret",
+    "secrecy",
+    "secretive",
+    "library"
+   ],
+   "on_list": true
+  },
+  {
+   "word": "shoulder",
+   "syll": "shoul-der",
+   "lang": "Old English",
+   "root": "sculdor",
+   "gloss": "shoulder",
+   "morph": "shoulder",
+   "traps": [
+    "ou"
+   ],
+   "patterns": [
+    "ou-spelling"
+   ],
+   "errors": [
+    "sholder",
+    "shoulda",
+    "sholuder"
+   ],
+   "why": "The ou here says 'oh', as it also does in boulder and smoulder.",
+   "family": [
+    "boulder",
+    "smoulder",
+    "mould",
+    "soul"
+   ],
+   "on_list": true
+  },
+  {
+   "word": "signature",
+   "syll": "sig-na-ture",
+   "lang": "Latin",
+   "root": "signum",
+   "gloss": "a sign",
+   "morph": "sign+ature",
+   "traps": [
+    "g",
+    "ature"
+   ],
+   "patterns": [
+    "silent-letter"
+   ],
+   "errors": [
+    "signiture",
+    "signeture",
+    "singature"
+   ],
+   "why": "Sign hides its g, signature says it out loud. Same word underneath.",
+   "family": [
+    "sign",
+    "design",
+    "signal",
+    "resign"
+   ],
+   "on_list": true
+  },
+  {
+   "word": "sincere",
+   "syll": "sin-cere",
+   "lang": "Latin",
+   "root": "sincerus",
+   "gloss": "pure, clean",
+   "morph": "sin+cere",
+   "traps": [
+    "cere"
+   ],
+   "patterns": [
+    "soft-c-g"
+   ],
+   "errors": [
+    "sincear",
+    "sinsere",
+    "sincer"
+   ],
+   "why": "Latin for pure. The ending is -cere, soft c before e.",
+   "family": [
+    "sincerely",
+    "sincerity",
+    "insincere",
+    "cereal"
+   ],
+   "on_list": true
+  },
+  {
+   "word": "sincerely",
+   "syll": "sin-cere-ly",
+   "lang": "Latin",
+   "root": "sincerus",
+   "gloss": "pure, clean",
+   "morph": "sin+cere+ly",
+   "traps": [
+    "ely"
+   ],
+   "patterns": [
+    "keep-e"
+   ],
+   "errors": [
+    "sincerly",
+    "sincerley",
+    "sincerelly"
+   ],
+   "why": "Sincere keeps its e before -ly. Same rule as immediately.",
+   "family": [
+    "sincere",
+    "immediately",
+    "definitely",
+    "completely"
+   ],
+   "on_list": true
+  },
+  {
+   "word": "soldier",
+   "syll": "sol-dier",
+   "lang": "French",
+   "root": "solidus",
+   "gloss": "a gold coin",
+   "morph": "sold+ier",
+   "traps": [
+    "dier"
+   ],
+   "patterns": [
+    "schwa"
+   ],
+   "errors": [
+    "soldior",
+    "solider",
+    "soljer"
+   ],
+   "why": "Paid in solidus coins, so soldier holds the word sold.",
+   "family": [
+    "solid",
+    "soldiery",
+    "salary",
+    "sold"
+   ],
+   "on_list": true
+  },
+  {
+   "word": "stomach",
+   "syll": "stom-ach",
+   "lang": "Greek",
+   "root": "stomachos",
+   "gloss": "gullet, mouth",
+   "morph": "stomach",
+   "traps": [
+    "ch"
+   ],
+   "patterns": [
+    "greek-marker"
+   ],
+   "errors": [
+    "stomache",
+    "stumach",
+    "stomac"
+   ],
+   "why": "Greek ch says /k/, as in chorus, character and echo.",
+   "family": [
+    "chorus",
+    "character",
+    "echo",
+    "ache"
+   ],
+   "on_list": true
+  },
+  {
+   "word": "sufficient",
+   "syll": "suf-fi-cient",
+   "lang": "Latin",
+   "root": "sub + facere",
+   "gloss": "to make up to",
+   "morph": "suf+fici+ent",
+   "traps": [
+    "ff",
+    "cie"
+   ],
+   "patterns": [
+    "assimilated-prefix",
+    "sh-spelling",
+    "suffix-ant-ent"
+   ],
+   "errors": [
+    "suficient",
+    "sufficent"
+   ],
+   "why": "Sub becomes suf before f. The /sh/ is ci, as in ancient.",
+   "family": [
+    "ancient",
+    "efficient",
+    "suffice",
+    "suffix"
+   ],
+   "on_list": true
+  },
+  {
+   "word": "suggest",
+   "syll": "sug-gest",
+   "lang": "Latin",
+   "root": "sub + gerere",
+   "gloss": "to carry under",
+   "morph": "sug+gest",
+   "traps": [
+    "gg"
+   ],
+   "patterns": [
+    "assimilated-prefix",
+    "double-consonant"
+   ],
+   "errors": [
+    "sugest",
+    "sugjest",
+    "suggeste"
+   ],
+   "why": "Sub becomes sug before g. You carry an idea up from underneath.",
+   "family": [
+    "digest",
+    "gesture",
+    "register",
+    "suggestion"
+   ],
+   "on_list": true
+  },
+  {
+   "word": "symbol",
+   "syll": "sym-bol",
+   "lang": "Greek",
+   "root": "symbolon",
+   "gloss": "a token thrown together",
+   "morph": "sym+bol",
+   "traps": [
+    "y",
+    "ol"
+   ],
+   "patterns": [
+    "greek-marker",
+    "homophone-trap"
+   ],
+   "errors": [
+    "simbol",
+    "symbal",
+    "cymbol"
+   ],
+   "why": "Greek y for short i. A cymbal is the instrument, a symbol is the sign.",
+   "family": [
+    "symmetry",
+    "sympathy",
+    "synonym",
+    "cymbal"
+   ],
+   "on_list": true
+  },
+  {
+   "word": "system",
+   "syll": "sys-tem",
+   "lang": "Greek",
+   "root": "systema",
+   "gloss": "set up together",
+   "morph": "sys+tem",
+   "traps": [
+    "y"
+   ],
+   "patterns": [
+    "greek-marker"
+   ],
+   "errors": [
+    "sistem",
+    "systum",
+    "sistum"
+   ],
+   "why": "Greek y again, saying short i. Things standing together.",
+   "family": [
+    "symbol",
+    "syllable",
+    "synthesis",
+    "systematic"
+   ],
+   "on_list": true
+  },
+  {
+   "word": "temperature",
+   "syll": "tem-per-a-ture",
+   "lang": "Latin",
+   "root": "temperare",
+   "gloss": "to mix, to moderate",
+   "morph": "temper+ature",
+   "traps": [
+    "per",
+    "ature"
+   ],
+   "patterns": [
+    "schwa"
+   ],
+   "errors": [
+    "temprature",
+    "temperture",
+    "tempreture"
+   ],
+   "why": "Temper is inside it: a mixing. Say all four syllables to spell it.",
+   "family": [
+    "temper",
+    "temperate",
+    "temperament",
+    "signature"
+   ],
+   "on_list": true
+  },
+  {
+   "word": "thorough",
+   "syll": "thor-ough",
+   "lang": "Old English",
+   "root": "thuruh",
+   "gloss": "through",
+   "morph": "thorough",
+   "traps": [
+    "ough"
+   ],
+   "patterns": [
+    "ough",
+    "homophone-trap"
+   ],
+   "errors": [
+    "thourough",
+    "thorogh",
+    "thourgh"
+   ],
+   "why": "Thorough is through with an extra syllable. Same family, same ough.",
+   "family": [
+    "through",
+    "borough",
+    "although",
+    "dough"
+   ],
+   "on_list": true
+  },
+  {
+   "word": "twelfth",
+   "syll": "twelfth",
+   "lang": "Old English",
+   "root": "twelfta",
+   "gloss": "twelfth",
+   "morph": "twelf+th",
+   "traps": [
+    "fth"
+   ],
+   "patterns": [
+    "unique"
+   ],
+   "errors": [
+    "twelth",
+    "twelvth",
+    "twelfeth"
+   ],
+   "why": "Twelve turns its v into f, then adds th. Three consonants, all needed.",
+   "family": [
+    "twelve",
+    "fifth",
+    "twentieth",
+    "month"
+   ],
+   "on_list": true
+  },
+  {
+   "word": "variety",
+   "syll": "va-ri-e-ty",
+   "lang": "Latin",
+   "root": "varius",
+   "gloss": "changing, spotted",
+   "morph": "vari+ety",
+   "traps": [
+    "iety"
+   ],
+   "patterns": [
+    "schwa"
+   ],
+   "errors": [
+    "variaty",
+    "vareity",
+    "varity"
+   ],
+   "why": "Vary plus -iety. Four syllables, so say it slowly to hear the e.",
+   "family": [
+    "various",
+    "vary",
+    "variable",
+    "society"
+   ],
+   "on_list": true
+  },
+  {
+   "word": "vegetable",
+   "syll": "veg-e-ta-ble",
+   "lang": "Latin",
+   "root": "vegetare",
+   "gloss": "to enliven",
+   "morph": "veget+able",
+   "traps": [
+    "e",
+    "able"
+   ],
+   "patterns": [
+    "schwa",
+    "suffix-able-ible"
+   ],
+   "errors": [
+    "vegtable",
+    "vegatable",
+    "vegitable"
+   ],
+   "why": "Say veg-e-table, four syllables. The hidden e is the one people drop.",
+   "family": [
+    "vegetation",
+    "vegetate",
+    "comfortable",
+    "suffix"
+   ],
+   "on_list": true
+  },
+  {
+   "word": "vehicle",
+   "syll": "ve-hi-cle",
+   "lang": "Latin",
+   "root": "vehiculum",
+   "gloss": "carrier",
+   "morph": "vehic+le",
+   "traps": [
+    "h",
+    "cle"
+   ],
+   "patterns": [
+    "silent-letter"
+   ],
+   "errors": [
+    "veicle",
+    "vehicel",
+    "vehical"
+   ],
+   "why": "Vehere means to carry. The h is silent here but loud in vehicular.",
+   "family": [
+    "vehicular",
+    "convey",
+    "conveyance",
+    "obstacle"
+   ],
+   "on_list": true
+  },
+  {
+   "word": "yacht",
+   "syll": "yacht",
+   "lang": "Dutch",
+   "root": "jacht",
+   "gloss": "a hunting ship",
+   "morph": "yacht",
+   "traps": [
+    "ach"
+   ],
+   "patterns": [
+    "unique",
+    "silent-letter"
+   ],
+   "errors": [
+    "yatch",
+    "yot",
+    "yaught"
+   ],
+   "why": "Dutch jachtschip, a hunting ship. English kept the Dutch letters, not the sounds.",
+   "family": [
+    "Dutch loans: sketch",
+    "landscape",
+    "skipper",
+    "cruise"
+   ],
+   "on_list": true
+  }
+ ],
+ "off_list": [
+  {
+   "word": "possession",
+   "syll": "pos-ses-sion",
+   "lang": "Latin",
+   "root": "possidere",
+   "gloss": "to have as one's own",
+   "morph": "possess+ion",
+   "traps": [
+    "ss",
+    "ss"
+   ],
+   "patterns": [
+    "double-consonant",
+    "sh-spelling"
+   ],
+   "errors": [
+    "posession",
+    "possesion",
+    "posesion"
+   ],
+   "why": "Two lots of double s, one in possess and one before -ion.",
+   "family": [
+    "possess",
+    "obsession",
+    "profession",
+    "session"
+   ],
+   "on_list": false
+  },
+  {
+   "word": "separate",
+   "syll": "sep-a-rate",
+   "lang": "Latin",
+   "root": "se + parare",
+   "gloss": "to prepare apart",
+   "morph": "separ+ate",
+   "traps": [
+    "a"
+   ],
+   "patterns": [
+    "schwa"
+   ],
+   "errors": [
+    "seperate",
+    "seperete",
+    "saperate"
+   ],
+   "why": "There is a rat in separate. The middle a is a lazy 'uh', so it has to be remembered.",
+   "family": [
+    "separation",
+    "prepare",
+    "apparatus",
+    "parade"
+   ],
+   "on_list": false
+  },
+  {
+   "word": "irregular",
+   "syll": "ir-reg-u-lar",
+   "lang": "Latin",
+   "root": "in + regula",
+   "gloss": "not by the rule",
+   "morph": "ir+regul+ar",
+   "traps": [
+    "rr"
+   ],
+   "patterns": [
+    "assimilated-prefix",
+    "double-consonant"
+   ],
+   "errors": [
+    "iregular",
+    "inregular",
+    "irrregular"
+   ],
+   "why": "The prefix in- turns into ir- before an r, so two r's meet.",
+   "family": [
+    "regular",
+    "irrational",
+    "irresponsible",
+    "rule"
+   ],
+   "on_list": false
+  },
+  {
+   "word": "delicious",
+   "syll": "de-li-cious",
+   "lang": "Latin",
+   "root": "delicere",
+   "gloss": "to entice away",
+   "morph": "delici+ous",
+   "traps": [
+    "cious"
+   ],
+   "patterns": [
+    "sh-spelling"
+   ],
+   "errors": [
+    "delicous",
+    "delishous",
+    "deliceous"
+   ],
+   "why": "The /sh/ is spelled ci, the same trick as in ancient and precious.",
+   "family": [
+    "precious",
+    "suspicious",
+    "ferocious",
+    "delight"
+   ],
+   "on_list": false
+  },
+  {
+   "word": "knowledge",
+   "syll": "know-ledge",
+   "lang": "Old English",
+   "root": "cnawan",
+   "gloss": "to know",
+   "morph": "know+ledge",
+   "traps": [
+    "kn",
+    "dge"
+   ],
+   "patterns": [
+    "silent-letter",
+    "soft-c-g"
+   ],
+   "errors": [
+    "nowledge",
+    "knowlege",
+    "knolwedge"
+   ],
+   "why": "Know is hiding inside it, silent k and all. Then -ledge, not -lege.",
+   "family": [
+    "know",
+    "acknowledge",
+    "knight",
+    "edge"
+   ],
+   "on_list": false
+  },
+  {
+   "word": "useful",
+   "syll": "use-ful",
+   "lang": "Latin",
+   "root": "usus",
+   "gloss": "a using",
+   "morph": "use+ful",
+   "traps": [
+    "ful"
+   ],
+   "patterns": [
+    "single-consonant",
+    "keep-e"
+   ],
+   "errors": [
+    "usefull",
+    "usful",
+    "usefil"
+   ],
+   "why": "The suffix is -ful, one l, always. Full has two, -ful never does.",
+   "family": [
+    "careful",
+    "helpful",
+    "beautiful",
+    "hopeful"
+   ],
+   "on_list": false
+  },
+  {
+   "word": "beautiful",
+   "syll": "beau-ti-ful",
+   "lang": "French",
+   "root": "beau",
+   "gloss": "fine, handsome",
+   "morph": "beauti+ful",
+   "traps": [
+    "eau",
+    "i"
+   ],
+   "patterns": [
+    "base-change",
+    "french-ending",
+    "single-consonant"
+   ],
+   "errors": [
+    "beautyful",
+    "beatiful",
+    "beutiful"
+   ],
+   "why": "Beauty swaps its y for an i before the suffix. The eau is French and stays whole.",
+   "family": [
+    "beauty",
+    "beautify",
+    "plentiful",
+    "bureau"
+   ],
+   "on_list": false
+  },
+  {
+   "word": "chemistry",
+   "syll": "chem-is-try",
+   "lang": "Greek",
+   "root": "khemia",
+   "gloss": "transmutation",
+   "morph": "chemist+ry",
+   "traps": [
+    "ch",
+    "y"
+   ],
+   "patterns": [
+    "greek-marker"
+   ],
+   "errors": [
+    "kemistry",
+    "chemestry",
+    "chemistary"
+   ],
+   "why": "Greek gives ch for /k/ and y for short i, the same as in scheme and physics.",
+   "family": [
+    "chemical",
+    "chemist",
+    "scheme",
+    "architect"
+   ],
+   "on_list": false
+  }
+ ]
+}

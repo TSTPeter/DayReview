@@ -1,0 +1,280 @@
+[
+ {
+  "day": "2026-09-08",
+  "queue": [
+   "accommodate",
+   "achieve",
+   "amateur",
+   "ancient",
+   "attached",
+   "available",
+   "awkward",
+   "average"
+  ],
+  "marks": [
+   {
+    "word": "accommodate",
+    "attempt": "accomodate",
+    "correct": false,
+    "type": "doubling",
+    "patterns": [
+     "double-consonant"
+    ]
+   },
+   {
+    "word": "achieve",
+    "attempt": "acheive",
+    "correct": false,
+    "type": "transposition",
+    "patterns": [
+     "sequencing"
+    ]
+   },
+   {
+    "word": "amateur",
+    "attempt": "amature",
+    "correct": false,
+    "type": "transposition",
+    "patterns": [
+     "sequencing"
+    ]
+   },
+   {
+    "word": "ancient",
+    "attempt": "ancient",
+    "correct": true,
+    "type": "correct",
+    "patterns": []
+   },
+   {
+    "word": "attached",
+    "attempt": "attached",
+    "correct": true,
+    "type": "correct",
+    "patterns": []
+   },
+   {
+    "word": "available",
+    "attempt": "available",
+    "correct": true,
+    "type": "correct",
+    "patterns": []
+   },
+   {
+    "word": "awkward",
+    "attempt": "awkward",
+    "correct": true,
+    "type": "correct",
+    "patterns": []
+   },
+   {
+    "word": "average",
+    "attempt": "average",
+    "correct": true,
+    "type": "correct",
+    "patterns": []
+   }
+  ],
+  "report": {
+   "boxes": {
+    "1": 98,
+    "2": 5,
+    "3": 0,
+    "4": 0,
+    "5": 0
+   },
+   "weak_patterns": [
+    "sequencing"
+   ],
+   "due_today": 95
+  }
+ },
+ {
+  "day": "2026-09-10",
+  "queue": [
+   "accommodate",
+   "achieve",
+   "amateur",
+   "bruise",
+   "bargain",
+   "committee",
+   "conscience",
+   "convenience"
+  ],
+  "marks": [
+   {
+    "word": "accommodate",
+    "attempt": "accomodate",
+    "correct": false,
+    "type": "doubling",
+    "patterns": [
+     "double-consonant"
+    ]
+   },
+   {
+    "word": "achieve",
+    "attempt": "acheive",
+    "correct": false,
+    "type": "transposition",
+    "patterns": [
+     "sequencing"
+    ]
+   },
+   {
+    "word": "amateur",
+    "attempt": "amature",
+    "correct": false,
+    "type": "transposition",
+    "patterns": [
+     "sequencing"
+    ]
+   },
+   {
+    "word": "bruise",
+    "attempt": "bruise",
+    "correct": true,
+    "type": "correct",
+    "patterns": []
+   },
+   {
+    "word": "bargain",
+    "attempt": "bargain",
+    "correct": true,
+    "type": "correct",
+    "patterns": []
+   },
+   {
+    "word": "committee",
+    "attempt": "committee",
+    "correct": true,
+    "type": "correct",
+    "patterns": []
+   },
+   {
+    "word": "conscience",
+    "attempt": "conscience",
+    "correct": true,
+    "type": "correct",
+    "patterns": []
+   },
+   {
+    "word": "convenience",
+    "attempt": "convenience",
+    "correct": true,
+    "type": "correct",
+    "patterns": []
+   }
+  ],
+  "report": {
+   "boxes": {
+    "1": 93,
+    "2": 10,
+    "3": 0,
+    "4": 0,
+    "5": 0
+   },
+   "weak_patterns": [
+    "sequencing",
+    "assimilated-prefix",
+    "double-consonant",
+    "ie-ei",
+    "french-ending"
+   ],
+   "due_today": 95
+  }
+ },
+ {
+  "day": "2026-09-14",
+  "queue": [
+   "accommodate",
+   "achieve",
+   "accompany",
+   "amateur",
+   "according",
+   "category",
+   "communicate",
+   "conscious"
+  ],
+  "marks": [
+   {
+    "word": "accommodate",
+    "attempt": "accomodate",
+    "correct": false,
+    "type": "doubling",
+    "patterns": [
+     "double-consonant"
+    ]
+   },
+   {
+    "word": "achieve",
+    "attempt": "acheive",
+    "correct": false,
+    "type": "transposition",
+    "patterns": [
+     "sequencing"
+    ]
+   },
+   {
+    "word": "accompany",
+    "attempt": "acompany",
+    "correct": false,
+    "type": "doubling",
+    "patterns": [
+     "double-consonant"
+    ]
+   },
+   {
+    "word": "amateur",
+    "attempt": "amateur",
+    "correct": true,
+    "type": "correct",
+    "patterns": []
+   },
+   {
+    "word": "according",
+    "attempt": "according",
+    "correct": true,
+    "type": "correct",
+    "patterns": []
+   },
+   {
+    "word": "category",
+    "attempt": "category",
+    "correct": true,
+    "type": "correct",
+    "patterns": []
+   },
+   {
+    "word": "communicate",
+    "attempt": "communicate",
+    "correct": true,
+    "type": "correct",
+    "patterns": []
+   },
+   {
+    "word": "conscious",
+    "attempt": "conscious",
+    "correct": true,
+    "type": "correct",
+    "patterns": []
+   }
+  ],
+  "report": {
+   "boxes": {
+    "1": 88,
+    "2": 15,
+    "3": 0,
+    "4": 0,
+    "5": 0
+   },
+   "weak_patterns": [
+    "sequencing",
+    "assimilated-prefix",
+    "double-consonant",
+    "ie-ei",
+    "french-ending"
+   ],
+   "due_today": 95
+  }
+ }
+]

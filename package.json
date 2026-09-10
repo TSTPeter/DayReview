@@ -1,0 +1,13 @@
+{
+  "name": "spelling-app-tests",
+  "private": true,
+  "description": "Test harness only. The app itself has no dependencies: web/ is vanilla JS and engine/ is pure Python with an empty import list. Nothing here ships to a browser.",
+  "scripts": {
+    "test": "python3 -m unittest discover -s tests -t .",
+    "test:browser": "node tests/browser/run.mjs",
+    "serve": "python3 serve.py"
+  },
+  "devDependencies": {
+    "playwright": "^1.49.0"
+  }
+}
