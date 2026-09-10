@@ -34,6 +34,11 @@ jobs:
       - name: Classifier coverage over the curated corpus
         run: python3 engine/demo.py
 
+      # The privacy guarantee. Feeds a complete attempt row to the Firebase
+      # shaper and fails if anything a child wrote survives it.
+      - name: Firebase payload carries no child writing
+        run: node tests/test_sync_shape.mjs
+
       # If words.py or sentences.py changed and export.py was not re-run, the front end
       # silently serves stale data. Cheap to catch, confusing to debug.
       - name: web/data is in step with the word model

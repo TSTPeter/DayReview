@@ -1,0 +1,8 @@
+{
+  "_comment": "Copy to web/data/firebase.json and fill in. That file is gitignored: the real config is never committed. Absent, the app runs fully and simply does not sync.",
+  "apiKey": "YOUR_WEB_API_KEY",
+  "authDomain": "your-project.firebaseapp.com",
+  "databaseURL": "https://your-project-default-rtdb.europe-west1.firebasedatabase.app",
+  "projectId": "your-project",
+  "appId": "1:000000000000:web:0000000000000000000000"
+}

@@ -44,4 +44,9 @@ if __name__ == "__main__":
     socketserver.TCPServer.allow_reuse_address = True
     with socketserver.TCPServer(("", args.port), functools.partial(Handler, directory=str(ROOT))) as httpd:
         print(f"serving {ROOT} at http://localhost:{args.port}  (ctrl-c to stop)")
-        httpd.serve_forever()
+        try:
+            httpd.serve_forever()
+        except KeyboardInterrupt:
+            # Ctrl-C is how you stop this. It is not a crash, so do not print
+            # eight frames of socketserver internals as though it were one.
+            print("\nstopped.")

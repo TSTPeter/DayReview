@@ -16,7 +16,11 @@ import { Scheduler, addDays, today } from "./engine/schedule.js";
 import { compute, narrate } from "./engine/profile.js";
 import * as audio from "./audio.js";
 import * as store from "./store.js";
+import * as sfx from "./sfx.js";
+import * as sync from "./sync.js";
+import * as dash from "./dashboard.js";
 import { Keystrokes, fluency } from "./keystrokes.js";
+import { crackedPatterns, settle, renderWorld, artFor, assignArt } from "./rewards.js";
 
 const $ = (sel) => document.querySelector(sel);
 const el = (tag, props = {}, kids = []) => {
@@ -47,6 +51,8 @@ const app = {
   mode: "practice",          // practice | probe
   probeItems: [], paperIndex: 0,
   audioOk: true,             // set by audio.working() at boot
+  cracked: new Set(),        // rules she has cracked, ever
+  curios: [],                // surprise pieces, ever
 };
 
 // --------------------------------------------------------------- boot
@@ -59,6 +65,7 @@ async function boot() {
   app.data = words;
   app.sentences = sentences.sentences || {};
   for (const w of [...words.words, ...words.off_list]) app.byWord.set(w.word, w);
+  assignArt(Object.keys(words.patterns));   // one distinct piece per rule
 
   audio.setOverrides(await store.getKV("pronunciation_overrides", {}));
   applyComfort(await store.getKV("comfort", { size: "default", theme: "light" }));
@@ -74,12 +81,31 @@ async function boot() {
   // so the two are never pooled in analysis.
   app.audioOk = await audio.working();
   $("#attempt-noaudio").hidden = app.audioOk;
+
+  sfx.setMuted((await store.getKV("sound", "on")) === "off");
+  // iOS keeps an AudioContext suspended until a real gesture, so the first
+  // touch anywhere arms it for the session.
+  const armOnce = () => { sfx.arm(); window.removeEventListener("pointerdown", armOnce); };
+  window.addEventListener("pointerdown", armOnce, { once: true });
+
+  await sync.load(await store.getKV("sync_enabled", false));
+  await loadCollection();
   await refreshHome();
   show("home");
 
   if ("serviceWorker" in navigator) {
     navigator.serviceWorker.register("sw.js").catch(() => {});
   }
+}
+
+async function loadCollection() {
+  const attempts = await store.allAttempts();
+  app.cracked = crackedPatterns(attempts, app.byWord);
+  app.curios = await store.getKV("curios", []);
+}
+
+function paintWorld(el) {
+  renderWorld(el, [...app.cracked], app.curios, app.data ? app.data.patterns : {});
 }
 
 async function persistScheduler() {
@@ -96,13 +122,20 @@ function applyComfort(c) {
 
 function show(name) {
   for (const s of document.querySelectorAll(".screen")) s.classList.toggle("on", s.id === `screen-${name}`);
-  // The redundancy guard: audio refuses to speak while the target word is on screen.
+  // Two guards ride on the router so neither can be forgotten at a call site:
+  // dictation refuses to speak while the word is on screen (redundancy), and
+  // effects refuse to sound at all while she is mid-attempt (coherence).
   audio.setWordVisible(name === "reveal" || name === "rule" || name === "paper-entry");
+  sfx.setAttemptScreenUp(name === "attempt");
+  // The item counter belongs to a session in progress and nowhere else.
+  if (name !== "attempt" && name !== "reveal" && name !== "rule") {
+    $("#attempt-count").textContent = "";
+  }
   window.scrollTo(0, 0);
 }
 
 function setProgress(done, total) {
-  $("#progress > i").style.width = total ? `${Math.round((done / total) * 100)}%` : "0%";
+  $("#progress-bar").style.width = total ? `${Math.round((done / total) * 100)}%` : "0%";
 }
 
 // --------------------------------------------------------------- home
@@ -113,6 +146,7 @@ async function refreshHome() {
   $("#home-summary").textContent = attempts.length
     ? `${due} words ready to practise.`
     : "Nothing practised yet. Start with the challenge so the app knows what to teach.";
+  paintWorld($("#home-world"));
   $("#home-probe-note").textContent = attempts.length
     ? "Re-run the challenge every half term. The change over time is the measure that matters."
     : "";
@@ -278,6 +312,10 @@ function showReveal(entry, d) {
   $("#reveal-strategy").hidden = !askStrategy;
 
   show("reveal");
+  // Informational, not celebratory. A wrong answer is the most useful event
+  // in this app and must not sound like a buzzer (Shute 2008: praise
+  // sparingly, no normative comparison).
+  sfx.play(d.correct ? "correct" : "notyet");
   $("#reveal-next").focus();
 }
 
@@ -338,8 +376,71 @@ async function endSession() {
   if (app.strategy.length) await store.setKV("strategy_log",
     [...(await store.getKV("strategy_log", [])), ...app.strategy]);
 
+  // What did she crack, across all history, that she had not cracked before?
+  const before = new Set(app.cracked);
+  await loadCollection();
+  const newly = [...app.cracked].filter((p) => !before.has(p));
+
+  const outcome = settle(newly, app.curios);
+  if (outcome.curio) {
+    app.curios = [...app.curios, outcome.curio.key];
+    await store.setKV("curios", app.curios);
+  }
+  renderUnlocks($("#end-unlocks"), outcome);
+  paintWorld($("#end-world"));
+  sfx.play(outcome.curio || newly.length ? "unlock" : "complete");
+
+  await pushAggregates();
   await refreshHome();
   show("end");
+}
+
+function renderUnlocks(host, outcome) {
+  host.replaceChildren();
+  const names = app.data ? app.data.patterns : {};
+  for (const pattern of outcome.pieces) {
+    const card = el("div", { className: "unlock" });
+    const art = el("div", { className: "art" });
+    art.innerHTML = artFor(pattern);
+    const text = el("div");
+    text.append(el("p", { style: "margin:0;font-weight:800",
+                          textContent: `You cracked ${pattern.replace(/-/g, " ")}.` }));
+    text.append(el("p", { className: "small muted", style: "margin:.2rem 0 0",
+                          textContent: names[pattern] || "" }));
+    card.append(art, text);
+    host.append(card);
+  }
+  if (outcome.curio) {
+    const card = el("div", { className: "unlock" });
+    const art = el("div", { className: "art" });
+    art.innerHTML = outcome.curio.art;
+    const text = el("div");
+    text.append(el("p", { style: "margin:0;font-weight:800", textContent: outcome.curio.line }));
+    card.append(art, text);
+    host.append(card);
+  }
+}
+
+/**
+ * Send the day's arithmetic, and only the arithmetic. sync.js enforces the
+ * allowlist; this function must never hand it an attempt row.
+ */
+async function pushAggregates() {
+  if (!sync.isConfigured()) return;
+  try {
+    const attempts = await store.allAttempts();
+    const days = dash.byDay(attempts);
+    const today = new Date().toISOString().slice(0, 10);
+    const d = days[today];
+    if (d) {
+      await sync.pushDay("beatrix", {
+        date: today, attempts: d.attempts, correct: d.correct,
+        accuracy: d.attempts ? d.correct / d.attempts : null,
+        patterns_cracked: app.cracked.size,
+        // day-level median, never the per-attempt figure
+      });
+    }
+  } catch { /* sync never blocks practice */ }
 }
 
 // --------------------------------------------------------------- 5. diagnostic (paper)
@@ -386,8 +487,8 @@ function buildPaperEntry() {
   const list = $("#paper-list");
   list.replaceChildren();
   app.probeItems.forEach((entry, i) => {
-    const row = el("div", { className: "card" });
-    row.append(el("div", { className: "label", textContent: `${i + 1}. ${entry.word}` }));
+    const row = el("div", { className: "sheet" });
+    row.append(el("div", { className: "tab", textContent: `${i + 1}. ${entry.word}` }));
     row.append(el("input", {
       type: "text", className: "spell", dataset: { word: entry.word },
       autocapitalize: "none", autocomplete: "off", spellcheck: false,
@@ -453,23 +554,37 @@ async function showGrownUp() {
 
   $("#gu-narrative").replaceChildren(...narrate(p).map((t) => el("p", { textContent: t })));
 
-  const rows = Object.entries(p.pattern_strength).sort((a, b) => a[1] - b[1]);
-  $("#gu-patterns").replaceChildren(...rows.map(([k, v]) => {
-    const tr = el("tr");
-    tr.append(el("td", { textContent: k.replace(/-/g, " ") }));
-    const cell = el("td");
-    const bar = el("div", { className: "bar-cell" });
-    bar.append(el("i", { style: `width:${Math.max(2, v * 120)}px` }),
-               el("span", { className: "small", textContent: pct(v) }));
-    cell.append(bar);
-    tr.append(cell);
-    return tr;
-  }));
+  dash.renderPatterns($("#gu-patterns"), p.pattern_strength);
+
+  // Habit metrics: daily use and consistency. Adult-facing, by design.
+  const days = dash.byDay(attempts);
+  const { scale } = dash.renderCalendar($("#gu-calendar"), days);
+  dash.renderLegend($("#gu-legend"), scale);
+  dash.renderTable($("#gu-table"), days);
+  const c = dash.consistency(days);
+  $("#gu-consistency").textContent = c.rate === null
+    ? "No practice recorded yet."
+    : `Practised on ${c.practised} of the last ${c.available} days `
+      + `(${Math.round(c.rate * 100)}%).`;
+
+  const syncOn = await store.getKV("sync_enabled", false);
+  $("#opt-sync").value = syncOn ? "on" : "off";
+  $("#gu-sync-state").textContent = !syncOn
+    ? "Off. Everything stays on this device and the app makes no network calls."
+    : sync.isConfigured()
+      ? "On. Only counts and percentages are sent — never her writing or keystrokes."
+      : "On, but no config found. Copy web/data/firebase.example.json to "
+        + "web/data/firebase.json and fill it in.";
 
   const medians = attempts.map((a) => a.median_inter_key_ms).filter((x) => x != null);
   const f = fluency(medians);
   $("#gu-fluency").textContent = f.median_inter_key_ms
     ? `${f.median_inter_key_ms} ms between keys. ${f.note}` : f.note;
+
+  $("#opt-sound").value = sfx.isMuted() ? "off" : "on";
+  const comfort = await store.getKV("comfort", {});
+  $("#comfort-size").value = comfort.size || "default";
+  $("#comfort-theme").value = comfort.theme || "light";
 
   show("grownup");
 }
@@ -535,6 +650,27 @@ function wire() {
     if (!confirm("Delete every attempt, session and profile on this device? This cannot be undone.")) return;
     await store.hardDelete();
     location.reload();
+  };
+
+  $("#gu-table-toggle").onclick = () => {
+    const t = $("#gu-table");
+    t.hidden = !t.hidden;
+    $("#gu-table-toggle").textContent = t.hidden
+      ? "Show the numbers instead" : "Hide the numbers";
+  };
+
+  $("#opt-sync").onchange = async (e) => {
+    const on = e.target.value === "on";
+    await store.setKV("sync_enabled", on);
+    await sync.load(on);
+    await showGrownUp();
+  };
+
+  $("#opt-sound").onchange = async (e) => {
+    const off = e.target.value === "off";
+    sfx.setMuted(off);
+    await store.setKV("sound", off ? "off" : "on");
+    if (!off) sfx.play("correct");        // so the choice is audible immediately
   };
 
   $("#comfort-size").onchange = async (e) => {
