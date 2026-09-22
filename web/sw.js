@@ -4,13 +4,14 @@
 // Cache-first for the shell and the word data, because neither changes between releases
 // and both are needed before the first word can be dictated.
 
-const CACHE = "spelling-v2";
+const CACHE = "spelling-v4";
 const SHELL = [
   "./", "index.html", "manifest.json",
   "css/paper.css",
   "js/app.js", "js/store.js", "js/audio.js", "js/keystrokes.js",
   "js/sfx.js", "js/rewards.js", "js/dashboard.js", "js/sync.js",
   "js/engine/classify.js", "js/engine/schedule.js", "js/engine/profile.js",
+  "js/engine/derive.js", "js/engine/weekly.js",
   "data/words.json", "data/sentences.json",
 ];
 

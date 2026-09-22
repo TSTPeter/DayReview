@@ -21,6 +21,8 @@ import * as sync from "./sync.js";
 import * as dash from "./dashboard.js";
 import { Keystrokes, fluency } from "./keystrokes.js";
 import { crackedPatterns, settle, renderWorld, artFor, assignArt } from "./rewards.js";
+import * as weekly from "./engine/weekly.js";
+import { NOUN_VERB_PAIRS, PAIR_RULE, makeEntry } from "./engine/derive.js";
 
 const $ = (sel) => document.querySelector(sel);
 const el = (tag, props = {}, kids = []) => {
@@ -53,6 +55,7 @@ const app = {
   audioOk: true,             // set by audio.working() at boot
   cracked: new Set(),        // rules she has cracked, ever
   curios: [],                // surprise pieces, ever
+  week: null,                // this week's list from school, or null
 };
 
 // --------------------------------------------------------------- boot
@@ -70,9 +73,8 @@ async function boot() {
   audio.setOverrides(await store.getKV("pronunciation_overrides", {}));
   applyComfort(await store.getKV("comfort", { size: "default", theme: "light" }));
 
-  const state = await store.getKV("scheduler_state", null);
-  const patterns = await store.getKV("pattern_state", null);
-  app.scheduler = new Scheduler(words.words, today(), state, patterns);
+  app.week = await store.getKV("weekly_list", null);
+  await rebuildScheduler();
 
   wire();
   // Find out whether this device can speak BEFORE dictating into silence. With no
@@ -96,6 +98,23 @@ async function boot() {
   if ("serviceWorker" in navigator) {
     navigator.serviceWorker.register("sw.js").catch(() => {});
   }
+}
+
+/**
+ * Build the scheduler over the statutory list PLUS this week's school words.
+ *
+ * The weekly words have to be in it from the start, not bolted on for the
+ * week: that is what lets them fold into the Leitner boxes once the test is
+ * past, which is the half of this feature that serves the actual goal.
+ */
+async function rebuildScheduler() {
+  const state = await store.getKV("scheduler_state", null);
+  const patterns = await store.getKV("pattern_state", null);
+  const extra = app.week
+    ? weekly.entriesFor(app.week.words, app.byWord).filter((e) => !app.byWord.has(e.word))
+    : [];
+  for (const e of extra) app.byWord.set(e.word, e);
+  app.scheduler = new Scheduler([...app.data.words, ...extra], today(), state, patterns);
 }
 
 async function loadCollection() {
@@ -147,16 +166,116 @@ async function refreshHome() {
     ? `${due} words ready to practise.`
     : "Nothing practised yet. Start with the challenge so the app knows what to teach.";
   paintWorld($("#home-world"));
+  paintWeekCard();
   $("#home-probe-note").textContent = attempts.length
     ? "Re-run the challenge every half term. The change over time is the measure that matters."
     : "";
+}
+
+function paintWeekCard() {
+  const card = $("#home-week");
+  if (!app.week || !app.week.words.length) { card.hidden = true; return; }
+  card.hidden = false;
+  const left = weekly.daysUntil(app.week.test_on);
+  const active = weekly.isActive(app.week);
+  $("#home-week-tab").textContent = active ? "This week" : "Last week";
+  $("#home-week-words").textContent = app.week.words.join("  ·  ");
+  $("#home-week-state").textContent = !active
+    ? "Tested. These are still coming back, spaced out, so they stick."
+    : left === 0 ? "Tested today."
+    : left === 1 ? "Tested tomorrow."
+    : `Tested in ${left} days.`;
+}
+
+// --------------------------------------------------------------- this week
+
+// Written back WITH the tags, one per line, so editing the list a second time
+// does not silently drop the noun/verb markers the school supplied.
+function weekText(list) {
+  if (!list) return "";
+  return list.words
+    .map((w) => (list.hints && list.hints[w] ? `${w} (${list.hints[w]})` : w))
+    .join("\n");
+}
+
+function showWeek() {
+  $("#week-input").value = weekText(app.week);
+  $("#week-test").value = app.week ? app.week.test_on : weekly.nextTestDay();
+  paintParsed();
+  $("#week-note").textContent = "";
+  show("week");
+}
+
+function paintParsed() {
+  const entries = weekly.parseEntries($("#week-input").value);
+  const words = entries.map((e) => e.word);
+  if (!words.length) { $("#week-parsed").textContent = ""; return; }
+  // Say plainly which words the app knows properly and which it is reading
+  // from the letters alone, so the thinner reveal is never a surprise.
+  const curated = words.filter((w) => app.byWord.has(w) && !app.byWord.get(w).derived);
+  const parts = [`${words.length} word${words.length === 1 ? "" : "s"}`];
+  // Show the tags back. If the school wrote '(N)' and the app did not read it,
+  // that has to be visible here rather than discovered mid-dictation.
+  const tagged = entries.filter((e) => e.hint);
+  if (tagged.length) {
+    parts.push(`${tagged.length} will be dictated with their word class `
+      + `(${tagged.slice(0, 3).map((e) => `${e.word} = ${e.hint}`).join(", ")}`
+      + `${tagged.length > 3 ? "\u2026" : ""})`);
+  }
+  if (curated.length) {
+    parts.push(`${curated.length} already known in full (${curated.slice(0, 4).join(", ")}`
+      + `${curated.length > 4 ? "…" : ""})`);
+  }
+  // The -ce/-se pairs were one instance of a general fault: a word that sounds
+  // exactly like another, dictated as 'The word is X' twice with no sentence
+  // and no word class, asks a question with no answer in it. A wrong answer
+  // then records an error type that describes nothing. The ten pairs are
+  // handled by NOUN_VERB_PAIRS; the rest of derive.HOMOPHONES are not, and
+  // writing fifty sentences unreviewed would break docs/05's review gate. So
+  // say so here instead of failing quietly during dictation.
+  const unanswerable = entries.filter((e) =>
+    !e.hint
+    && !app.sentences[e.word]
+    && (app.byWord.get(e.word) || makeEntry(e.word)).patterns.includes("homophone-trap"));
+  if (unanswerable.length) {
+    parts.push(`⚠ ${unanswerable.map((e) => e.word).join(", ")} `
+      + `sound${unanswerable.length === 1 ? "s" : ""} like another word and the app `
+      + `has no sentence to tell them apart — add the word class in brackets, `
+      + `like "${unanswerable[0].word} (noun)"`);
+  }
+  const rest = words.length - curated.length;
+  if (rest) parts.push(`${rest} read from the spelling — she'll get the rule but not the word history`);
+  $("#week-parsed").textContent = parts.join(" · ");
+}
+
+async function saveWeek() {
+  const words = weekly.parse($("#week-input").value);
+  if (!words.length) {
+    $("#week-note").textContent = "No words found. One per line, or separated by commas.";
+    return;
+  }
+  const testOn = $("#week-test").value || weekly.nextTestDay();
+  app.week = weekly.makeList($("#week-input").value, today(), testOn);
+  await store.setKV("weekly_list", app.week);
+  await rebuildScheduler();
+  await persistScheduler();
+  await refreshHome();
+  show("home");
+}
+
+async function clearWeek() {
+  app.week = null;
+  await store.setKV("weekly_list", null);
+  await rebuildScheduler();
+  await refreshHome();
+  show("home");
 }
 
 // --------------------------------------------------------------- 1. attempt
 
 function startPractice() {
   app.mode = "practice";
-  app.queue = app.scheduler.session(SESSION_SIZE);
+  app.queue = weekly.compose(app.scheduler, app.week, SESSION_SIZE, today());
   app.index = 0;
   app.marks = [];
   app.strategy = [];
@@ -174,6 +293,7 @@ function nextItem() {
   $("#attempt-input").disabled = false;
   $("#attempt-submit").disabled = true;
   $("#attempt-state").textContent = "";
+  $("#attempt-hint").hidden = true;
   $("#attempt-count").textContent = `${app.index + 1} of ${app.queue.length}`;
   app.keys.reset();
 
@@ -201,23 +321,39 @@ function promptMode() {
   return app.audioOk ? "audio_sentence" : "text_cloze";
 }
 
+// 'advice' and 'advise' sound the same, and so do 'licence' and 'license'. Naming
+// the word twice asks a question with no answer in it. The word class is the
+// missing half of the prompt, so it is spoken with the word and then left on
+// screen while she types. See engine/derive.py NOUN_VERB_PAIRS.
+function showHint(hint) {
+  const p = $("#attempt-hint");
+  p.hidden = !hint;
+  p.textContent = hint ? `It is the ${hint}.` : "";
+}
+
 async function playPrompt(entry) {
   const sentence = app.sentences[entry.word] || "";
+  const hint = weekly.hintOf(app.week, entry.word);
   if (!app.audioOk) {
     $("#attempt-cloze").hidden = false;
     $("#attempt-cloze").replaceChildren(clozeFor(entry));
     $("#attempt-state").textContent = "Read the sentence and fill in the missing word.";
+    // No audio here, so there is no second channel to be redundant with.
+    showHint(hint);
     $("#attempt-replay").disabled = true;
     $("#attempt-input").focus();
     return;
   }
   $("#attempt-cloze").hidden = true;
+  $("#attempt-hint").hidden = true;
   $("#attempt-replay").disabled = true;
   const labels = { word: "Listening\u2026", sentence: "In a sentence\u2026",
                    "word-again": "Once more\u2026", done: "" };
   await audio.dictate(entry.word, sentence, {
+    hint,
     onStep: (step) => { $("#attempt-state").textContent = labels[step] ?? ""; },
   });
+  showHint(hint);
   $("#attempt-replay").disabled = false;
   $("#attempt-input").focus();
 }
@@ -296,6 +432,12 @@ function showReveal(entry, d) {
   $("#reveal-detail").textContent = d.correct ? "" : d.detail;
   $("#reveal-detail").hidden = d.correct;
 
+  // A school word we only know from its letters has no origin, no morphemes
+  // and no word family. Hiding that card is the honest answer: a guessed root
+  // told to a child is worse than a missing one. She still gets the marking,
+  // the named error and the rule. See docs/12.
+  $("#reveal-about").hidden = !!entry.derived;
+
   $("#reveal-morph").innerHTML = "";
   entry.morph.split("+").forEach((m, i, arr) => {
     $("#reveal-morph").append(el("b", { textContent: m }));
@@ -329,14 +471,25 @@ function answerStrategy(key) {
 function showRule() {
   const entry = app.byWord.get(app.queue[app.index]);
   const key = entry.patterns[0];
-  $("#rule-name").textContent = key.replace(/-/g, " ");
-  $("#rule-explain").textContent = app.data.patterns[key] || "";
-  const siblings = [...app.data.words, ...app.data.off_list]
-    .filter((w) => w.word !== entry.word && w.patterns.includes(key))
-    .slice(0, 6);
+  if (!key) { show("reveal"); return; }
+  const pair = NOUN_VERB_PAIRS.get(entry.word);
+  $("#rule-name").textContent = pair ? "noun or verb" : key.replace(/-/g, " ");
+  // For the -ce/-se pairs the generic homophone card is true and useless. This
+  // is one of the few completely regular spelling rules in English, so say it.
+  $("#rule-explain").textContent = pair ? PAIR_RULE : (app.data.patterns[key] || "");
+  const siblings = pair
+    ? [...NOUN_VERB_PAIRS.keys()].filter((w) => w !== entry.word).map((word) => ({ word }))
+        .slice(0, 6)
+    : [...app.data.words, ...app.data.off_list]
+        .filter((w) => w.word !== entry.word && w.patterns.includes(key))
+        .slice(0, 6);
   $("#rule-siblings").replaceChildren(...siblings.map((w) => el("span", { textContent: w.word })));
-  $("#rule-worked").textContent = `${entry.word}  =  ${entry.morph.replace(/\+/g, " + ")}`;
-  $("#rule-why").textContent = entry.why;
+  const worked = entry.morph && entry.morph !== "-"
+    ? `${entry.word}  =  ${entry.morph.replace(/\+/g, " + ")}` : entry.word;
+  $("#rule-worked").textContent = pair ? `${entry.word}  \u2014  the ${pair}` : worked;
+  $("#rule-why").textContent = pair
+    ? `Its partner is the ${pair === "noun" ? "verb" : "noun"}, spelled the other way.`
+    : (entry.why || "");
   show("rule");
 }
 
@@ -569,6 +722,25 @@ async function showGrownUp() {
 
   const syncOn = await store.getKV("sync_enabled", false);
   $("#opt-sync").value = syncOn ? "on" : "off";
+  const weekCard = $("#gu-week");
+  if (app.week && app.week.words.length) {
+    weekCard.hidden = false;
+    const c = weekly.coverage(app.week, app.scheduler);
+    const when = c.days_left > 0 ? `Tested in ${c.days_left} days.`
+               : c.days_left === 0 ? "Tested today."
+               : "Tested. Still in rotation.";
+    $("#gu-week-summary").textContent =
+      `${c.practised} of ${c.words} practised so far, ${c.secure} looking secure. ${when}`;
+    $("#gu-week-words").replaceChildren(...app.week.words.map((w) => {
+      const st = app.scheduler.state[w] || {};
+      const chip = el("span", { textContent: w });
+      if (!st.seen) chip.className = "word-chip untouched";
+      return chip;
+    }));
+  } else {
+    weekCard.hidden = true;
+  }
+
   $("#gu-sync-state").textContent = !syncOn
     ? "Off. Everything stays on this device and the app makes no network calls."
     : sync.isConfigured()
@@ -612,6 +784,11 @@ function wire() {
   $("#btn-practise").onclick = startPractice;
   $("#btn-probe").onclick = startProbe;
   $("#btn-grownup").onclick = showGrownUp;
+  $("#btn-week").onclick = showWeek;
+  $("#week-input").addEventListener("input", paintParsed);
+  $("#week-save").onclick = saveWeek;
+  $("#week-clear").onclick = clearWeek;
+  $("#week-back").onclick = async () => { await refreshHome(); show("home"); };
 
   $("#attempt-input").addEventListener("keydown", (e) => {
     app.keys.onKey(e);

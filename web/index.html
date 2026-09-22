@@ -38,8 +38,18 @@
     <div id="home-world"></div>
   </div>
 
+  <div class="sheet kraft torn" id="home-week" hidden>
+    <span class="tab coral" id="home-week-tab">This week</span>
+    <p id="home-week-words" class="morphemes" style="margin-bottom:.5rem"></p>
+    <p id="home-week-state" class="small muted" style="margin:0"></p>
+  </div>
+
   <p id="home-probe-note" class="small muted"></p>
-  <p style="margin-top:1.5rem"><button id="btn-grownup" class="link">Grown-up view</button></p>
+  <p style="margin-top:1.5rem">
+    <button id="btn-week" class="link">This week&rsquo;s spellings</button>
+    &nbsp;&nbsp;
+    <button id="btn-grownup" class="link">Grown-up view</button>
+  </p>
 </section>
 
 <!-- ============================================ 1. attempt
@@ -50,6 +60,12 @@
 <section id="screen-attempt" class="screen">
   <h1>Listen, then spell it</h1>
   <p id="attempt-state" class="prompt-state" aria-live="polite"></p>
+  <!-- The word-class tag for a -ce/-se pair. It appears only AFTER the dictation
+       has finished, never alongside it: Mayer's redundancy effect is about a
+       spoken and a written channel carrying the same words at the same moment.
+       Once the audio has stopped there is no second channel, and she needs the
+       tag in front of her while she types or the item is unanswerable. -->
+  <p id="attempt-hint" class="note small" hidden></p>
   <p id="attempt-cloze" class="cloze" hidden></p>
   <p id="attempt-noaudio" class="note small" hidden>
     This device has no speech voice installed, so the app is showing the sentence with
@@ -80,7 +96,7 @@
       <p id="reveal-detail" class="muted" style="margin-top:.8rem"></p>
     </div>
 
-    <div class="sheet kraft tilt-r">
+    <div class="sheet kraft tilt-r" id="reveal-about">
       <span class="tab plum">How it is built</span>
       <p id="reveal-morph" class="morphemes"></p>
       <span class="tab">Where it comes from</span>
@@ -185,6 +201,42 @@
   <button id="paper-submit" class="primary">Save and see the profile</button>
 </section>
 
+<!-- ============================================ this week's spellings
+     For the adult, on a Sunday evening. Paste or type the list the school
+     sent home; the app works out which words it already knows properly and
+     which it has to read from the letters alone. -->
+<section id="screen-week" class="screen">
+  <h1>This week&rsquo;s spellings</h1>
+  <p class="muted">Paste the list, or type one word per line. Numbers and
+     punctuation are ignored.</p>
+
+  <div class="sheet torn">
+    <span class="tab">The words</span>
+    <textarea id="week-input" rows="9" placeholder="1. necessary&#10;2. rhythm&#10;3. conscience&#10;..."></textarea>
+    <p id="week-parsed" class="small muted" style="margin:.6rem 0 0"></p>
+  </div>
+
+  <div class="sheet kraft">
+    <span class="tab mustard">Test day</span>
+    <div class="row">
+      <label for="week-test" class="small">Tested on</label>
+      <input id="week-test" type="date">
+    </div>
+    <p class="small muted" style="margin:.6rem 0 0">Until then, about two words
+       in three each session come from this list. After it they don&rsquo;t
+       disappear &mdash; they join the normal rotation and come back a day, then
+       two, then four, then eight and sixteen days later. That later part is
+       what makes them stick for the writing, rather than just for Friday.</p>
+  </div>
+
+  <div class="row">
+    <button id="week-save" class="primary">Save the list</button>
+    <button id="week-clear">Clear it</button>
+    <button id="week-back" class="link">Back</button>
+  </div>
+  <p id="week-note" class="note small" style="margin-top:1.2rem"></p>
+</section>
+
 <!-- ============================================ 6. grown-up view -->
 <section id="screen-grownup" class="screen">
   <h1>Grown-up view</h1>
@@ -201,6 +253,14 @@
        the ICO Children's code both warn against.</p>
     <p><button id="gu-table-toggle" class="link">Show the numbers instead</button></p>
     <div id="gu-table" hidden></div>
+  </div>
+
+  <div class="sheet" id="gu-week" hidden>
+    <span class="tab coral">This week&rsquo;s list</span>
+    <p id="gu-week-summary"></p>
+    <div id="gu-week-words" class="siblings"></div>
+    <p class="small muted" style="margin-top:.7rem">Words she has not met yet are
+       shown plain. This is a coverage check for you, not a score for her.</p>
   </div>
 
   <div class="two-col">

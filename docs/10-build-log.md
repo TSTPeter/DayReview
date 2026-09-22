@@ -104,19 +104,33 @@ needs sequences of 200+ elements and the longest word here is 13 characters.
   audio-only prompt unusable. It now degrades to a cloze: the sentence with the word
   blanked. Still free-typed retrieval, still never shows the spelling, and it records
   `prompt_mode = text_cloze` so the two are never pooled in analysis.
+- **The first real list from school broke the parser and exposed an unanswerable
+  item.** Headings ending in a colon were parsed as spellings, so a list of 15 words
+  became 20 and Beatrix would have been asked to spell *pairs*. Worse, ten of the
+  fifteen were `-ce`/`-se` noun-verb pairs: the dictation said "The word is licence"
+  twice, with no sentence, which cannot be answered except by guessing. An impossible
+  item is worse than a missing one, because it records as a miss. Both fixed; see
+  `docs/12`. Found by pasting the actual list in, not by reading the code.
 
 ## What to distrust
 
-**Read the 111 sentences in `engine/sentences.py` before she does.** They were written
+**Read the 122 sentences in `engine/sentences.py` before she does.** They were written
 for this build and have had no second pair of eyes. `docs/05` decision 2 says nothing
 unreviewed is shown to a child; this is the outstanding item. Check two things: that no
 sentence gives the spelling away or leans on a homophone, and that each one disambiguates
 its word, which is the job the KS2 script gives it.
 
-**Listen to the pronunciation watchlist on the actual device.** 16 words are flagged in
+**Listen to the pronunciation watchlist on the actual device.** 18 words are flagged in
 `engine/sentences.py` with a respelling. None have been heard, because this was built in
 a container with no audio. A wrong model of the word teaches the wrong spelling, so this
 is a correctness task, not polish.
+
+**44 homophones on a school list are still undictatable.** `derive.HOMOPHONES` names
+54 words that sound like another word. The ten `-ce`/`-se` pairs now carry a word class
+and a sentence. The other 44 — *stationary*/*stationery*, *principal*/*principle* — have
+neither, and a word class cannot separate a pair that is two nouns. The list-entry screen
+warns the adult rather than failing quietly at dictation, which is honest, not fixed. The
+real fix is a reviewed sentence per homophone.
 
 **`equip` is missing from the word list.** English Appendix 1 reads `equip (–ped, –ment)`,
 so the statutory forms are *equip*, *equipped* and *equipment*. `words.py` carries the
