@@ -137,6 +137,21 @@ class TestCoverageOnceRendered(unittest.TestCase):
         self.assertEqual(self.m["voice_id"], render_audio.VOICE_ID)
         self.assertEqual(self.m["model_id"], render_audio.MODEL_ID)
 
+    def test_every_clip_is_the_requested_format(self):
+        # 64 kbps, 44.1 kHz: what render_audio.OUTPUT_FORMAT asks for. A clip that
+        # does not parse as frames at all is not audio the page can play.
+        for text, url in self.m["clips"].items():
+            with self.subTest(text=text):
+                self.assertGreater(render_audio.mp3_seconds(ROOT / "web" / url), 0.3)
+
+    def test_no_take_runs_long_or_cuts_short(self):
+        # A take far too long for its text is speech the model invented; far too
+        # short is a line it cut off. v3, the more expressive model, is the likelier
+        # to do either, and neither is visible in a file listing.
+        odd = render_audio.pace_outliers(self.m["clips"])
+        self.assertEqual(odd, [], "re-render these with --only <word>; if a take "
+                         "repeats, respell it in SPOKEN_OVERRIDES: " + repr(odd))
+
     def test_every_line_has_a_clip(self):
         missing = [t for t, _ in render_audio.utterances() if t not in self.m["clips"]]
         self.assertEqual(missing, [],

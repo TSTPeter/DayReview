@@ -147,11 +147,21 @@ def describe(err):
 
 
 def check_voice(key, voice_id):
+    """
+    Fail fast on a wrong key or voice id, before a long run. Optional: a key
+    scoped to text-to-speech alone (good practice, and how a temporary key is
+    usually issued) cannot read voices, so a missing permission here is a note,
+    not a stop. The first render will say soon enough if the key is no good.
+    """
     try:
         with request("GET", f"{API}/voices/{voice_id}", key) as r:
             v = json.loads(r.read().decode("utf-8"))
     except urllib.error.HTTPError as e:
-        sys.exit(f"Cannot use voice {voice_id}: {describe(e)}. Check the key and the id.")
+        why = describe(e)
+        if "missing_permissions" in why or "voices_read" in why:
+            print("voice: not checked (the key is scoped to text-to-speech, which is fine)")
+            return
+        sys.exit(f"Cannot use voice {voice_id}: {why}. Check the key and the id.")
     labels = v.get("labels") or {}
     print(f"voice: {v.get('name')} ({v.get('category')}), "
           f"accent: {labels.get('accent', 'not labelled')}")
@@ -183,23 +193,75 @@ def render(key, voice_id, text):
     raise RuntimeError("gave up after retries")
 
 
+# MPEG-1 Layer III. Enough to walk the frames of what ElevenLabs returns, which is
+# how a clip's real length is known without ffmpeg.
+_KBPS = {1: 32, 2: 40, 3: 48, 4: 56, 5: 64, 6: 80, 7: 96, 8: 112,
+         9: 128, 10: 160, 11: 192, 12: 224, 13: 256, 14: 320}
+_HZ = {0: 44100, 1: 48000, 2: 32000}
+
+
+def mp3_seconds(path):
+    """Exact duration from the frame headers. 0.0 if nothing parses as MP3."""
+    b = pathlib.Path(path).read_bytes()
+    i = 0
+    if b[:3] == b"ID3":
+        i = 10 + ((b[6] << 21) | (b[7] << 14) | (b[8] << 7) | b[9])
+    frames, rate = 0, None
+    while i + 4 <= len(b):
+        h = int.from_bytes(b[i:i + 4], "big")
+        ok = ((h >> 21) & 0x7FF) == 0x7FF and ((h >> 19) & 3) == 3 and ((h >> 17) & 3) == 1
+        bi, ri = (h >> 12) & 0xF, (h >> 10) & 3
+        if not ok or bi not in _KBPS or ri not in _HZ:
+            i += 1
+            continue
+        rate = _HZ[ri]
+        i += 144 * _KBPS[bi] * 1000 // rate + ((h >> 9) & 1)
+        frames += 1
+    return frames * 1152 / rate if rate else 0.0
+
+
+# Characters of text per second of audio. A measured reading sits well inside this;
+# far outside it means the take is not the line: speech the model invented (too
+# long) or a line it cut off (too short). Both are things v3, the more expressive
+# model, is more likely to do than v2, and neither shows up in a file listing.
+PACE = (6.0, 30.0)
+
+
+def pace_outliers(clips):
+    """[(text, seconds, chars_per_second)] for clips whose length does not fit their text."""
+    out = []
+    for text, url in clips.items():
+        sec = mp3_seconds(ROOT / "web" / url)
+        cps = len(text) / sec if sec else float("inf")
+        if not PACE[0] <= cps <= PACE[1]:
+            out.append((text, round(sec, 2), round(cps, 1)))
+    return out
+
+
 def main(argv=None):
     ap = argparse.ArgumentParser(description=__doc__.split("\n")[1])
     ap.add_argument("--dry-run", action="store_true", help="count, render nothing")
     ap.add_argument("--voice", default=VOICE_ID, help="ElevenLabs voice id")
     ap.add_argument("--only", nargs="+", metavar="WORD",
-                    help="force re-render of these words' lines")
+                    help="render ONLY these words' lines, replacing any existing clips")
     ap.add_argument("--keep-orphans", action="store_true",
                     help="do not delete clips the manifest no longer uses")
     args = ap.parse_args(argv)
 
     lines = utterances()
+    known = {w for _, w in lines}
+    unknown = sorted(set(args.only or []) - known)
+    if unknown:
+        sys.exit(f"No sentence for: {', '.join(unknown)}. Add one to engine/sentences.py first.")
     plan = []
     for text, word in lines:
         spoken = SPOKEN_OVERRIDES.get(text, text)
         name = clip_name(spoken, args.voice)
-        forced = bool(args.only) and word in args.only
-        if forced or not (AUDIO_DIR / name).exists():
+        if args.only:
+            # --only means only: these words, re-rendered whether or not they exist.
+            if word in args.only:
+                plan.append((text, spoken, name))
+        elif not (AUDIO_DIR / name).exists():
             plan.append((text, spoken, name))
 
     chars = sum(len(s) for _, s, _ in plan)
@@ -254,6 +316,9 @@ def main(argv=None):
     size = sum(f.stat().st_size for f in AUDIO_DIR.glob("*.mp3"))
     print(f"wrote {MANIFEST.relative_to(ROOT)}: {len(clips)}/{len(lines)} lines "
           f"have a clip, {size / 1e6:.1f} MB")
+    odd = pace_outliers(clips)
+    for text, sec, cps in odd:
+        print(f"  CHECK BY EAR: {sec}s for {len(text)} characters ({cps}/s): {text}")
     if failed:
         sys.exit(f"{len(failed)} line(s) failed; they will use the device voice. "
                  "Re-run to retry just those.")
