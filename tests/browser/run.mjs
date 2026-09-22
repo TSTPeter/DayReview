@@ -57,7 +57,17 @@ const readAttempts = (page) => page.evaluate(async () => {
 
 const browser = await chromium.launch(
   EXECUTABLE ? { executablePath: EXECUTABLE } : {});
+// Every context below tests the DEVICE-voice path unless it says otherwise, so each
+// pins that precondition: an empty clip manifest, for the page and for the service
+// worker's precache alike (a context route reaches the worker in Chromium; checked).
+// Without this, what the suite means would change with whatever happens to be
+// rendered. The clip tests further down pin their own manifests, and one of them
+// uses the real one.
+const noClips = (c) => c.route("**/data/audio.json", (r) => r.fulfill({
+  contentType: "application/json", body: JSON.stringify({ clips: {} }) }));
+
 const ctx = await browser.newContext({ viewport: { width: 420, height: 900 } });
+await noClips(ctx);
 const page = await ctx.newPage();
 const errors = [];
 const requestLog = [];
@@ -134,6 +144,7 @@ check("session end reports self-referenced progress", /spelled correctly/i.test(
 
 console.log("\n— 5. paper probe —");
 const ctx2 = await browser.newContext({ viewport: { width: 420, height: 900 } });
+await noClips(ctx2);
 const p2 = await ctx2.newPage();
 p2.on("pageerror", (e) => errors.push("probe pageerror: " + e.message));
 await p2.goto(BASE, { waitUntil: "networkidle" });
@@ -303,6 +314,7 @@ check("three consecutive correct cracks that word's rules",
 console.log("\n— this week's spellings —");
 {
   const ctx3 = await browser.newContext({ viewport: { width: 820, height: 1180 } });
+  await noClips(ctx3);
   const w = await ctx3.newPage();
   w.on("pageerror", (e) => errors.push("week pageerror: " + e.message));
   await w.goto(BASE, { waitUntil: "networkidle" });
@@ -371,6 +383,7 @@ console.log("\n— this week's spellings —");
 console.log("\n— a real school list, headings and all —");
 {
   const ctx4 = await browser.newContext({ viewport: { width: 820, height: 1180 } });
+  await noClips(ctx4);
   const w = await ctx4.newPage();
   w.on("pageerror", (e) => errors.push("real-list pageerror: " + e.message));
   await w.goto(BASE, { waitUntil: "networkidle" });
@@ -462,6 +475,7 @@ console.log("\n— a real school list, headings and all —");
 console.log("\n— what the dictation actually says —");
 {
   const ctx5 = await browser.newContext({ viewport: { width: 820, height: 1180 } });
+  await noClips(ctx5);
   const w = await ctx5.newPage();
   w.on("pageerror", (e) => errors.push("dictation pageerror: " + e.message));
   await w.addInitScript(() => {
@@ -718,6 +732,45 @@ console.log("\n— pre-rendered clips, on a device WITH a speech voice —");
   check("cancelling a clip never hands the line to the device voice",
         leaked.length === 0, leaked.length ? `leaked: ${leaked.join(" | ")}` : "");
   await ctx.close();
+}
+
+// The real rendered set, end to end: the manifest the renderer wrote, the MP3s it
+// fetched, played by a real browser engine to their end. Skips while nothing is
+// rendered. Service workers are blocked so every request is visible.
+console.log("\n— the real rendered clips —");
+{
+  const real = await (await fetch(new URL("data/audio.json", BASE))).json();
+  if (!Object.keys(real.clips || {}).length) {
+    console.log("  skip  nothing rendered yet");
+  } else {
+    const c = await browser.newContext({ viewport: { width: 820, height: 1180 },
+                                         serviceWorkers: "block" });
+    const w = await c.newPage();
+    w.on("pageerror", (e) => errors.push("real clips pageerror: " + e.message));
+    const got = [];
+    w.on("response", (r) => { if (r.url().includes("/audio/")) got.push([new URL(r.url()).pathname, r.status()]); });
+    await w.goto(BASE, { waitUntil: "networkidle" });
+    await w.click("#btn-practise");
+    await w.waitForSelector("#screen-attempt.on");
+    const t0 = Date.now();
+    await w.waitForFunction(() => !document.querySelector("#attempt-replay").disabled,
+                            null, { timeout: 30000 });
+    const took = (Date.now() - t0) / 1000;
+    await w.fill("#attempt-input", "zzz");
+    await w.click("#attempt-submit");
+    await w.waitForSelector("#screen-reveal.on");
+    const word = (await w.textContent("#reveal-target")).trim();
+    const row = await lastRow(w);
+    const want = [namingLine(word, hintFor(word)), dictation.sentences[word]]
+      .map((t) => "/" + real.clips[t]);
+    const fetched = new Set(got.filter(([, st]) => st < 400).map(([pth]) => pth));
+    check(`'${word}': its real naming and sentence clips were fetched`,
+          want.every((u) => fetched.has(u)), [...fetched].join(" "));
+    check(`'${word}': the real MP3s played to their end in a browser`,
+          row.audio_source === "clip" && took > 3 && took < 20,
+          `${row.audio_source}, script took ${took.toFixed(1)} s`);
+    await c.close();
+  }
 }
 
 console.log("\n— privacy defaults —");

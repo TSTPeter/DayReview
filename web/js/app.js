@@ -159,6 +159,12 @@ function applyComfort(c) {
 async function warmClips() {
   if (!navigator.onLine) return;
   if (navigator.connection && navigator.connection.saveData) return;
+  // First visit: the worker has just installed and is not yet in charge of this
+  // page, so nothing fetched now would be kept. Wait until it claims the page.
+  if (!navigator.serviceWorker.controller) {
+    await new Promise((resolve) => navigator.serviceWorker
+      .addEventListener("controllerchange", resolve, { once: true }));
+  }
   const words = new Set([...(app.week ? app.week.words : []),
                          ...app.scheduler.due().slice(0, SESSION_SIZE * 3)]);
   const urls = new Set();
@@ -171,8 +177,12 @@ async function warmClips() {
     }
   }
   for (const url of urls) {
-    // One at a time, and give up quietly: this is a nicety, never a blocker.
-    try { await fetch(url); } catch { return; }
+    // One at a time, read to the end, and give up quietly: a nicety, never a blocker.
+    // Reading matters. fetch() resolves on the headers, so an unread body is a
+    // request still open, and sixty of those would sit on the handful of connections
+    // a browser allows per host: the clip she is actually waiting for would queue
+    // behind them. The browser suite found this as a page that never went idle.
+    try { await (await fetch(url)).arrayBuffer(); } catch { return; }
   }
 }
 
