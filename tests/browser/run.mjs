@@ -363,6 +363,158 @@ console.log("\n— this week's spellings —");
   await ctx3.close();
 }
 
+// Headless Chromium has no speech voices, so this runs the cloze path. That is
+// the harder case for these words, not the easier one: with no dictation at all
+// the word class is the only thing separating 'licence' from 'license'.
+console.log("\n— a real school list, headings and all —");
+{
+  const ctx4 = await browser.newContext({ viewport: { width: 820, height: 1180 } });
+  const w = await ctx4.newPage();
+  w.on("pageerror", (e) => errors.push("real-list pageerror: " + e.message));
+  await w.goto(BASE, { waitUntil: "networkidle" });
+  await w.waitForSelector("#screen-home.on");
+
+  await w.click("#btn-week");
+  await w.waitForSelector("#screen-week.on");
+  await w.fill("#week-input",
+    "Noun/verb pairs (N = noun, V = verb):\n"
+    + "advice (N) / advise (V) / device (N) / devise (V) / licence (N) "
+    + "/ license (V) / practice (N) / practise (V) / prophecy (N) / prophesy (V)\n"
+    + "Plain list:\n"
+    + "ancient, apparent, appreciate, attached, available");
+  await w.waitForTimeout(150);
+  const parsed = await w.textContent("#week-parsed");
+  check("the headings are not counted as spellings", /15 words/.test(parsed),
+        parsed.trim().slice(0, 80));
+  check("the adult is shown which words got a word class",
+        /10 will be dictated with their word class/.test(parsed));
+  check("this week's list has nothing the app cannot dictate", !/⚠/.test(parsed));
+
+  // A homophone with no sentence and no word class is unanswerable, and the
+  // adult has to be told before the child meets it, not after.
+  await w.fill("#week-input", "stationery\nrhythm");
+  await w.waitForTimeout(150);
+  const risky = await w.textContent("#week-parsed");
+  check("an undictatable homophone is flagged to the adult",
+        /⚠ stationery/.test(risky), risky.trim().slice(0, 110));
+  check("an ordinary word is not flagged", !/rhythm sounds like/.test(risky));
+  await w.fill("#week-input",
+    "Noun/verb pairs (N = noun, V = verb):\n"
+    + "advice (N) / advise (V) / device (N) / devise (V) / licence (N) "
+    + "/ license (V) / practice (N) / practise (V) / prophecy (N) / prophesy (V)\n"
+    + "Plain list:\n"
+    + "ancient, apparent, appreciate, attached, available");
+  await w.waitForTimeout(150);
+
+  await w.click("#week-save");
+  await w.waitForSelector("#screen-home.on");
+  const shown = await w.textContent("#home-week-words");
+  for (const junk of ["pairs", "plain"]) {
+    check(`'${junk}' never becomes a spelling`, !new RegExp(`\\b${junk}\\b`).test(shown));
+  }
+
+  // Re-opening the list must not lose the tags the school supplied.
+  await w.click("#btn-week");
+  await w.waitForSelector("#screen-week.on");
+  check("the word class survives a round trip through the editor",
+        /advice \(noun\)/.test(await w.inputValue("#week-input")));
+  await w.click("#week-back");
+  await w.waitForSelector("#screen-home.on");
+
+  const PAIRS = ["advice", "advise", "device", "devise", "licence", "license",
+                 "practice", "practise", "prophecy", "prophesy"];
+  await w.click("#btn-practise");
+  let sawPair = false, sawPlain = false;
+  for (let i = 0; i < 10; i++) {
+    await w.waitForSelector("#screen-attempt.on");
+    const hint = (await w.textContent("#attempt-hint")).trim();
+    const hintUp = await w.locator("#attempt-hint").isVisible();
+    await w.fill("#attempt-input", "zzz");
+    await w.click("#attempt-submit");
+    await w.waitForSelector("#screen-reveal.on");
+    const target = (await w.textContent("#reveal-target")).trim().toLowerCase();
+    if (PAIRS.includes(target) && !sawPair) {
+      sawPair = true;
+      check(`'${target}': the word class is on screen while she types`,
+            hintUp && /It is the (noun|verb)\./.test(hint), hint);
+      await w.click("#reveal-rule-btn");
+      await w.waitForSelector("#screen-rule.on");
+      check(`'${target}': the rule card teaches the c/s rule, not 'sounds the same'`,
+            /The noun has a c, the verb has an s/.test(await w.textContent("#rule-explain")));
+      await w.click("#rule-back");
+      await w.waitForSelector("#screen-reveal.on");
+    } else if (!PAIRS.includes(target) && !sawPlain) {
+      sawPlain = true;
+      check(`'${target}': no word class is invented for an ordinary word`, !hintUp);
+    }
+    await w.click("#reveal-next");
+  }
+  check("a noun/verb pair was reached", sawPair);
+
+  await ctx4.close();
+}
+
+// Beatrix's iPad HAS voices, so the path she will actually use is the one
+// headless Chromium cannot run. Stub the speech API and read back what the app
+// asked it to say: for these ten words the spoken line is the whole question.
+console.log("\n— what the dictation actually says —");
+{
+  const ctx5 = await browser.newContext({ viewport: { width: 820, height: 1180 } });
+  const w = await ctx5.newPage();
+  w.on("pageerror", (e) => errors.push("dictation pageerror: " + e.message));
+  await w.addInitScript(() => {
+    window.__spoken = [];
+    class FakeUtterance {
+      constructor(text) { this.text = text; this.onend = null; this.onerror = null; }
+    }
+    // speechSynthesis is an accessor on the window prototype in Chromium, so a
+    // plain assignment is silently dropped. Define over it.
+    const fake = {
+      getVoices: () => [{ name: "Test Voice", lang: "en-GB", default: true }],
+      speak(u) { window.__spoken.push(u.text); setTimeout(() => u.onend && u.onend(), 5); },
+      cancel() {}, pause() {}, resume() {},
+      addEventListener() {}, removeEventListener() {},
+      speaking: false, pending: false, paused: false,
+    };
+    Object.defineProperty(window, "SpeechSynthesisUtterance",
+                          { value: FakeUtterance, configurable: true, writable: true });
+    Object.defineProperty(window, "speechSynthesis",
+                          { value: fake, configurable: true });
+  });
+  await w.goto(BASE, { waitUntil: "networkidle" });
+  await w.waitForSelector("#screen-home.on");
+
+  await w.click("#btn-week");
+  await w.waitForSelector("#screen-week.on");
+  await w.fill("#week-input", "advice (N)\nadvise (V)\nlicence (N)\nlicense (V)");
+  await w.click("#week-save");
+  await w.waitForSelector("#screen-home.on");
+
+  await w.click("#btn-practise");
+  await w.waitForSelector("#screen-attempt.on");
+  // Wait for the three-step script to finish rather than for a fixed time.
+  await w.waitForFunction(
+    () => window.__spoken.filter((t) => /^The word is /.test(t)).length >= 2,
+    null, { timeout: 15000 });
+  const said = await w.evaluate(() => window.__spoken.slice());
+  const naming = said.filter((t) => /^The word is /.test(t));
+
+  check("the word class is spoken, not just displayed",
+        /^The word is \w+, the (noun|verb)\.$/.test(naming[0]), naming[0]);
+  check("it is repeated on the second naming, as the KS2 script does",
+        naming[1] === naming[0], naming[1]);
+  check("the sentence still sits between the two namings",
+        said.indexOf(naming[0]) < said.length - 1
+        && !/^The word is /.test(said[said.indexOf(naming[0]) + 1]),
+        said.join(" | ").slice(0, 120));
+  check("the word itself is never spelled out or shown during dictation",
+        await w.locator("#attempt-hint").isVisible()
+        && !(await w.innerText("#screen-attempt")).toLowerCase()
+              .includes(naming[0].replace(/^The word is (\w+),.*$/, "$1")));
+
+  await ctx5.close();
+}
+
 console.log("\n— privacy defaults —");
 const syncDefault = await page.evaluate(async () => {
   const db = await new Promise((r) => { const q = indexedDB.open("spelling", 1);

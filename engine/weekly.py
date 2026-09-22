@@ -44,25 +44,62 @@ AFTERGLOW_DAYS = 21        # how long a finished list keeps a claim on sessions
 AFTERGLOW_SHARE = 1 / 3    # of each session, after the test, for DUE words only
 
 
-def parse(text):
-    """
-    Pull words out of whatever the adult pastes.
+# A line that ends in a colon is a heading, not spellings. Without this, a
+# real list pasted verbatim —
+#     Noun/verb pairs (N = noun, V = verb):
+#     advice (N) / advise (V)
+# — put 'noun', 'verb' and 'pairs' on the practice queue, and she would have
+# been asked to spell 'pairs'.
+HEADING = re.compile(r":\s*$")
 
-    Deliberately forgiving: a school list arrives as a photo retyped in a
-    hurry, a numbered list, a comma-separated line, or one word per row.
-    Anything that is not a word is dropped rather than queried.
+# A parenthesised or bracketed tag after a word: '(N)', '(noun)', '[verb]'.
+# Schools write the list this way precisely because the word alone is
+# ambiguous, so the tag is information, not decoration.
+TAG = re.compile(r"[\(\[]\s*([A-Za-z][A-Za-z ]{0,14}?)\s*[\)\]]")
+TAG_MEANING = {"n": "noun", "noun": "noun", "v": "verb", "verb": "verb",
+               "adj": "adjective", "adjective": "adjective",
+               "adv": "adverb", "adverb": "adverb"}
+
+
+def parse_entries(text):
+    """
+    Pull words, and any disambiguating tag, out of whatever the adult pastes.
+
+    Returns [{"word": ..., "hint": ... or None}]. Deliberately forgiving: a
+    school list arrives retyped in a hurry, numbered, comma-separated, or one
+    per row. Headings are skipped; anything else that is not a word is dropped
+    rather than queried.
     """
     if not text:
         return []
     out, seen = [], set()
-    for token in re.split(r"[^A-Za-z'’-]+", text):
-        w = re.sub(r"[^a-z]", "", token.lower())
-        # Numbering and stray single letters are noise; real Y5/6 words are 3+.
-        if len(w) < 3 or w in seen:
+    for line in str(text).splitlines():
+        if HEADING.search(line):
             continue
-        seen.add(w)
-        out.append(w)
+        # Split the line into segments so a tag attaches to the word before it:
+        # 'advice (N) / advise (V)' is two items, not one with two tags.
+        for segment in re.split(r"[/,;]|\s{2,}", line):
+            tag = TAG.search(segment)
+            hint = TAG_MEANING.get(tag.group(1).strip().lower()) if tag else None
+            for token in re.split(r"[^A-Za-z'’-]+", TAG.sub(" ", segment)):
+                w = re.sub(r"[^a-z]", "", token.lower())
+                # Numbering and stray initials are noise; real Y5/6 words are 3+.
+                if len(w) < 3 or w in seen:
+                    continue
+                seen.add(w)
+                out.append({"word": w, "hint": hint or derive.hint_for(w)})
     return out
+
+
+def parse(text):
+    """Just the words. See parse_entries for the tags."""
+    return [e["word"] for e in parse_entries(text)]
+
+
+def hint_of(lst, word):
+    """The tag to speak and show for a word: the list's own first, then the table."""
+    w = derive.normalise(word)
+    return ((lst or {}).get("hints") or {}).get(w) or derive.hint_for(w)
 
 
 def next_test_day(from_day=None, weekday=FRIDAY):
@@ -74,10 +111,13 @@ def next_test_day(from_day=None, weekday=FRIDAY):
 
 def make_list(text, set_on=None, test_on=None, list_id=None):
     set_on = set_on or date.today()
-    words = parse(text)
+    entries = parse_entries(text)
     return {
         "id": list_id or f"week-{set_on.isoformat()}",
-        "words": words,
+        "words": [e["word"] for e in entries],
+        # word -> 'noun' / 'verb' / ..., for words dictation alone cannot ask
+        # for. Only the ones that need it are stored.
+        "hints": {e["word"]: e["hint"] for e in entries if e["hint"]},
         "set_on": set_on.isoformat(),
         "test_on": (test_on or next_test_day(set_on)).isoformat(),
         "done": False,

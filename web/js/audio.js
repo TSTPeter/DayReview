@@ -119,9 +119,16 @@ function spoken(word) {
 
 // The four-step script. Returns when the third step finishes; the caller owns the pause,
 // because in the app the pause is the child typing rather than dead air.
-export async function dictate(word, sentence, { onStep = () => {} } = {}) {
+//
+// `hint` is a word-class tag ('noun', 'verb') and is spoken as part of the naming step,
+// which is what a teacher dictating a -ce/-se pair actually does. It is not decoration:
+// for 'licence'/'license' the two words sound identical, so without it the item has no
+// answerable question in it at all. See engine/derive.js NOUN_VERB_PAIRS.
+export async function dictate(word, sentence, { onStep = () => {}, hint = null } = {}) {
+  const naming = hint ? `The word is ${spoken(word)}, the ${hint}.`
+                      : `The word is ${spoken(word)}.`;
   onStep("word");
-  await speak(`The word is ${spoken(word)}.`);
+  await speak(naming);
   await wait(BETWEEN_STEPS_MS);
   if (sentence) {
     onStep("sentence");
@@ -131,7 +138,7 @@ export async function dictate(word, sentence, { onStep = () => {} } = {}) {
     await wait(BETWEEN_STEPS_MS);
   }
   onStep("word-again");
-  await speak(`The word is ${spoken(word)}.`);
+  await speak(naming);
   onStep("done");
 }
 

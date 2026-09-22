@@ -7,7 +7,7 @@
 // A local-time Date would shift the test day across a timezone or a DST
 // boundary, and "which day is the test" is not a question to get wrong.
 
-import { derive, makeEntry, normalise } from "./derive.js";
+import { derive, hintFor, makeEntry, normalise } from "./derive.js";
 
 export const FRIDAY = 5;            // JS getUTCDay(): Sunday is 0
 export const WEEKLY_SHARE = 2 / 3;
@@ -19,18 +19,61 @@ const parseISO = (iso) => Date.parse(`${iso}T00:00:00Z`);
 const toISO = (ms) => new Date(ms).toISOString().slice(0, 10);
 export const today = () => new Date().toISOString().slice(0, 10);
 
-/** Forgiving on purpose: a school list arrives retyped in a hurry. */
-export function parse(text) {
+// A line that ends in a colon is a heading, not spellings. Without this, a
+// real list pasted verbatim --
+//     Noun/verb pairs (N = noun, V = verb):
+//     advice (N) / advise (V)
+// -- put 'noun', 'verb' and 'pairs' on the practice queue, and she would have
+// been asked to spell 'pairs'.
+const HEADING = /:\s*$/;
+
+// A parenthesised or bracketed tag after a word: '(N)', '(noun)', '[verb]'.
+// Schools write the list this way precisely because the word alone is
+// ambiguous, so the tag is information, not decoration.
+const TAG = /[\(\[]\s*([A-Za-z][A-Za-z ]{0,14}?)\s*[\)\]]/;
+const TAG_ALL = new RegExp(TAG.source, "g");
+const TAG_MEANING = new Map([
+  ["n", "noun"], ["noun", "noun"], ["v", "verb"], ["verb", "verb"],
+  ["adj", "adjective"], ["adjective", "adjective"],
+  ["adv", "adverb"], ["adverb", "adverb"],
+]);
+
+// Python's str.splitlines(), near enough: the boundaries a pasted list can
+// actually contain. Parity with weekly.py depends on splitting the same way.
+const LINES = /\r\n|[\n\r\u000b\u000c\u001c-\u001e\u0085\u2028\u2029]/;
+
+/**
+ * Pull words, and any disambiguating tag, out of whatever the adult pastes.
+ * Returns [{word, hint}]. Forgiving on purpose: a school list arrives retyped
+ * in a hurry, numbered, comma-separated, or one per row. Headings are skipped;
+ * anything else that is not a word is dropped rather than queried.
+ */
+export function parseEntries(text) {
   if (!text) return [];
   const out = [];
   const seen = new Set();
-  for (const token of String(text).split(/[^A-Za-z'’-]+/)) {
-    const w = token.toLowerCase().replace(/[^a-z]/g, "");
-    if (w.length < 3 || seen.has(w)) continue;   // numbering and initials are noise
-    seen.add(w);
-    out.push(w);
+  for (const line of String(text).split(LINES)) {
+    if (HEADING.test(line)) continue;
+    // Split the line into segments so a tag attaches to the word before it:
+    // 'advice (N) / advise (V)' is two items, not one with two tags.
+    for (const segment of line.split(/[/,;]|\s{2,}/)) {
+      const tag = TAG.exec(segment);
+      const hint = tag ? TAG_MEANING.get(tag[1].trim().toLowerCase()) : null;
+      for (const token of segment.replace(TAG_ALL, " ").split(/[^A-Za-z'’-]+/)) {
+        const w = token.toLowerCase().replace(/[^a-z]/g, "");
+        // Numbering and stray initials are noise; real Y5/6 words are 3+.
+        if (w.length < 3 || seen.has(w)) continue;
+        seen.add(w);
+        out.push({ word: w, hint: hint || hintFor(w) });
+      }
+    }
   }
   return out;
+}
+
+/** Just the words. See parseEntries for the tags. */
+export function parse(text) {
+  return parseEntries(text).map((e) => e.word);
 }
 
 export function nextTestDay(fromISO, weekday = FRIDAY) {
@@ -41,13 +84,25 @@ export function nextTestDay(fromISO, weekday = FRIDAY) {
 
 export function makeList(text, setOn, testOn, listId) {
   const set = setOn || today();
+  const entries = parseEntries(text);
+  const hints = {};
+  for (const e of entries) if (e.hint) hints[e.word] = e.hint;
   return {
     id: listId || `week-${set}`,
-    words: parse(text),
+    words: entries.map((e) => e.word),
+    // word -> 'noun' / 'verb' / ..., for words dictation alone cannot ask for.
+    // Only the ones that need it are stored.
+    hints,
     set_on: set,
     test_on: testOn || nextTestDay(set),
     done: false,
   };
+}
+
+/** The tag to speak and show for a word, from the list first, then the table. */
+export function hintOf(list, word) {
+  const w = normalise(word);
+  return (list && list.hints && list.hints[w]) || hintFor(w);
 }
 
 /**

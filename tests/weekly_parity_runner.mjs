@@ -17,6 +17,13 @@ for (const w of input.words) derived[w] = derive(w, 99);
 
 // --- a full week replayed through the composer ---------------------------
 const list = weekly.makeList(input.listText, input.setOn);
+
+// The tagged list is parsed separately: headings must be skipped and '(N)'/'(V)'
+// must land on the right word on BOTH sides, or one device dictates an item the
+// other cannot ask.
+const tagged = weekly.makeList(input.taggedText, input.setOn);
+const hints = Object.fromEntries(
+  input.words.map((w) => [w, weekly.hintOf(tagged, w)]));
 const extra = weekly.entriesFor(list.words, byWord).filter((e) => !byWord.has(e.word));
 const scheduler = new Scheduler([...data.words, ...extra], input.setOn);
 
@@ -32,4 +39,4 @@ for (const offset of input.offsets) {
   log.push({ day, queue, coverage: weekly.coverage(list, scheduler) });
 }
 
-process.stdout.write(JSON.stringify({ derived, list, log }));
+process.stdout.write(JSON.stringify({ derived, list, tagged, hints, log }));

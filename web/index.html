@@ -60,6 +60,12 @@
 <section id="screen-attempt" class="screen">
   <h1>Listen, then spell it</h1>
   <p id="attempt-state" class="prompt-state" aria-live="polite"></p>
+  <!-- The word-class tag for a -ce/-se pair. It appears only AFTER the dictation
+       has finished, never alongside it: Mayer's redundancy effect is about a
+       spoken and a written channel carrying the same words at the same moment.
+       Once the audio has stopped there is no second channel, and she needs the
+       tag in front of her while she types or the item is unanswerable. -->
+  <p id="attempt-hint" class="note small" hidden></p>
   <p id="attempt-cloze" class="cloze" hidden></p>
   <p id="attempt-noaudio" class="note small" hidden>
     This device has no speech voice installed, so the app is showing the sentence with

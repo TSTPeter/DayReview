@@ -22,6 +22,7 @@ import * as dash from "./dashboard.js";
 import { Keystrokes, fluency } from "./keystrokes.js";
 import { crackedPatterns, settle, renderWorld, artFor, assignArt } from "./rewards.js";
 import * as weekly from "./engine/weekly.js";
+import { NOUN_VERB_PAIRS, PAIR_RULE, makeEntry } from "./engine/derive.js";
 
 const $ = (sel) => document.querySelector(sel);
 const el = (tag, props = {}, kids = []) => {
@@ -188,8 +189,17 @@ function paintWeekCard() {
 
 // --------------------------------------------------------------- this week
 
+// Written back WITH the tags, one per line, so editing the list a second time
+// does not silently drop the noun/verb markers the school supplied.
+function weekText(list) {
+  if (!list) return "";
+  return list.words
+    .map((w) => (list.hints && list.hints[w] ? `${w} (${list.hints[w]})` : w))
+    .join("\n");
+}
+
 function showWeek() {
-  $("#week-input").value = app.week ? app.week.words.join("\n") : "";
+  $("#week-input").value = weekText(app.week);
   $("#week-test").value = app.week ? app.week.test_on : weekly.nextTestDay();
   paintParsed();
   $("#week-note").textContent = "";
@@ -197,15 +207,41 @@ function showWeek() {
 }
 
 function paintParsed() {
-  const words = weekly.parse($("#week-input").value);
+  const entries = weekly.parseEntries($("#week-input").value);
+  const words = entries.map((e) => e.word);
   if (!words.length) { $("#week-parsed").textContent = ""; return; }
   // Say plainly which words the app knows properly and which it is reading
   // from the letters alone, so the thinner reveal is never a surprise.
   const curated = words.filter((w) => app.byWord.has(w) && !app.byWord.get(w).derived);
   const parts = [`${words.length} word${words.length === 1 ? "" : "s"}`];
+  // Show the tags back. If the school wrote '(N)' and the app did not read it,
+  // that has to be visible here rather than discovered mid-dictation.
+  const tagged = entries.filter((e) => e.hint);
+  if (tagged.length) {
+    parts.push(`${tagged.length} will be dictated with their word class `
+      + `(${tagged.slice(0, 3).map((e) => `${e.word} = ${e.hint}`).join(", ")}`
+      + `${tagged.length > 3 ? "\u2026" : ""})`);
+  }
   if (curated.length) {
     parts.push(`${curated.length} already known in full (${curated.slice(0, 4).join(", ")}`
       + `${curated.length > 4 ? "…" : ""})`);
+  }
+  // The -ce/-se pairs were one instance of a general fault: a word that sounds
+  // exactly like another, dictated as 'The word is X' twice with no sentence
+  // and no word class, asks a question with no answer in it. A wrong answer
+  // then records an error type that describes nothing. The ten pairs are
+  // handled by NOUN_VERB_PAIRS; the rest of derive.HOMOPHONES are not, and
+  // writing fifty sentences unreviewed would break docs/05's review gate. So
+  // say so here instead of failing quietly during dictation.
+  const unanswerable = entries.filter((e) =>
+    !e.hint
+    && !app.sentences[e.word]
+    && (app.byWord.get(e.word) || makeEntry(e.word)).patterns.includes("homophone-trap"));
+  if (unanswerable.length) {
+    parts.push(`⚠ ${unanswerable.map((e) => e.word).join(", ")} `
+      + `sound${unanswerable.length === 1 ? "s" : ""} like another word and the app `
+      + `has no sentence to tell them apart — add the word class in brackets, `
+      + `like "${unanswerable[0].word} (noun)"`);
   }
   const rest = words.length - curated.length;
   if (rest) parts.push(`${rest} read from the spelling — she'll get the rule but not the word history`);
@@ -257,6 +293,7 @@ function nextItem() {
   $("#attempt-input").disabled = false;
   $("#attempt-submit").disabled = true;
   $("#attempt-state").textContent = "";
+  $("#attempt-hint").hidden = true;
   $("#attempt-count").textContent = `${app.index + 1} of ${app.queue.length}`;
   app.keys.reset();
 
@@ -284,23 +321,39 @@ function promptMode() {
   return app.audioOk ? "audio_sentence" : "text_cloze";
 }
 
+// 'advice' and 'advise' sound the same, and so do 'licence' and 'license'. Naming
+// the word twice asks a question with no answer in it. The word class is the
+// missing half of the prompt, so it is spoken with the word and then left on
+// screen while she types. See engine/derive.py NOUN_VERB_PAIRS.
+function showHint(hint) {
+  const p = $("#attempt-hint");
+  p.hidden = !hint;
+  p.textContent = hint ? `It is the ${hint}.` : "";
+}
+
 async function playPrompt(entry) {
   const sentence = app.sentences[entry.word] || "";
+  const hint = weekly.hintOf(app.week, entry.word);
   if (!app.audioOk) {
     $("#attempt-cloze").hidden = false;
     $("#attempt-cloze").replaceChildren(clozeFor(entry));
     $("#attempt-state").textContent = "Read the sentence and fill in the missing word.";
+    // No audio here, so there is no second channel to be redundant with.
+    showHint(hint);
     $("#attempt-replay").disabled = true;
     $("#attempt-input").focus();
     return;
   }
   $("#attempt-cloze").hidden = true;
+  $("#attempt-hint").hidden = true;
   $("#attempt-replay").disabled = true;
   const labels = { word: "Listening\u2026", sentence: "In a sentence\u2026",
                    "word-again": "Once more\u2026", done: "" };
   await audio.dictate(entry.word, sentence, {
+    hint,
     onStep: (step) => { $("#attempt-state").textContent = labels[step] ?? ""; },
   });
+  showHint(hint);
   $("#attempt-replay").disabled = false;
   $("#attempt-input").focus();
 }
@@ -419,16 +472,24 @@ function showRule() {
   const entry = app.byWord.get(app.queue[app.index]);
   const key = entry.patterns[0];
   if (!key) { show("reveal"); return; }
-  $("#rule-name").textContent = key.replace(/-/g, " ");
-  $("#rule-explain").textContent = app.data.patterns[key] || "";
-  const siblings = [...app.data.words, ...app.data.off_list]
-    .filter((w) => w.word !== entry.word && w.patterns.includes(key))
-    .slice(0, 6);
+  const pair = NOUN_VERB_PAIRS.get(entry.word);
+  $("#rule-name").textContent = pair ? "noun or verb" : key.replace(/-/g, " ");
+  // For the -ce/-se pairs the generic homophone card is true and useless. This
+  // is one of the few completely regular spelling rules in English, so say it.
+  $("#rule-explain").textContent = pair ? PAIR_RULE : (app.data.patterns[key] || "");
+  const siblings = pair
+    ? [...NOUN_VERB_PAIRS.keys()].filter((w) => w !== entry.word).map((word) => ({ word }))
+        .slice(0, 6)
+    : [...app.data.words, ...app.data.off_list]
+        .filter((w) => w.word !== entry.word && w.patterns.includes(key))
+        .slice(0, 6);
   $("#rule-siblings").replaceChildren(...siblings.map((w) => el("span", { textContent: w.word })));
   const worked = entry.morph && entry.morph !== "-"
     ? `${entry.word}  =  ${entry.morph.replace(/\+/g, " + ")}` : entry.word;
-  $("#rule-worked").textContent = worked;
-  $("#rule-why").textContent = entry.why || "";
+  $("#rule-worked").textContent = pair ? `${entry.word}  \u2014  the ${pair}` : worked;
+  $("#rule-why").textContent = pair
+    ? `Its partner is the ${pair === "noun" ? "verb" : "noun"}, spelled the other way.`
+    : (entry.why || "");
   show("rule");
 }
 

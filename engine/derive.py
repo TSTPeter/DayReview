@@ -74,6 +74,38 @@ SUFFIXES = [
 
 FRENCH_ENDINGS = ["eur", "eau", "oir", "ette", "esque", "et", "que"]
 
+# The -ce/-se noun-verb pairs. A closed set in English, and one of the few
+# spelling rules that is genuinely regular: the NOUN takes c, the VERB takes s.
+# 'Advice' is a noun and has ice in it. Note prophecy/prophesy end -cy/-sy, so
+# the rule is about the consonant, not the last two letters.
+#
+# These matter more than an ordinary homophone because dictation alone cannot
+# ask for one. 'The word is practice' does not tell a child which of the two
+# words is wanted, so an item with no hint is not hard, it is impossible.
+# weekly.py uses this table to supply the missing half of the prompt.
+NOUN_VERB_PAIRS = {
+    "advice": "noun",    "advise": "verb",
+    "device": "noun",    "devise": "verb",
+    "licence": "noun",   "license": "verb",
+    "practice": "noun",  "practise": "verb",
+    "prophecy": "noun",  "prophesy": "verb",
+}
+
+
+# One rule covers all ten. The generic 'homophone-trap' card says only that a
+# word sounds the same as another, which for these is true and useless: this is
+# one of the few English spelling rules that is completely regular, so say it.
+PAIR_RULE = (
+    "The noun has a c, the verb has an s. "
+    "Advice is a thing, like ice. Advise is something you do."
+)
+
+
+def hint_for(word):
+    """The disambiguating tag an item needs, or None. See NOUN_VERB_PAIRS."""
+    return NOUN_VERB_PAIRS.get(normalise(word))
+
+
 # Homophones and near-homophones a Year 6 list actually trips over. A pattern
 # here means "another real word sounds the same", which is only knowable from
 # a lexicon, so this is a list rather than a rule.
@@ -251,7 +283,7 @@ def derive(word, limit=MAX_PATTERNS):
     # solve this properly; CMUdict is American, which docs/05 already rules out.
 
     # --- lexical ----------------------------------------------------------
-    if w in HOMOPHONES:
+    if w in HOMOPHONES or w in NOUN_VERB_PAIRS:
         add("homophone-trap", w)
 
     if not patterns:

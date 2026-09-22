@@ -45,6 +45,35 @@ const SUFFIXES = [
 
 const FRENCH_ENDINGS = ["eur", "eau", "oir", "ette", "esque", "et", "que"];
 
+// The -ce/-se noun-verb pairs. A closed set in English, and one of the few
+// spelling rules that is genuinely regular: the NOUN takes c, the VERB takes s.
+// 'Advice' is a noun and has ice in it. Note prophecy/prophesy end -cy/-sy, so
+// the rule is about the consonant, not the last two letters.
+//
+// These matter more than an ordinary homophone because dictation alone cannot
+// ask for one. 'The word is practice' does not tell a child which of the two
+// words is wanted, so an item with no hint is not hard, it is impossible.
+// weekly.js uses this table to supply the missing half of the prompt.
+export const NOUN_VERB_PAIRS = new Map([
+  ["advice", "noun"],    ["advise", "verb"],
+  ["device", "noun"],    ["devise", "verb"],
+  ["licence", "noun"],   ["license", "verb"],
+  ["practice", "noun"],  ["practise", "verb"],
+  ["prophecy", "noun"],  ["prophesy", "verb"],
+]);
+
+// One rule covers all ten. The generic 'homophone-trap' card says only that a
+// word sounds the same as another, which for these is true and useless: this is
+// one of the few English spelling rules that is completely regular, so say it.
+export const PAIR_RULE =
+  "The noun has a c, the verb has an s. " +
+  "Advice is a thing, like ice. Advise is something you do.";
+
+/** The disambiguating tag an item needs, or null. See NOUN_VERB_PAIRS. */
+export function hintFor(word) {
+  return NOUN_VERB_PAIRS.get(normalise(word)) || null;
+}
+
 const HOMOPHONES = new Set([
   "accept", "except", "affect", "effect", "aloud", "allowed", "altar", "alter",
   "ascent", "assent", "bough", "bow", "brake", "break", "cereal", "serial",
@@ -135,7 +164,7 @@ export function derive(word, limit = MAX_PATTERNS) {
     if (rx.test(w)) { add("silent-letter", trap); break; }
   }
 
-  if (HOMOPHONES.has(w)) add("homophone-trap", w);
+  if (HOMOPHONES.has(w) || NOUN_VERB_PAIRS.has(w)) add("homophone-trap", w);
 
   if (!patterns.length) add("unique");
 

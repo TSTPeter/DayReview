@@ -36,6 +36,15 @@ NODE = shutil.which("node")
 BY_WORD = {w["word"]: w for w in list(WORDS) + list(probe.OFF_LIST)}
 
 SET_ON = "2026-09-21"
+# Beatrix's real list for the week of 2026-09-21, pasted the way the school
+# writes it. It is here rather than in a fixture because both defects it
+# exposed were invisible against a tidy word-per-line list: the headings became
+# spellings, and the ten -ce/-se words became unanswerable.
+TAGGED_TEXT = """Noun/verb pairs (N = noun, V = verb):
+advice (N) / advise (V) / device (N) / devise (V) / licence (N) / license (V) \
+/ practice (N) / practise (V) / prophecy (N) / prophesy (V)
+Plain list:
+ancient, apparent, appreciate, attached, available"""
 LIST_TEXT = ("necessary rhythm conscience wednesday separate business "
              "definitely embarrass occurred tomorrow")
 HARD = ["necessary", "rhythm", "conscience", "wednesday"]
@@ -64,6 +73,7 @@ class TestWeeklyParity(unittest.TestCase):
     def setUpClass(cls):
         cls.words = [w["word"] for w in WORDS] + SCHOOL_WORDS
         payload = {"words": cls.words, "listText": LIST_TEXT, "setOn": SET_ON,
+                   "taggedText": TAGGED_TEXT,
                    "offsets": OFFSETS, "hard": HARD, "size": SIZE}
         proc = subprocess.run([NODE, str(RUNNER)], input=json.dumps(payload),
                               capture_output=True, text=True)
@@ -83,6 +93,20 @@ class TestWeeklyParity(unittest.TestCase):
         self.assertEqual(self.js["list"]["words"], py["words"])
         self.assertEqual(self.js["list"]["test_on"], py["test_on"])
         self.assertEqual(self.js["list"]["id"], py["id"])
+
+    def test_headings_and_word_class_tags_are_read_identically(self):
+        py = py_weekly.make_list(TAGGED_TEXT, set_on=date.fromisoformat(SET_ON))
+        self.maxDiff = None
+        self.assertEqual(self.js["tagged"]["words"], py["words"])
+        self.assertEqual(self.js["tagged"]["hints"], py["hints"])
+
+    def test_hint_of_agrees_on_every_word(self):
+        py_tagged = py_weekly.make_list(TAGGED_TEXT, set_on=date.fromisoformat(SET_ON))
+        for w in self.words:
+            with self.subTest(word=w):
+                self.assertEqual(self.js["hints"][w],
+                                 py_weekly.hint_of(py_tagged, w),
+                                 f"hint_of diverged on {w!r}")
 
     def test_every_session_queue_matches(self):
         py_list = py_weekly.make_list(LIST_TEXT, set_on=date.fromisoformat(SET_ON))

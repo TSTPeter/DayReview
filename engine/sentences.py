@@ -138,6 +138,22 @@ SENTENCES = {
     "useful": "A torch is useful when you go camping.",
     "beautiful": "The garden looked beautiful in the spring.",
     "chemistry": "We mixed the two liquids in chemistry.",
+    # -ce/-se noun-verb pairs. These carry more weight than the rest: for four
+    # of the five pairs the two words are HOMOPHONES, so the sentence is the
+    # only thing in the dictation that can say which one is wanted. Each one
+    # below is built so the grammar rules the other member out - a determiner
+    # or an adjective in front of the noun, an auxiliary in front of the verb -
+    # rather than merely making it unlikely. See derive.NOUN_VERB_PAIRS.
+    "advice": "She gave me some good advice about the test.",
+    "advise": "I would advise you to take a coat.",
+    "device": "He plugged the small device into the wall.",
+    "devise": "They had to devise a plan very quickly.",
+    "licence": "My uncle keeps his licence in his wallet.",
+    "license": "The council will license the new market.",
+    "practice": "She was late for netball practice again.",
+    "practise": "You should practise the piano every day.",
+    "prophecy": "The old prophecy came true at last.",
+    "prophesy": "Nobody can prophesy what will happen next.",
 }
 
 # British text-to-speech mispronounces some of these reliably enough to teach the wrong
@@ -161,6 +177,12 @@ PRONUNCIATION_WATCHLIST = {
     "twelfth": "twelfth",
     "thorough": "THUH-ruh",
     "restaurant": "REST-ron",
+    # Unlike the other four pairs these two are NOT homophones in British
+    # English - the endings are -see and -sigh - so the voice getting them
+    # right is the difference between a fair item and an unfair one. Listen
+    # to this pair before any of the others.
+    "prophecy": "PROF-uh-see",
+    "prophesy": "PROF-uh-sigh",
 }
 
 

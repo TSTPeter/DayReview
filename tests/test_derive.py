@@ -9,12 +9,16 @@ other way, these fail and say by how much.
 """
 import pathlib
 import sys
+import re
 import unittest
 from collections import defaultdict
 
 sys.path.insert(0, str(pathlib.Path(__file__).resolve().parents[1] / "engine"))
 
-from derive import derive, make_entry, normalise, SPECIFICITY  # noqa: E402
+import probe  # noqa: E402
+import sentences  # noqa: E402
+from derive import (NOUN_VERB_PAIRS, derive, hint_for,  # noqa: E402
+                    make_entry, normalise, SPECIFICITY)
 from words import PATTERNS, WORDS  # noqa: E402
 
 # Patterns that are knowledge about a word rather than properties of its
@@ -176,6 +180,87 @@ class TestMakeEntry(unittest.TestCase):
 
     def test_normalise_strips_punctuation_and_case(self):
         self.assertEqual(normalise("  Don't!  "), "dont")
+
+
+class TestNounVerbPairs(unittest.TestCase):
+    """
+    The -ce/-se pairs are the one case where a correct word model is not enough
+    to ask the question. 'The word is licence' and 'The word is license' are the
+    same sound, so the prompt has to carry the word class as well, and the
+    sentence has to rule the partner out on grammar rather than on likelihood.
+    """
+
+    PARTNER = {"advice": "advise", "advise": "advice",
+               "device": "devise", "devise": "device",
+               "licence": "license", "license": "licence",
+               "practice": "practise", "practise": "practice",
+               "prophecy": "prophesy", "prophesy": "prophecy"}
+
+    def test_the_table_is_closed_and_paired(self):
+        self.assertEqual(set(NOUN_VERB_PAIRS), set(self.PARTNER))
+        for word, partner in self.PARTNER.items():
+            self.assertNotEqual(NOUN_VERB_PAIRS[word], NOUN_VERB_PAIRS[partner],
+                                f"{word} and {partner} cannot both be the same class")
+
+    def test_the_noun_takes_c_and_the_verb_takes_s(self):
+        # The rule the app teaches, asserted against the words themselves. If
+        # this ever fails, derive.PAIR_RULE is telling a child something false.
+        # 'prophecy'/'prophesy' end -cy/-sy rather than -ce/-se, so the test is
+        # on the consonant, which is the part the rule is actually about.
+        for word, kind in NOUN_VERB_PAIRS.items():
+            with self.subTest(word=word):
+                self.assertEqual(word[-2], "c" if kind == "noun" else "s")
+
+    def test_hint_for_is_case_and_punctuation_proof(self):
+        self.assertEqual(hint_for("  Practise!  "), "verb")
+        self.assertIsNone(hint_for("rhythm"))
+        self.assertIsNone(hint_for(""))
+
+    def test_they_are_flagged_as_a_homophone_trap(self):
+        for word in NOUN_VERB_PAIRS:
+            with self.subTest(word=word):
+                self.assertIn("homophone-trap", derive(word)["patterns"])
+
+    def test_every_pair_word_has_a_sentence(self):
+        missing = sentences.missing(list(NOUN_VERB_PAIRS))
+        self.assertEqual(missing, [], "a pair word with no sentence is undictatable")
+
+    def test_the_sentence_contains_the_word(self):
+        # The cloze fallback blanks the target out of its sentence. A sentence
+        # that does not contain the word leaves a gap with no gap in it.
+        for word in NOUN_VERB_PAIRS:
+            with self.subTest(word=word):
+                self.assertRegex(sentences.SENTENCES[word], rf"\b{word}\b")
+
+    def test_the_sentence_never_contains_the_partner(self):
+        for word, partner in self.PARTNER.items():
+            with self.subTest(word=word):
+                self.assertNotRegex(sentences.SENTENCES[word], rf"\b{partner}\b")
+
+    def test_the_grammar_rules_the_partner_out(self):
+        # A determiner or adjective in front of the noun, an auxiliary or
+        # 'to' in front of the verb. Checked here because 'unlikely' is not
+        # good enough: swapping the pair member in must be UNGRAMMATICAL.
+        before = {}
+        for word in NOUN_VERB_PAIRS:
+            m = re.search(rf"(\w+)\s+{word}\b", sentences.SENTENCES[word])
+            before[word] = m.group(1).lower() if m else ""
+        nouny = {"some", "the", "his", "her", "my", "their", "old", "small",
+                 "good", "new", "netball", "football"}
+        verby = {"would", "should", "could", "will", "can", "must", "to", "may"}
+        for word, kind in NOUN_VERB_PAIRS.items():
+            with self.subTest(word=word, kind=kind):
+                self.assertIn(before[word], nouny if kind == "noun" else verby,
+                              f"{word!r} is preceded by {before[word]!r}, which does "
+                              f"not force it to be the {kind}")
+
+
+class TestEveryWordCanBeDictated(unittest.TestCase):
+    """engine/export.py refuses to build without these; assert it here too."""
+
+    def test_no_curated_word_is_missing_a_sentence(self):
+        words = [w["word"] for w in WORDS] + [w["word"] for w in probe.OFF_LIST]
+        self.assertEqual(sentences.missing(words), [])
 
 
 if __name__ == "__main__":

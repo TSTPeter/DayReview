@@ -48,6 +48,77 @@ class TestParsing(unittest.TestCase):
         self.assertEqual(weekly.parse(None), [])
 
 
+class TestHeadingsAndTags(unittest.TestCase):
+    """
+    Beatrix's real list, pasted verbatim. Before this the headings became
+    spellings — she would have been asked to spell 'pairs' — and the ten
+    -ce/-se words were dictated as 'The word is practice' twice, which asks a
+    question with no answer in it.
+    """
+
+    REAL = ("Noun/verb pairs (N = noun, V = verb):\n"
+            "advice (N) / advise (V) / device (N) / devise (V) / licence (N) "
+            "/ license (V) / practice (N) / practise (V) / prophecy (N) "
+            "/ prophesy (V)\n"
+            "Plain list:\n"
+            "ancient, apparent, appreciate, attached, available")
+
+    def test_headings_are_not_spellings(self):
+        words = weekly.parse(self.REAL)
+        for junk in ("noun", "verb", "pairs", "plain", "list"):
+            self.assertNotIn(junk, words)
+
+    def test_the_real_list_is_fifteen_words_in_order(self):
+        self.assertEqual(weekly.parse(self.REAL), [
+            "advice", "advise", "device", "devise", "licence", "license",
+            "practice", "practise", "prophecy", "prophesy",
+            "ancient", "apparent", "appreciate", "attached", "available"])
+
+    def test_every_pair_word_carries_its_word_class(self):
+        lst = weekly.make_list(self.REAL, set_on=MON)
+        self.assertEqual(lst["hints"], {
+            "advice": "noun", "advise": "verb", "device": "noun",
+            "devise": "verb", "licence": "noun", "license": "verb",
+            "practice": "noun", "practise": "verb",
+            "prophecy": "noun", "prophesy": "verb"})
+
+    def test_plain_words_get_no_hint(self):
+        lst = weekly.make_list(self.REAL, set_on=MON)
+        for w in ("ancient", "apparent", "appreciate", "attached", "available"):
+            self.assertIsNone(weekly.hint_of(lst, w))
+
+    def test_a_tag_attaches_to_its_own_word_not_the_next(self):
+        entries = weekly.parse_entries("advice (N) / advise (V)")
+        self.assertEqual(entries, [{"word": "advice", "hint": "noun"},
+                                   {"word": "advise", "hint": "verb"}])
+
+    def test_long_form_and_bracketed_tags(self):
+        self.assertEqual(weekly.parse_entries("queue [noun]"),
+                         [{"word": "queue", "hint": "noun"}])
+        self.assertEqual(weekly.parse_entries("hollow (adjective)"),
+                         [{"word": "hollow", "hint": "adjective"}])
+
+    def test_an_unreadable_tag_is_dropped_not_spelled(self):
+        # '(x3)' is a repetition marker, not a word class. It must not become a
+        # hint, and it must not become a word either.
+        self.assertEqual(weekly.parse_entries("rhythm (x3)"),
+                         [{"word": "rhythm", "hint": None}])
+
+    def test_the_pairs_are_known_without_any_tag_at_all(self):
+        # A list typed as bare words still has to be dictatable, because a
+        # hurried retype is the normal case.
+        lst = weekly.make_list("practice practise", set_on=MON)
+        self.assertEqual(lst["hints"], {"practice": "noun", "practise": "verb"})
+
+    def test_the_lists_own_tag_wins_over_the_table(self):
+        lst = {"hints": {"practice": "verb"}}
+        self.assertEqual(weekly.hint_of(lst, "practice"), "verb")
+
+    def test_hint_of_survives_a_list_saved_before_hints_existed(self):
+        self.assertEqual(weekly.hint_of({"words": ["advise"]}, "advise"), "verb")
+        self.assertIsNone(weekly.hint_of(None, "rhythm"))
+
+
 class TestDates(unittest.TestCase):
     def test_next_friday_from_midweek(self):
         self.assertEqual(weekly.next_test_day(date(2026, 9, 21)), FRI)
