@@ -7,6 +7,10 @@
 <meta name="description" content="Year 5/6 statutory spelling practice, built on the evidence.">
 <link rel="icon" href="data:image/svg+xml,%3Csvg xmlns=%27http://www.w3.org/2000/svg%27 viewBox=%270 0 32 32%27%3E%3Crect width=%2732%27 height=%2732%27 rx=%277%27 fill=%27%232f7d72%27/%3E%3Ctext x=%2716%27 y=%2723%27 font-size=%2720%27 font-family=%27serif%27 fill=%27%23fff%27 text-anchor=%27middle%27%3ESp%3C/text%3E%3C/svg%3E">
 <link rel="manifest" href="manifest.json">
+<!-- iOS ignores the web manifest for home-screen icons and reads this instead.
+     Without it "Add to Home Screen" on an iPad gives a blank tile, which is the
+     one install path this app is actually built for. -->
+<link rel="apple-touch-icon" href="apple-touch-icon.png">
 <meta name="theme-color" content="#f7f1e3">
 <meta name="apple-mobile-web-app-capable" content="yes">
 <meta name="apple-mobile-web-app-status-bar-style" content="default">

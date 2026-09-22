@@ -4,7 +4,12 @@
 // Cache-first for the shell and the word data, because neither changes between releases
 // and both are needed before the first word can be dictated.
 
-const CACHE = "spelling-v4";
+// Namespaced, and the sweep below is limited to this prefix. CacheStorage is
+// per-ORIGIN, not per-scope, so on a shared domain - which is where this now
+// lives - a bare "delete everything that is not mine" would wipe the caches of
+// every other app on the host.
+const PREFIX = "spelling-";
+const CACHE = `${PREFIX}v4`;
 const SHELL = [
   "./", "index.html", "manifest.json",
   "css/paper.css",
@@ -21,7 +26,9 @@ self.addEventListener("install", (e) => {
 
 self.addEventListener("activate", (e) => {
   e.waitUntil(caches.keys()
-    .then((keys) => Promise.all(keys.filter((k) => k !== CACHE).map((k) => caches.delete(k))))
+    .then((keys) => Promise.all(keys
+      .filter((k) => k.startsWith(PREFIX) && k !== CACHE)
+      .map((k) => caches.delete(k))))
     .then(() => self.clients.claim()));
 });
 
