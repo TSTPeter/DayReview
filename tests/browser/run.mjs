@@ -298,6 +298,71 @@ check("three consecutive correct cracks that word's rules",
       crackedCount.cracked >= crackedCount.patterns,
       `${crackedCount.cracked} cracked`);
 
+console.log("\n— this week's spellings —");
+{
+  const ctx3 = await browser.newContext({ viewport: { width: 820, height: 1180 } });
+  const w = await ctx3.newPage();
+  w.on("pageerror", (e) => errors.push("week pageerror: " + e.message));
+  await w.goto(BASE, { waitUntil: "networkidle" });
+  await w.waitForSelector("#screen-home.on");
+
+  await w.click("#btn-week");
+  await w.waitForSelector("#screen-week.on");
+  // Two curated (necessary, rhythm), four the app has never seen.
+  await w.fill("#week-input",
+    "1. necessary\n2. rhythm\n3. tomorrow\n4. business\n5. column\n6. receipt");
+  await w.waitForTimeout(150);
+  const parsed = await w.textContent("#week-parsed");
+  check("a pasted, numbered list is parsed", /6 words/.test(parsed), parsed.trim().slice(0, 60));
+  check("the adult is told which words get a thinner reveal",
+        /read from the spelling/.test(parsed));
+  check("the test day defaults to a Friday",
+        new Date((await w.inputValue("#week-test")) + "T00:00:00Z").getUTCDay() === 5);
+
+  await w.click("#week-save");
+  await w.waitForSelector("#screen-home.on");
+  check("home shows this week's list", /tomorrow/.test(await w.textContent("#home-week-words")));
+  check("home says when the test is",
+        /Tested (in \d+ days|today|tomorrow)/.test(await w.textContent("#home-week-state")));
+
+  // The mix: two in three from the list.
+  const WEEK = ["necessary", "rhythm", "tomorrow", "business", "column", "receipt"];
+  await w.click("#btn-practise");
+  let fromList = 0, derivedSeen = false;
+  for (let i = 0; i < 10; i++) {
+    await w.waitForSelector("#screen-attempt.on");
+    await w.fill("#attempt-input", "zzz");
+    await w.click("#attempt-submit");
+    await w.waitForSelector("#screen-reveal.on");
+    const target = (await w.textContent("#reveal-target")).trim().toLowerCase();
+    if (WEEK.includes(target)) fromList += 1;
+    // A word with no curated entry must not show an empty origin card.
+    if (["tomorrow", "business", "column", "receipt"].includes(target) && !derivedSeen) {
+      derivedSeen = true;
+      check(`'${target}': origin card hidden, not blank`,
+            await w.locator("#reveal-about").isHidden());
+      check(`'${target}': still marked and diagnosed`,
+            (await w.textContent("#reveal-verdict")).trim().length > 0 &&
+            (await w.textContent("#reveal-marked")).trim().length > 0);
+      const revealText = await w.innerText("#screen-reveal");
+      check(`'${target}': no empty origin line leaks through`,
+            !/^\s*:\s*,\s*$/m.test(revealText));
+    }
+    await w.click("#reveal-next");
+  }
+  check("about two words in three come from this week's list",
+        fromList >= 6 && fromList <= 8, `${fromList}/10`);
+  check("a word with no curated entry was reached", derivedSeen);
+
+  await w.waitForSelector("#screen-end.on");
+  await w.click("#end-grownup");
+  await w.waitForSelector("#screen-grownup.on");
+  check("the grown-up view reports coverage of the list",
+        /\d+ of \d+ practised/.test(await w.textContent("#gu-week-summary")));
+
+  await ctx3.close();
+}
+
 console.log("\n— privacy defaults —");
 const syncDefault = await page.evaluate(async () => {
   const db = await new Promise((r) => { const q = indexedDB.open("spelling", 1);

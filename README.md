@@ -54,6 +54,8 @@ engine/                    the domain core. Pure Python, no I/O, no dependencies
   words.py                 103 statutory word forms, 21 patterns, 293 curated misspellings
   classify.py              error classifier and KS2 mark-scheme scoring
   schedule.py              Leitner boxes plus a pattern layer, interleaved
+  derive.py                infer patterns from a word with no curated entry
+  weekly.py                this week's school list, test day, session mix
   probe.py                 the 24-item baseline probe, 16 on-list and 8 off-list
   profile.py               phonological reliance, orthographic choice, transfer
   ladder.py                the escalation ladder, DEFAULT OFF (docs/08 M5)
@@ -66,6 +68,8 @@ web/                       the six screens. Vanilla JS, no framework, offline-ca
   js/sfx.js                synthesised reinforcement stings
   js/dashboard.js          calendar heatmap, consistency, rule strength
   js/sync.js               Firebase aggregates only, off by default
+  js/engine/derive.js      spelling patterns inferred from a bare word
+  js/engine/weekly.js      this week's school list and the session mix
 db/schema.sql              the Postgres schema this grows into
 tests/                     unit, golden-file and cross-language parity suites
 ```
@@ -97,6 +101,20 @@ never while she is typing.
 Firebase sync is **off by default** and carries aggregates only — counts and
 percentages. What she actually writes never leaves the device. Copy
 `web/data/firebase.example.json` to `web/data/firebase.json` to enable it.
+
+## This week's spellings
+
+The school's weekly list goes in on the home screen under **This week's
+spellings** — paste it, numbers and punctuation and all. Until the test, about
+two words in three each session come from it; after the test they fold into the
+spaced rotation and come back at 1, 2, 4, 8 and 16 days, which is the part that
+makes them stick for her writing rather than just for Friday.
+
+Words the app has never seen still get marked, diagnosed and given a rule: the
+pattern is derived from the spelling. What cannot be derived — origin, root,
+word family — is left out rather than guessed, and the reveal hides that card.
+Measured precision and recall, and the one rule that had to be abandoned, are
+in [`docs/12-weekly-lists.md`](docs/12-weekly-lists.md).
 
 ## Three things this app deliberately does not have
 
