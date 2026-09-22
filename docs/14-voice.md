@@ -125,12 +125,27 @@ down to the bytes returned.
 
 ## The render, and the review it enables
 
+**From GitHub**, the way ProductionSite's `generate-drop-audio` workflow already
+renders the PMI drops with this same voice and model. Add `ELEVENLABS_API_KEY`
+as a repository secret (Settings > Secrets and variables > Actions), then run
+**Render dictation audio** from the Actions tab: once with `dry_run`, then for
+real. It renders what is missing, runs the tests against the real clips before
+committing anything, commits them, and starts the full test workflow on the new
+commit (a push made with the workflow's own token would otherwise get no CI).
+
+**Or locally:**
+
 ```
 python3 tools/render_audio.py --dry-run              # what would render, spends nothing
 ELEVENLABS_API_KEY=... python3 tools/render_audio.py # render what is missing
 ```
 
 On Windows: `$env:ELEVENLABS_API_KEY="..."; py tools\render_audio.py`.
+
+The PMI renderer sends only `{text, model_id}`, so those drops use the voice's
+saved settings, and the API's documented stability default is `0.5`, Natural.
+Dictation asks for Robust, so it will sound a little more measured than the PMI
+narration. That is the intent; `0.5` is one edit away if it sounds flat.
 
 Then listen. The words to hear first are the ones `engine/sentences.py`
 `PRONUNCIATION_WATCHLIST` flags, and above all `prophecy` / `prophesy`, which
