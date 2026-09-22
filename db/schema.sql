@@ -85,6 +85,10 @@ CREATE TABLE attempts (
 
     prompt_mode         TEXT NOT NULL CHECK (prompt_mode IN
                           ('audio_sentence','audio_word','text_cloze','dictation_paper')),
+    -- Which voice said it. Pre-rendered clips (tools/render_audio.py) and the device's
+    -- own speech are different stimuli, so they are recorded rather than pooled, for
+    -- the same reason prompt_mode is. 'mixed': a clip failed and the device covered.
+    audio_source        TEXT CHECK (audio_source IN ('clip','device','mixed')),
     attempt_text        TEXT NOT NULL,
     correct             BOOLEAN NOT NULL,
 

@@ -52,7 +52,9 @@ const app = {
   marks: [], strategy: [], keys: new Keystrokes(),
   mode: "practice",          // practice | probe
   probeItems: [], paperIndex: 0,
-  audioOk: true,             // set by audio.working() at boot
+  audioOk: true,             // set by audio.working() at boot: the DEVICE voice
+  prompt: { mode: null, source: null },   // how the item on screen was presented
+  probeSources: [],          // voice per paper-probe item, written into its row
   cracked: new Set(),        // rules she has cracked, ever
   curios: [],                // surprise pieces, ever
   week: null,                // this week's list from school, or null
@@ -61,10 +63,14 @@ const app = {
 // --------------------------------------------------------------- boot
 
 async function boot() {
-  const [words, sentences] = await Promise.all([
+  const [words, sentences, clips] = await Promise.all([
     fetch("data/words.json").then((r) => r.json()),
     fetch("data/sentences.json").then((r) => r.json()).catch(() => ({})),
+    // Pre-rendered dictation (tools/render_audio.py). Missing or empty is fine: every
+    // item then uses the device voice, exactly as before clips existed.
+    fetch("data/audio.json").then((r) => r.json()).catch(() => ({})),
   ]);
+  audio.setClips(clips);
   app.data = words;
   app.sentences = sentences.sentences || {};
   for (const w of [...words.words, ...words.off_list]) app.byWord.set(w.word, w);
@@ -82,12 +88,18 @@ async function boot() {
   // still never shows the spelling. prompt_mode records which one she actually got,
   // so the two are never pooled in analysis.
   app.audioOk = await audio.working();
-  $("#attempt-noaudio").hidden = app.audioOk;
+  // The "no speech voice" note is now per item: set in playPrompt, shown only when the
+  // item on screen actually fell back to the cloze.
+  $("#attempt-noaudio").hidden = true;
 
   sfx.setMuted((await store.getKV("sound", "on")) === "off");
   // iOS keeps an AudioContext suspended until a real gesture, so the first
   // touch anywhere arms it for the session.
-  const armOnce = () => { sfx.arm(); window.removeEventListener("pointerdown", armOnce); };
+  const armOnce = () => {
+    sfx.arm();
+    audio.arm();
+    window.removeEventListener("pointerdown", armOnce);
+  };
   window.addEventListener("pointerdown", armOnce, { once: true });
 
   await sync.load(await store.getKV("sync_enabled", false));
@@ -97,6 +109,7 @@ async function boot() {
 
   if ("serviceWorker" in navigator) {
     navigator.serviceWorker.register("sw.js").catch(() => {});
+    navigator.serviceWorker.ready.then(warmClips).catch(() => {});
   }
 }
 
@@ -135,6 +148,42 @@ async function persistScheduler() {
 function applyComfort(c) {
   document.documentElement.dataset.comfort = c.size || "default";
   document.documentElement.dataset.theme = c.theme || "light";
+}
+
+/**
+ * Fetch the clips she is about to need, so the next session works offline. Not all of
+ * them: that is several megabytes on a first visit. This week's words and whatever the
+ * scheduler has due are what the next session will be made of. Everything else is
+ * cached as it is heard. The service worker stores each response on the way through.
+ */
+async function warmClips() {
+  if (!navigator.onLine) return;
+  if (navigator.connection && navigator.connection.saveData) return;
+  // First visit: the worker has just installed and is not yet in charge of this
+  // page, so nothing fetched now would be kept. Wait until it claims the page.
+  if (!navigator.serviceWorker.controller) {
+    await new Promise((resolve) => navigator.serviceWorker
+      .addEventListener("controllerchange", resolve, { once: true }));
+  }
+  const words = new Set([...(app.week ? app.week.words : []),
+                         ...app.scheduler.due().slice(0, SESSION_SIZE * 3)]);
+  const urls = new Set();
+  for (const w of words) {
+    const sentence = app.sentences[w] || "";
+    const hint = weekly.hintOf(app.week, w);
+    for (const text of [audio.namingLine(w, hint), sentence]) {
+      const url = text && audio.clipFor(text);
+      if (url) urls.add(url);
+    }
+  }
+  for (const url of urls) {
+    // One at a time, read to the end, and give up quietly: a nicety, never a blocker.
+    // Reading matters. fetch() resolves on the headers, so an unread body is a
+    // request still open, and sixty of those would sit on the handful of connections
+    // a browser allows per host: the clip she is actually waiting for would queue
+    // behind them. The browser suite found this as a page that never went idle.
+    try { await (await fetch(url)).arrayBuffer(); } catch { return; }
+  }
 }
 
 // --------------------------------------------------------------- router
@@ -240,11 +289,11 @@ function paintParsed() {
   if (unanswerable.length) {
     parts.push(`⚠ ${unanswerable.map((e) => e.word).join(", ")} `
       + `sound${unanswerable.length === 1 ? "s" : ""} like another word and the app `
-      + `has no sentence to tell them apart — add the word class in brackets, `
+      + `has no sentence to tell them apart. Add the word class in brackets, `
       + `like "${unanswerable[0].word} (noun)"`);
   }
   const rest = words.length - curated.length;
-  if (rest) parts.push(`${rest} read from the spelling — she'll get the rule but not the word history`);
+  if (rest) parts.push(`${rest} read from the spelling, so she'll get the rule but not the word history`);
   $("#week-parsed").textContent = parts.join(" · ");
 }
 
@@ -317,8 +366,11 @@ function clozeFor(entry) {
   return frag;
 }
 
-function promptMode() {
-  return app.audioOk ? "audio_sentence" : "text_cloze";
+// Per ITEM, not per device. A clip plays with no device voice at all, so a Chromebook
+// with no speech installed now hears curated words properly and only falls back to the
+// cloze for a school word nobody rendered.
+function canHear(word, sentence, hint) {
+  return app.audioOk || audio.clipsCover(word, sentence, hint);
 }
 
 // 'advice' and 'advise' sound the same, and so do 'licence' and 'license'. Naming
@@ -334,7 +386,10 @@ function showHint(hint) {
 async function playPrompt(entry) {
   const sentence = app.sentences[entry.word] || "";
   const hint = weekly.hintOf(app.week, entry.word);
-  if (!app.audioOk) {
+  $("#attempt-noaudio").hidden = true;
+  if (!canHear(entry.word, sentence, hint)) {
+    app.prompt = { mode: "text_cloze", source: null };
+    $("#attempt-noaudio").hidden = false;
     $("#attempt-cloze").hidden = false;
     $("#attempt-cloze").replaceChildren(clozeFor(entry));
     $("#attempt-state").textContent = "Read the sentence and fill in the missing word.";
@@ -347,12 +402,18 @@ async function playPrompt(entry) {
   $("#attempt-cloze").hidden = true;
   $("#attempt-hint").hidden = true;
   $("#attempt-replay").disabled = true;
+  // Set BEFORE dictating: if she submits mid-way the row still says which voice it was.
+  app.prompt = { mode: "audio_sentence",
+                 source: audio.clipsCover(entry.word, sentence, hint) ? "clip" : "device" };
   const labels = { word: "Listening\u2026", sentence: "In a sentence\u2026",
                    "word-again": "Once more\u2026", done: "" };
-  await audio.dictate(entry.word, sentence, {
+  const source = await audio.dictate(entry.word, sentence, {
     hint,
     onStep: (step) => { $("#attempt-state").textContent = labels[step] ?? ""; },
   });
+  // null: cancelled by a submit or a replay, which owns the screen now.
+  if (source === null) return;
+  app.prompt.source = source;
   showHint(hint);
   $("#attempt-replay").disabled = false;
   $("#attempt-input").focus();
@@ -363,10 +424,10 @@ function submitAttempt() {
   const raw = $("#attempt-input").value;
   if (!raw.trim()) return;
   audio.cancel();
-  recordAttempt(entry, raw, promptMode()).then((d) => showReveal(entry, d));
+  recordAttempt(entry, raw, app.prompt).then((d) => showReveal(entry, d));
 }
 
-async function recordAttempt(entry, raw, promptMode) {
+async function recordAttempt(entry, raw, prompt) {
   const d = classify(raw, entry);
   const st = app.scheduler.state[entry.word];
   const boxBefore = st ? st.box : null;
@@ -378,7 +439,11 @@ async function recordAttempt(entry, raw, promptMode) {
   const row = {
     session_id: app.session ? app.session.id : null,
     word: entry.word,
-    prompt_mode: promptMode,
+    prompt_mode: prompt.mode,
+    // "clip" (pre-rendered), "device", "mixed" (a clip failed and the device voice
+    // covered it), or null for a cloze. Two voices are two stimuli; recorded so an
+    // analysis can separate them, the same reason prompt_mode exists.
+    audio_source: prompt.source,
     attempt_text: d.raw,
     correct: d.correct,
     error_type: d.type,
@@ -578,6 +643,28 @@ function renderUnlocks(host, outcome) {
  * Send the day's arithmetic, and only the arithmetic. sync.js enforces the
  * allowlist; this function must never hand it an attempt row.
  */
+/**
+ * The key a synced row is filed under. docs/06 standard 8: no name, no email,
+ * no date of birth, no school in the learner record. A child's first name was
+ * hardcoded here, which put it in a file the site serves to anyone with the
+ * URL and made it the primary key of every row that would ever be sent.
+ *
+ * It is an opaque random id instead, minted ONCE on this device and kept in
+ * IndexedDB, so days and profiles still group together over time without
+ * naming the child they belong to. Minted lazily, inside the isConfigured
+ * guard, so a device with sync off never generates an identifier at all.
+ */
+async function learnerKey() {
+  let key = await store.getKV("learner_key", null);
+  if (!key) {
+    key = (self.crypto && self.crypto.randomUUID)
+      ? self.crypto.randomUUID()
+      : `k-${Date.now().toString(36)}-${Math.random().toString(36).slice(2, 10)}`;
+    await store.setKV("learner_key", key);
+  }
+  return key;
+}
+
 async function pushAggregates() {
   if (!sync.isConfigured()) return;
   try {
@@ -586,7 +673,7 @@ async function pushAggregates() {
     const today = new Date().toISOString().slice(0, 10);
     const d = days[today];
     if (d) {
-      await sync.pushDay("beatrix", {
+      await sync.pushDay(await learnerKey(), {
         date: today, attempts: d.attempts, correct: d.correct,
         accuracy: d.attempts ? d.correct / d.attempts : null,
         patterns_cracked: app.cracked.size,
@@ -619,10 +706,14 @@ async function dictateProbe() {
     const entry = app.probeItems[i];
     $("#probe-count").textContent = `Word ${i + 1} of ${app.probeItems.length}`;
     setProgress(i, app.probeItems.length);
-    if (app.audioOk) {
+    const sentence = app.sentences[entry.word] || "";
+    if (canHear(entry.word, sentence, null)) {
       $("#probe-cloze").hidden = true;
-      await audio.dictate(entry.word, app.sentences[entry.word] || "");
+      app.probeSources[i] = audio.clipsCover(entry.word, sentence) ? "clip" : "device";
+      const source = await audio.dictate(entry.word, sentence);
+      if (source) app.probeSources[i] = source;
     } else {
+      app.probeSources[i] = null;
       $("#probe-cloze").hidden = false;
       $("#probe-cloze").replaceChildren(clozeFor(entry));
     }
@@ -664,6 +755,7 @@ async function submitPaper() {
     await store.putAttempt({
       session_id: session.id, word: entry.word,
       prompt_mode: "dictation_paper",     // docs/07: measurement runs on paper
+      audio_source: app.probeSources[i] ?? null,
       attempt_text: (input.value || "").trim(), correct: d.correct,
       error_type: d.type, error_detail: d.detail, error_patterns: d.patterns,
       sounds_right: d.sounds_right, trap: d.trap, mark_scheme: d.mark_scheme,
@@ -692,7 +784,7 @@ async function showGrownUp() {
   }).filter(Boolean);
 
   const p = compute(marks, await store.getKV("strategy_log", []));
-  const pct = (v) => (v === null || v === undefined ? "—" : `${Math.round(v * 100)}%`);
+  const pct = (v) => (v === null || v === undefined ? "-" : `${Math.round(v * 100)}%`);
 
   // The four numbers docs/04 says matter, and none of the ones it says do not.
   $("#gu-phon").textContent = pct(p.phonological_reliance);
@@ -744,7 +836,7 @@ async function showGrownUp() {
   $("#gu-sync-state").textContent = !syncOn
     ? "Off. Everything stays on this device and the app makes no network calls."
     : sync.isConfigured()
-      ? "On. Only counts and percentages are sent — never her writing or keystrokes."
+      ? "On. Only counts and percentages are sent, never her writing or keystrokes."
       : "On, but no config found. Copy web/data/firebase.example.json to "
         + "web/data/firebase.json and fill it in.";
 

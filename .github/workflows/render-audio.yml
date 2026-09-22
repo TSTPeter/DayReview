@@ -1,0 +1,113 @@
+# Render the dictation audio, test the result, and commit the clips.
+#
+# Manual, from the Actions tab. Needs one repository secret, ELEVENLABS_API_KEY
+# (Settings > Secrets and variables > Actions). The same key ProductionSite's
+# generate-drop-audio workflow uses will do: this is the same voice and model.
+#
+# Run once with dry_run first: it lists what would be rendered and spends nothing.
+#
+# Incremental. tools/render_audio.py only renders a line whose clip is missing,
+# so after a sentence edit a run re-renders that sentence and nothing else. The
+# app falls back to the device voice for any line without a clip, so a partial
+# or failed run never breaks dictation.
+#
+# The key goes to the renderer as an environment variable and nowhere else.
+# Nothing under web/ may ever contain it: everything there is served.
+
+name: Render dictation audio
+
+on:
+  workflow_dispatch:
+    inputs:
+      dry_run:
+        description: Count only. No ElevenLabs call, no spend, no commit.
+        type: boolean
+        default: false
+      only:
+        description: Words to force re-render, space separated (e.g. prophecy prophesy). Blank for everything missing.
+        required: false
+        default: ''
+
+permissions:
+  contents: write     # commit the clips back to the branch this ran on
+  actions: write      # start the test workflow on the new commit
+
+jobs:
+  render:
+    name: Render ${{ inputs.dry_run && '(dry run)' || '' }}
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.11"
+      # tests/test_audio.py runs the browser's naming-line builder under node, to
+      # prove it asks for exactly the text the renderer keyed each clip by.
+      - uses: actions/setup-node@v4
+        with:
+          node-version: "22"
+
+      - name: Check the secret is set
+        if: ${{ !inputs.dry_run }}
+        env:
+          ELEVENLABS_API_KEY: ${{ secrets.ELEVENLABS_API_KEY }}
+        run: |
+          if [ -z "$ELEVENLABS_API_KEY" ]; then
+            echo "::error::Add ELEVENLABS_API_KEY under Settings > Secrets and variables > Actions, then run again."
+            exit 1
+          fi
+
+      - name: Render
+        env:
+          ELEVENLABS_API_KEY: ${{ secrets.ELEVENLABS_API_KEY }}
+          DRY_RUN: ${{ inputs.dry_run }}
+          ONLY: ${{ inputs.only }}
+        run: |
+          set -euo pipefail
+          ARGS=()
+          [ "$DRY_RUN" = "true" ] && ARGS+=(--dry-run)
+          if [ -n "$ONLY" ]; then
+            # Words only. The input is typed by a person, so it is checked, not trusted.
+            if ! [[ "$ONLY" =~ ^[a-z\ ]+$ ]]; then
+              echo "::error::'only' takes lowercase words separated by spaces."
+              exit 1
+            fi
+            read -r -a WORDS <<< "$ONLY"
+            ARGS+=(--only "${WORDS[@]}")
+          fi
+          python3 tools/render_audio.py "${ARGS[@]}"
+
+      # Coverage and integrity tests run against the real clips here, before anything
+      # is committed: every line has a clip, every clip exists and is an MP3, nothing
+      # orphaned, and the text contract with the browser holds.
+      - name: Test the result
+        if: ${{ !inputs.dry_run }}
+        run: python3 -m unittest discover -s tests -t . -v
+
+      - name: Commit the clips
+        if: ${{ !inputs.dry_run }}
+        id: commit
+        run: |
+          set -euo pipefail
+          git config user.name "github-actions[bot]"
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+          git add web/audio web/data/audio.json
+          if git diff --cached --quiet; then
+            echo "Nothing new to commit."
+            echo "pushed=false" >> "$GITHUB_OUTPUT"
+            exit 0
+          fi
+          COUNT=$(git diff --cached --name-only -- web/audio | wc -l | tr -d ' ')
+          git commit -m "Render dictation audio: ${COUNT} clip file(s) changed" \
+                     -m "tools/render_audio.py, run from the Render dictation audio workflow."
+          git push
+          echo "pushed=true" >> "$GITHUB_OUTPUT"
+
+      # A push made with this workflow's token does not start other workflows, which
+      # would leave the new commit with no CI at all. workflow_dispatch is the one
+      # event such a token may raise, so the full suite is started explicitly.
+      - name: Run the full test suite on the new commit
+        if: ${{ steps.commit.outputs.pushed == 'true' }}
+        env:
+          GH_TOKEN: ${{ github.token }}
+        run: gh workflow run tests.yml --ref "${GITHUB_REF_NAME}"

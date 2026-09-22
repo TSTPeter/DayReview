@@ -125,6 +125,12 @@ its word, which is the job the KS2 script gives it.
 a container with no audio. A wrong model of the word teaches the wrong spelling, so this
 is a correctness task, not polish.
 
+**The dictation voice has not been listened to.** Every curated line is now rendered
+once in one ElevenLabs voice (`docs/14`), which is what finally makes "listen to every
+word by hand" a finishable job. It has not been done, and until `tools/render_audio.py`
+is run nothing is rendered at all: the app uses the device voice exactly as before.
+Start with `prophecy` and `prophesy`.
+
 **44 homophones on a school list are still undictatable.** `derive.HOMOPHONES` names
 54 words that sound like another word. The ten `-ce`/`-se` pairs now carry a word class
 and a sentence. The other 44 — *stationary*/*stationery*, *principal*/*principle* — have
