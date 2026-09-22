@@ -578,6 +578,28 @@ function renderUnlocks(host, outcome) {
  * Send the day's arithmetic, and only the arithmetic. sync.js enforces the
  * allowlist; this function must never hand it an attempt row.
  */
+/**
+ * The key a synced row is filed under. docs/06 standard 8: no name, no email,
+ * no date of birth, no school in the learner record. A child's first name was
+ * hardcoded here, which put it in a file the site serves to anyone with the
+ * URL and made it the primary key of every row that would ever be sent.
+ *
+ * It is an opaque random id instead, minted ONCE on this device and kept in
+ * IndexedDB, so days and profiles still group together over time without
+ * naming the child they belong to. Minted lazily, inside the isConfigured
+ * guard, so a device with sync off never generates an identifier at all.
+ */
+async function learnerKey() {
+  let key = await store.getKV("learner_key", null);
+  if (!key) {
+    key = (self.crypto && self.crypto.randomUUID)
+      ? self.crypto.randomUUID()
+      : `k-${Date.now().toString(36)}-${Math.random().toString(36).slice(2, 10)}`;
+    await store.setKV("learner_key", key);
+  }
+  return key;
+}
+
 async function pushAggregates() {
   if (!sync.isConfigured()) return;
   try {
@@ -586,7 +608,7 @@ async function pushAggregates() {
     const today = new Date().toISOString().slice(0, 10);
     const d = days[today];
     if (d) {
-      await sync.pushDay("beatrix", {
+      await sync.pushDay(await learnerKey(), {
         date: today, attempts: d.attempts, correct: d.correct,
         accuracy: d.attempts ? d.correct / d.attempts : null,
         patterns_cracked: app.cracked.size,

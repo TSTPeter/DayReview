@@ -528,6 +528,33 @@ check("sync is OFF by default (ICO standard 7, high privacy by default)", !syncD
 const calledFirebase = requestLog.some((u) => /firebase|googleapis|gstatic/.test(u));
 check("no call to Firebase or Google on a default launch", !calledFirebase);
 
+// docs/06 standard 8: no name in the learner record. The sync key used to be a
+// child's first name, hardcoded, which put it in a file the site serves to
+// anyone with the URL. It is now an opaque id minted lazily, so a device with
+// sync off should finish a whole session without an identifier existing at all.
+const learnerKey = await page.evaluate(async () => {
+  const db = await new Promise((r) => { const q = indexedDB.open("spelling", 1);
+    q.onsuccess = () => r(q.result); });
+  return await new Promise((r) => {
+    const t = db.transaction("kv", "readonly").objectStore("kv").get("learner_key");
+    t.onsuccess = () => r(t.result ? t.result.value : null);
+  });
+});
+check("no learner identifier is minted while sync is off", learnerKey === null,
+      learnerKey === null ? "" : String(learnerKey));
+
+// Belt and braces on the same rule: nothing the site serves may carry a name.
+// Read from the served files rather than the repo, because that is what a
+// stranger with the URL actually gets.
+const served = ["js/app.js", "js/sync.js", "js/store.js", "data/words.json"];
+const names = [];
+for (const f of served) {
+  const body = await (await fetch(new URL(f, BASE))).text();
+  // A key under learners/ must be a variable, never a string literal.
+  if (/pushDay\s*\(\s*["'`]/.test(body)) names.push(`${f}: literal sync key`);
+}
+check("the sync key is never a hardcoded string", names.length === 0, names.join("; "));
+
 console.log("\n— tablet —");
 for (const [name, w, h] of [["iPad portrait", 820, 1180], ["iPad landscape", 1180, 820]]) {
   await page.setViewportSize({ width: w, height: h });
