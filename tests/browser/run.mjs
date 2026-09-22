@@ -762,7 +762,8 @@ console.log("\n— the real rendered clips —");
     const word = (await w.textContent("#reveal-target")).trim();
     const row = await lastRow(w);
     const want = [namingLine(word, hintFor(word)), dictation.sentences[word]]
-      .map((t) => "/" + real.clips[t]);
+      // Resolved against BASE, so this holds at the root and at /Games/Spelling/ alike.
+      .map((t) => new URL(real.clips[t], BASE).pathname);
     const fetched = new Set(got.filter(([, st]) => st < 400).map(([pth]) => pth));
     check(`'${word}': its real naming and sentence clips were fetched`,
           want.every((u) => fetched.has(u)), [...fetched].join(" "));
