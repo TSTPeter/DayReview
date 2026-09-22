@@ -17,6 +17,8 @@
  */
 import { existsSync } from "node:fs";
 import { chromium } from "playwright-core";
+import { namingLine } from "../../web/js/audio.js";
+import { hintFor } from "../../web/js/engine/derive.js";
 
 const BASE = process.env.BASE || "http://localhost:8137/";
 
@@ -513,6 +515,209 @@ console.log("\n— what the dictation actually says —");
               .includes(naming[0].replace(/^The word is (\w+),.*$/, "$1")));
 
   await ctx5.close();
+}
+
+// Pre-rendered clips. The real manifest may be empty (nothing rendered yet), so this
+// block serves its own: every curated line mapped to a clip, and every clip answered
+// with 1.2 s of silence, long enough to cancel in the middle of. Service workers are
+// blocked here so Playwright can see and answer every request; the worker's range
+// slicing has its own test.
+function silentWav(seconds) {
+  const sr = 8000, n = Math.round(sr * seconds), b = Buffer.alloc(44 + n * 2);
+  b.write("RIFF", 0); b.writeUInt32LE(36 + n * 2, 4); b.write("WAVE", 8);
+  b.write("fmt ", 12); b.writeUInt32LE(16, 16); b.writeUInt16LE(1, 20); b.writeUInt16LE(1, 22);
+  b.writeUInt32LE(sr, 24); b.writeUInt32LE(sr * 2, 28); b.writeUInt16LE(2, 32);
+  b.writeUInt16LE(16, 34); b.write("data", 36); b.writeUInt32LE(n * 2, 40);
+  return b;
+}
+const WAV = silentWav(1.2);
+const dictation = await (await fetch(new URL("data/sentences.json", BASE))).json();
+const clipOf = {};                       // text -> url, the way render_audio.py writes it
+let k = 0;
+for (const [word, sentence] of Object.entries(dictation.sentences)) {
+  for (const text of [namingLine(word, hintFor(word)), sentence]) {
+    clipOf[text] = `audio/${(k++).toString(16).padStart(16, "0")}.mp3`;
+  }
+}
+const clipManifest = { voice_id: "test", model_id: "test", clips: clipOf };
+
+async function clipContext({ deviceVoice }) {
+  const ctx = await browser.newContext({ viewport: { width: 820, height: 1180 },
+                                         serviceWorkers: "block" });
+  const w = await ctx.newPage();
+  w.on("pageerror", (e) => errors.push("clips pageerror: " + e.message));
+  const hits = [];
+  await w.route("**/data/audio.json", (r) => r.fulfill({
+    contentType: "application/json", body: JSON.stringify(clipManifest) }));
+  await w.route("**/audio/*.mp3", (r) => {
+    hits.push({ path: new URL(r.request().url()).pathname, t: Date.now() });
+    r.fulfill({ contentType: "audio/wav", body: WAV });
+  });
+  if (deviceVoice) {
+    await w.addInitScript(() => {
+      window.__spoken = [];
+      class U { constructor(t) { this.text = t; } }
+      const fake = {
+        getVoices: () => [{ name: "Test Voice", lang: "en-GB", default: true }],
+        speak(u) { window.__spoken.push(u.text); setTimeout(() => u.onend && u.onend(), 5); },
+        cancel() {}, pause() {}, resume() {}, addEventListener() {}, removeEventListener() {},
+      };
+      Object.defineProperty(window, "SpeechSynthesisUtterance", { value: U, configurable: true, writable: true });
+      Object.defineProperty(window, "speechSynthesis", { value: fake, configurable: true });
+    });
+  }
+  await w.goto(BASE, { waitUntil: "networkidle" });
+  await w.waitForSelector("#screen-home.on");
+  return { ctx, w, hits };
+}
+const lastRow = (w) => w.evaluate(async () => {
+  const db = await new Promise((res) => { const r = indexedDB.open("spelling", 1); r.onsuccess = () => res(r.result); });
+  const all = await new Promise((res) => {
+    const t = db.transaction("attempts", "readonly").objectStore("attempts").getAll();
+    t.onsuccess = () => res(t.result);
+  });
+  return all[all.length - 1];
+});
+const pathOf = (text) => "/" + new URL(clipOf[text], BASE).pathname.split("/").slice(-2).join("/");
+const hitFor = (hits, text) => hits.some((h) => h.path.endsWith(pathOf(text)));
+
+console.log("\n— pre-rendered clips, on a device with NO speech voice —");
+{
+  const { ctx, w, hits } = await clipContext({ deviceVoice: false });
+  await w.click("#btn-practise");
+  await w.waitForSelector("#screen-attempt.on");
+  const first = (await w.evaluate(() => document.querySelector("#attempt-count").textContent)).length > 0;
+  // Which word is it? The naming clip it asks for says.
+  await w.waitForFunction(() => true);
+  await w.waitForTimeout(300);
+  const firstWord = Object.keys(dictation.sentences).find((wd) => hitFor(hits, namingLine(wd, hintFor(wd))));
+  check("a curated word is DICTATED, not dropped to the cloze, with no device voice",
+        first && !!firstWord && await w.locator("#attempt-cloze").isHidden(), firstWord || "no clip requested");
+  await w.waitForFunction(() => !document.querySelector("#attempt-replay").disabled, null, { timeout: 15000 });
+  const sentenceHeard = hitFor(hits, dictation.sentences[firstWord]);
+  check("the sentence is played from its clip too, in the same voice", sentenceHeard);
+  check("the no-voice note stays hidden when clips cover the item",
+        await w.locator("#attempt-noaudio").isHidden());
+  await w.fill("#attempt-input", "zzz");
+  await w.click("#attempt-submit");
+  await w.waitForSelector("#screen-reveal.on");
+  const row1 = await lastRow(w);
+  check("the attempt row records which voice she heard",
+        row1.audio_source === "clip" && row1.prompt_mode === "audio_sentence",
+        `${row1.prompt_mode} / ${row1.audio_source}`);
+
+  // Cancel in the middle of the first clip: nothing after it may play.
+  await w.click("#reveal-next");
+  await w.waitForSelector("#screen-attempt.on");
+  const before = hits.length;
+  await w.waitForFunction((n) => window.__n = n, before);
+  await w.waitForTimeout(250);          // the naming clip is now playing
+  const second = Object.keys(dictation.sentences).find((wd) =>
+    hits.slice(before).some((h) => h.path.endsWith(pathOf(namingLine(wd, hintFor(wd))))));
+  await w.fill("#attempt-input", "zzz");
+  const submittedAt = Date.now();
+  await w.click("#attempt-submit");
+  await w.waitForSelector("#screen-reveal.on");
+  await w.waitForTimeout(2500);         // longer than the rest of the script would take
+  const late = hits.filter((h) => h.t > submittedAt && second &&
+                           h.path.endsWith(pathOf(dictation.sentences[second])));
+  check("submitting mid-dictation stops it: the sentence clip is never fetched",
+        !!second && late.length === 0, second ? `${second}: ${late.length} late` : "no second word");
+
+  // A school word nobody rendered, on a device with no voice: the cloze, honestly.
+  await w.click("#reveal-next").catch(() => {});
+  await w.goto(BASE, { waitUntil: "networkidle" });
+  await w.click("#btn-week");
+  await w.waitForSelector("#screen-week.on");
+  await w.fill("#week-input", "tomorrow");
+  await w.click("#week-save");
+  await w.waitForSelector("#screen-home.on");
+  await w.click("#btn-practise");
+  let clozeRow = null;
+  for (let i = 0; i < 10 && !clozeRow; i++) {
+    await w.waitForSelector("#screen-attempt.on");
+    const cloze = await w.locator("#attempt-cloze").isVisible();
+    await w.fill("#attempt-input", "zzz");
+    await w.click("#attempt-submit");
+    await w.waitForSelector("#screen-reveal.on");
+    const target = (await w.textContent("#reveal-target")).trim();
+    if (target === "tomorrow") {
+      const row = await lastRow(w);
+      clozeRow = { cloze, row };
+    } else {
+      await w.click("#reveal-next");
+    }
+  }
+  check("an unrendered word with no device voice falls back to the cloze",
+        !!clozeRow && clozeRow.cloze && clozeRow.row.prompt_mode === "text_cloze"
+        && clozeRow.row.audio_source === null,
+        clozeRow ? `${clozeRow.row.prompt_mode} / ${clozeRow.row.audio_source}` : "not reached");
+  await ctx.close();
+}
+
+console.log("\n— pre-rendered clips, on a device WITH a speech voice —");
+{
+  const { ctx, w, hits } = await clipContext({ deviceVoice: true });
+  await w.click("#btn-week");
+  await w.waitForSelector("#screen-week.on");
+  await w.fill("#week-input", "tomorrow");
+  await w.click("#week-save");
+  await w.waitForSelector("#screen-home.on");
+  await w.click("#btn-practise");
+  let curatedChecked = false, deviceRow = null;
+  for (let i = 0; i < 10 && !(curatedChecked && deviceRow); i++) {
+    await w.waitForSelector("#screen-attempt.on");
+    await w.waitForFunction(() => !document.querySelector("#attempt-replay").disabled,
+                            null, { timeout: 15000 });
+    await w.fill("#attempt-input", "zzz");
+    await w.click("#attempt-submit");
+    await w.waitForSelector("#screen-reveal.on");
+    const target = (await w.textContent("#reveal-target")).trim();
+    const spoken = await w.evaluate(() => window.__spoken.slice());
+    const row = await lastRow(w);
+    if (target === "tomorrow") {
+      deviceRow = { row, spoken, clip: hitFor(hits, "The word is tomorrow.") };
+    } else if (!curatedChecked) {
+      curatedChecked = true;
+      check(`'${target}': the clip wins over a working device voice`,
+            !spoken.some((t) => t.startsWith(`The word is ${target}`)) && row.audio_source === "clip",
+            row.audio_source);
+    }
+    await w.evaluate(() => { window.__spoken.length = 0; });
+    await w.click("#reveal-next");
+  }
+  check("a school word with no clip uses the device voice, and says so",
+        !!deviceRow && deviceRow.spoken.includes("The word is tomorrow.")
+        && !deviceRow.clip && deviceRow.row.audio_source === "device",
+        deviceRow ? deviceRow.row.audio_source : "not reached");
+
+  await ctx.close();
+}
+
+// The check that isolates the cancel token, in a clean context so the item under test is
+// a curated word with clips (a saved weekly list would put an unrendered word first).
+// Submitting settles the playing clip as "failed", and a failed clip falls back to the
+// device voice. Without the token that fallback fires in the gap before the reveal is
+// drawn, so the tablet starts saying the word over the marking. The redundancy guard
+// cannot catch it: the word is not on screen yet.
+{
+  const { ctx, w, hits } = await clipContext({ deviceVoice: true });
+  await w.click("#btn-practise");
+  await w.waitForSelector("#screen-attempt.on");
+  await w.waitForFunction(() => true);
+  const t0 = Date.now();
+  while (hits.length === 0 && Date.now() - t0 < 5000) await w.waitForTimeout(50);
+  await w.waitForTimeout(300);                  // the naming clip is mid-play
+  await w.evaluate(() => { window.__spoken.length = 0; });
+  await w.fill("#attempt-input", "zzz");
+  await w.click("#attempt-submit");
+  await w.waitForSelector("#screen-reveal.on");
+  await w.waitForTimeout(600);
+  const leaked = await w.evaluate(() => window.__spoken.filter((t) => t.startsWith("The word is")));
+  check("the item under test really was playing a clip", hits.length > 0, `${hits.length} clip request(s)`);
+  check("cancelling a clip never hands the line to the device voice",
+        leaked.length === 0, leaked.length ? `leaked: ${leaked.join(" | ")}` : "");
+  await ctx.close();
 }
 
 console.log("\n— privacy defaults —");

@@ -68,6 +68,11 @@ Treat it as the domain core. The API wraps it; the front end never reimplements 
 | `docs/07-assessment.md` | How KS2 actually tests spelling, and what that forces |
 | `docs/08-build-plan.md` | Milestones, in order, with what "done" means |
 | `docs/09-open-questions.md` | Where the science is thin and what to go and read |
+| `docs/10-build-log.md` | What was built, what changed, and what to distrust |
+| `docs/11-engagement.md` | Which engagement features survived the evidence, and which did not |
+| `docs/12-weekly-lists.md` | This week's school list: massed before the test, spaced after it |
+| `docs/13-hosting.md` | Served from TST's Azure Static Web App, and why that is not a DPIA trigger |
+| `docs/14-voice.md` | Pre-rendered dictation in one voice, and the exact-text contract |
 
 ## Working style
 

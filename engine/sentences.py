@@ -186,6 +186,18 @@ PRONUNCIATION_WATCHLIST = {
 }
 
 
+def naming_line(word, hint=None):
+    """
+    The first and third lines of the KS2 script: 'The word is passed.'
+
+    With a word-class hint for a -ce/-se pair: 'The word is advice, the noun.'
+    web/js/audio.js builds exactly the same string, and tests/test_audio.py
+    holds the two to it for every word, because a pre-rendered clip is found
+    by its EXACT text. One stray comma and the clip is never played.
+    """
+    return f"The word is {word}, the {hint}." if hint else f"The word is {word}."
+
+
 def for_word(word):
     return SENTENCES.get(word)
 

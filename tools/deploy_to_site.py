@@ -16,7 +16,9 @@ Deliberately excluded:
                               standard 7 is high privacy by default.
   data/firebase.example.json  developer documentation, not site content.
 """
+import hashlib
 import pathlib
+import re
 import shutil
 import subprocess
 import sys
@@ -52,6 +54,22 @@ def short_head(repo):
         return "unknown"
 
 
+def stamp_cache_version(dest):
+    digest = hashlib.sha256()
+    for f in sorted(dest.rglob("*")):
+        if f.is_file() and f.name not in ("sw.js", "README.md"):
+            digest.update(str(f.relative_to(dest)).encode("utf-8"))
+            digest.update(f.read_bytes())
+    sw = dest / "sw.js"
+    text = sw.read_text(encoding="utf-8")
+    pattern = re.compile(r"const CACHE = `\$\{PREFIX\}[^`]*`;")
+    if len(pattern.findall(text)) != 1:
+        sys.exit("REFUSING: could not find the CACHE line in sw.js to stamp. "
+                 "If it was renamed, update stamp_cache_version().")
+    stamped = pattern.sub("const CACHE = `${PREFIX}" + digest.hexdigest()[:12] + "`;", text)
+    sw.write_text(stamped, encoding="utf-8")
+
+
 def main(argv):
     site = pathlib.Path(argv[1]).resolve() if len(argv) > 1 else ROOT.parent / "productionsite"
     dest = site / "Games" / "Spelling"
@@ -69,6 +87,13 @@ def main(argv):
         shutil.rmtree(dest)
     shutil.copytree(SRC, dest,
                     ignore=lambda _d, names: [n for n in names if n in EXCLUDE])
+
+    # The service worker serves the shell cache-first and only drops an old cache when
+    # its version string changes. A sync that changed words, sentences or clips but
+    # not that string would never reach an installed tablet: the new files would sit
+    # on the server while the iPad kept playing the old ones. So the deployed copy is
+    # versioned by its content, and every sync that changes anything is picked up.
+    stamp_cache_version(dest)
 
     (dest / "README.md").write_text(
         README.format(commit=short_head(ROOT), when=date.today().isoformat()))
