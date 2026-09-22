@@ -240,11 +240,11 @@ function paintParsed() {
   if (unanswerable.length) {
     parts.push(`⚠ ${unanswerable.map((e) => e.word).join(", ")} `
       + `sound${unanswerable.length === 1 ? "s" : ""} like another word and the app `
-      + `has no sentence to tell them apart — add the word class in brackets, `
+      + `has no sentence to tell them apart. Add the word class in brackets, `
       + `like "${unanswerable[0].word} (noun)"`);
   }
   const rest = words.length - curated.length;
-  if (rest) parts.push(`${rest} read from the spelling — she'll get the rule but not the word history`);
+  if (rest) parts.push(`${rest} read from the spelling, so she'll get the rule but not the word history`);
   $("#week-parsed").textContent = parts.join(" · ");
 }
 
@@ -692,7 +692,7 @@ async function showGrownUp() {
   }).filter(Boolean);
 
   const p = compute(marks, await store.getKV("strategy_log", []));
-  const pct = (v) => (v === null || v === undefined ? "—" : `${Math.round(v * 100)}%`);
+  const pct = (v) => (v === null || v === undefined ? "-" : `${Math.round(v * 100)}%`);
 
   // The four numbers docs/04 says matter, and none of the ones it says do not.
   $("#gu-phon").textContent = pct(p.phonological_reliance);
@@ -744,7 +744,7 @@ async function showGrownUp() {
   $("#gu-sync-state").textContent = !syncOn
     ? "Off. Everything stays on this device and the app makes no network calls."
     : sync.isConfigured()
-      ? "On. Only counts and percentages are sent — never her writing or keystrokes."
+      ? "On. Only counts and percentages are sent, never her writing or keystrokes."
       : "On, but no config found. Copy web/data/firebase.example.json to "
         + "web/data/firebase.json and fill it in.";
 

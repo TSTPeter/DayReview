@@ -1,9 +1,9 @@
-// Firebase sync — AGGREGATES ONLY.
+// Firebase sync: AGGREGATES ONLY.
 //
 // WHAT THIS DELIBERATELY DOES NOT SEND.
 //
 // docs/05 decision 2: "no child's writing ever leaves our tenancy", and
-// docs/06 concentrates the whole data-protection risk in one place — free
+// docs/06 concentrates the whole data-protection risk in one place: free
 // text written by a child. Her attempts ARE that free text: 'goverment' for
 // 'government' is a nine-year-old's writing, and the keystroke timings are a
 // behavioural trace of her using a device.
@@ -29,8 +29,8 @@ const SDK = "https://www.gstatic.com/firebasejs/10.12.2";
 // DAY-LEVEL aggregate must have.
 //
 // The type matters as much as the name. Several day-level names collide with
-// per-attempt field names — a day has a `correct` COUNT, an attempt has a
-// `correct` BOOLEAN — so a name-only allowlist would let a raw attempt row's
+// per-attempt field names. A day has a `correct` COUNT, an attempt has a
+// `correct` BOOLEAN, so a name-only allowlist would let a raw attempt row's
 // values ride through. Checking the type as well makes that impossible:
 // tests/test_sync_shape.mjs caught exactly this.
 const SCHEMA = Object.freeze({

@@ -13,7 +13,7 @@
 //
 // WHAT THE SOUNDS MAY SAY. Shute 2008 advises praise sparingly and no
 // normative comparison, so "correct" is a brief confirming figure rather than
-// a fanfare, and "not yet" is neutral and low — informational, never a buzzer.
+// a fanfare, and "not yet" is neutral and low: informational, never a buzzer.
 // A wrong answer is the most useful event in this app; it must not sound like
 // a punishment.
 

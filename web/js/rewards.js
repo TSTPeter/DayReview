@@ -3,7 +3,7 @@
 // THE WHOLE DESIGN IS ONE CHOICE, MADE FROM ONE FINDING.
 //
 // Deci, Koestner & Ryan, 128 studies: expected tangible rewards REDUCE
-// free-choice persistence — engagement-contingent d = -0.40, completion
+// free-choice persistence: engagement-contingent d = -0.40, completion
 // d = -0.36, performance d = -0.28, and the damage is larger in children than
 // adults. The single exception is the UNEXPECTED reward: d = 0.01, no harm.
 // Verbal praise helped overall (d = 0.33) but for children specifically was
@@ -26,7 +26,7 @@
 // how a reward becomes a pressure, which is the ICO Children's code standard
 // 13 problem as well as the overjustification one.
 //
-// The habit metrics Peter asked for — consistency, daily plotting — are real
+// The habit metrics Peter asked for (consistency, daily plotting) are real
 // and useful, and they live in the GROWN-UP view where they inform an adult
 // instead of nudging a child.
 
