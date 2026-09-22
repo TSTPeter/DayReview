@@ -102,7 +102,7 @@ a voice change only costs consistency. The attempt row records `mixed`.
 cloze. Two voices are two stimuli, so they are recorded rather than pooled, for
 the same reason `prompt_mode` exists. The column is in `db/schema.sql`.
 
-## Three things that went wrong on the way, or would have
+## Four things that went wrong on the way, or would have
 
 **A device with no speech voice used to get the cloze for everything.** Now a
 curated word is dictated properly from its clip; only an unrendered school word
@@ -122,6 +122,14 @@ media in byte ranges and can refuse a whole response to a range request, while
 a cache can only hold whole responses. The service worker now slices a cached
 clip into the `206` the media element asked for. Tested on nine range shapes,
 down to the bytes returned.
+
+**The cache warm-up left every request open.** `fetch()` resolves on the headers,
+so the warm-up loop fired sixty requests without reading a single body. A
+browser allows only a handful of connections per host, so sixty half-read
+responses could have starved the clip she was actually waiting for, and
+dictation would have stalled on the first word. Nothing showed it until the
+real clips existed: the browser suite's first page then never went idle. Each
+body is now read to the end.
 
 ## The render, and the review it enables
 
@@ -157,12 +165,45 @@ Then sync to the site with `tools/deploy_to_site.py`, which now stamps the
 service worker's cache version from the content, so an installed tablet actually
 picks the new clips up instead of keeping the old ones forever.
 
+## The first render, measured
+
+Rendered on 22 September 2026 with a temporary key: 244 of 244 lines, no
+failures, 4.0 MB, 8.3 minutes of speech. Every clip parses as 64 kbps, 44.1 kHz
+MP3, and its frame-count length agrees with its file size.
+
+| | median | 10th to 90th percentile | fastest |
+|---|---|---|---|
+| Naming lines ("The word is ...") | 126 wpm | 116 to 144 | 219 |
+| Sentences | 189 wpm | 151 to 235 | 277 |
+
+The naming line, which carries the target word and is heard twice, is at a
+measured dictation pace. The sentences are brisker, and two of the three fastest
+are the `advise` and `advice` sentences, where catching "would advise" against
+"some good advice" is the whole point. Whether that is too quick for a Year 6
+child is a judgement for the ear, not the table; `"speed": 0.9` in
+`VOICE_SETTINGS` and a re-render would slow everything by a tenth.
+
+## Space
+
+MP3 is already compressed, so git saves almost nothing on it (97% of raw).
+Each repository holds one copy: about 4 MB in DayReview and 3.9 MB in
+ProductionSite, whose own upload check went from 332.1 MB to 335.9 MB of the
+Static Web App's 500 MB. GitHub asks for repositories "ideally less than 1 GB"
+and blocks single files over 100 MiB; the largest clip is 29 KB.
+
+What grows is history. A re-rendered clip replaces the old one on disk, but the
+old one stays in git history, so every full re-render adds another ~4 MB to each
+repository for good. Editing one sentence adds about 15 KB. If that ever
+mattered, the route ProductionSite's Duet already took is to move media to Azure
+Blob storage.
+
 ## Still open
 
-- **Nothing has been rendered yet.** The connector can start a generation but
-  lacks the scope to read one back (`convai_read convai_write flows
-  speech_history_read text_to_speech`), so the render needs the script and a
-  key. Until then the app behaves exactly as it did.
+- **Nobody has listened yet.** Start with `prophecy` and `prophesy`, then the
+  rest of `PRONUNCIATION_WATCHLIST`, then the pace of the pair sentences.
+- **The connector cannot read a generation back** (it lacks `convai_read
+  convai_write flows speech_history_read text_to_speech`), which is why
+  rendering goes through the script and a key.
 - **Clip warm-up has no browser test.** `warmClips()` fetches this week's
   words and the next due words once the service worker is in charge. Testing it
   needs the worker and request interception together, which Playwright does not
