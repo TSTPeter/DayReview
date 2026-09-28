@@ -8,8 +8,9 @@ const byWord = new Map();
 for (const w of [...data.words, ...data.off_list]) byWord.set(w.word, w);
 
 const cases = JSON.parse(readFileSync(0, "utf8"));
-const out = cases.map(({ word, attempt }) => {
-  const entry = byWord.get(word);
+const out = cases.map(({ word, attempt, entry: given }) => {
+  // A school word has no curated entry, so the case brings the one Python built.
+  const entry = given || byWord.get(word);
   if (!entry) return { error: `unknown word ${word}` };
   const d = classify(attempt, entry);
   // Compare only the fields the app and the dataset actually consume.

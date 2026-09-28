@@ -64,7 +64,20 @@ SCHOOL_WORDS = [
     "delicious", "useful", "although", "thought", "enough", "cough",
     "unique", "antique", "chauffeur", "silhouette", "picturesque",
     "cat", "dog", "a", "", "Don't", "  SPACED  ",
+    # The autumn term's hyphen weeks, and the ways a pasted hyphen arrives.
+    "co-operate", "co-ordinate", "co-own", "co-author", "re-enter", "re-educate",
+    "re-examine", "re-evaluate", "re-energise", "re-elect", "man-eating",
+    "little-used", "rock-bottom", "wide-eyed", "pig-headed", "tight-fisted",
+    "cold-hearted", "stone-faced", "green-eyed", "short-tempered",
+    "co\u2010ordinate", "re--enter", "-advice", "pre-arrange", "anti-ageing",
 ]
+# The same two weeks pasted the way a list is typed: numbered, bulleted, with a
+# non-breaking hyphen from a word processor. Every hyphen must survive.
+HYPHEN_TEXT = """Hyphens (w/c 12/10):
+1. co-operate  2. co-ordinate  3. co-own  4. co-author
+5. re-enter, re-educate, re-examine, re-evaluate, re-energise, re\u2011elect
+- man-eating
+- little-used / rock-bottom / wide-eyed"""
 
 
 @unittest.skipIf(NODE is None, "node not installed")
@@ -73,7 +86,7 @@ class TestWeeklyParity(unittest.TestCase):
     def setUpClass(cls):
         cls.words = [w["word"] for w in WORDS] + SCHOOL_WORDS
         payload = {"words": cls.words, "listText": LIST_TEXT, "setOn": SET_ON,
-                   "taggedText": TAGGED_TEXT,
+                   "taggedText": TAGGED_TEXT, "hyphenText": HYPHEN_TEXT,
                    "offsets": OFFSETS, "hard": HARD, "size": SIZE}
         proc = subprocess.run([NODE, str(RUNNER)], input=json.dumps(payload),
                               capture_output=True, text=True)
@@ -99,6 +112,14 @@ class TestWeeklyParity(unittest.TestCase):
         self.maxDiff = None
         self.assertEqual(self.js["tagged"]["words"], py["words"])
         self.assertEqual(self.js["tagged"]["hints"], py["hints"])
+
+    def test_hyphens_survive_parsing_identically(self):
+        py = py_weekly.make_list(HYPHEN_TEXT, set_on=date.fromisoformat(SET_ON))
+        self.assertEqual(self.js["hyphened"]["words"], py["words"])
+        self.assertIn("co-operate", py["words"])
+        self.assertIn("re-elect", py["words"])
+        self.assertNotIn("cooperate", py["words"])
+        self.assertEqual(len(py["words"]), 14)
 
     def test_hint_of_agrees_on_every_word(self):
         py_tagged = py_weekly.make_list(TAGGED_TEXT, set_on=date.fromisoformat(SET_ON))

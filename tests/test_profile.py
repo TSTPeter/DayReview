@@ -7,6 +7,7 @@ import unittest
 
 sys.path.insert(0, str(pathlib.Path(__file__).resolve().parents[1] / "engine"))
 
+import derive  # noqa: E402
 import ladder  # noqa: E402
 import probe  # noqa: E402
 from classify import classify  # noqa: E402
@@ -123,6 +124,17 @@ class TestProfile(unittest.TestCase):
         t = compute(marks)["transfer"]
         self.assertEqual(t["on_list"], 1.0)
         self.assertEqual(t["off_list"], 0.0)
+        self.assertEqual(t["off_list_items"], 1)
+
+    def test_a_school_word_counts_as_taught(self):
+        # Off the statutory list, but practised every week. Counting school words
+        # as untaught once put the whole weekly list into the transfer slice.
+        school = derive.make_entry("observant")
+        off = probe.OFF_LIST[0]
+        marks = marks_for([(school, "observent"), (off, off["word"])])
+        t = compute(marks)["transfer"]
+        self.assertEqual(t["on_list"], 0.0)
+        self.assertEqual(t["off_list"], 1.0)
         self.assertEqual(t["off_list_items"], 1)
 
     def test_confidence_is_low_below_the_documented_floor(self):

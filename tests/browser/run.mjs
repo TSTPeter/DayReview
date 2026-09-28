@@ -65,9 +65,16 @@ const browser = await chromium.launch(
 // uses the real one.
 const noClips = (c) => c.route("**/data/audio.json", (r) => r.fulfill({
   contentType: "application/json", body: JSON.stringify({ clips: {} }) }));
+// The same for the school term: engine/term.py ships the real autumn lists, and
+// which one is live depends on today's date. A context that tests the app with no
+// list pins an empty term, so what the suite means does not change with the
+// calendar. The term's own checks further down build a term relative to today.
+const noTerm = (c) => c.route("**/data/term.json", (r) => r.fulfill({
+  contentType: "application/json", body: JSON.stringify({ weeks: [] }) }));
 
 const ctx = await browser.newContext({ viewport: { width: 420, height: 900 } });
 await noClips(ctx);
+await noTerm(ctx);
 const page = await ctx.newPage();
 const errors = [];
 const requestLog = [];
@@ -145,6 +152,7 @@ check("session end reports self-referenced progress", /spelled correctly/i.test(
 console.log("\n— 5. paper probe —");
 const ctx2 = await browser.newContext({ viewport: { width: 420, height: 900 } });
 await noClips(ctx2);
+await noTerm(ctx2);
 const p2 = await ctx2.newPage();
 p2.on("pageerror", (e) => errors.push("probe pageerror: " + e.message));
 await p2.goto(BASE, { waitUntil: "networkidle" });
@@ -315,6 +323,7 @@ console.log("\n— this week's spellings —");
 {
   const ctx3 = await browser.newContext({ viewport: { width: 820, height: 1180 } });
   await noClips(ctx3);
+  await noTerm(ctx3);
   const w = await ctx3.newPage();
   w.on("pageerror", (e) => errors.push("week pageerror: " + e.message));
   await w.goto(BASE, { waitUntil: "networkidle" });
@@ -384,6 +393,7 @@ console.log("\n— a real school list, headings and all —");
 {
   const ctx4 = await browser.newContext({ viewport: { width: 820, height: 1180 } });
   await noClips(ctx4);
+  await noTerm(ctx4);
   const w = await ctx4.newPage();
   w.on("pageerror", (e) => errors.push("real-list pageerror: " + e.message));
   await w.goto(BASE, { waitUntil: "networkidle" });
@@ -476,6 +486,7 @@ console.log("\n— what the dictation actually says —");
 {
   const ctx5 = await browser.newContext({ viewport: { width: 820, height: 1180 } });
   await noClips(ctx5);
+  await noTerm(ctx5);
   const w = await ctx5.newPage();
   w.on("pageerror", (e) => errors.push("dictation pageerror: " + e.message));
   await w.addInitScript(() => {
@@ -558,6 +569,7 @@ const clipManifest = { voice_id: "test", model_id: "test", clips: clipOf };
 async function clipContext({ deviceVoice }) {
   const ctx = await browser.newContext({ viewport: { width: 820, height: 1180 },
                                          serviceWorkers: "block" });
+  await noTerm(ctx);
   const w = await ctx.newPage();
   w.on("pageerror", (e) => errors.push("clips pageerror: " + e.message));
   const hits = [];
@@ -748,6 +760,7 @@ console.log("\n— the real rendered clips —");
   } else {
     const c = await browser.newContext({ viewport: { width: 820, height: 1180 },
                                          serviceWorkers: "block" });
+    await noTerm(c);
     const w = await c.newPage();
     w.on("pageerror", (e) => errors.push("real clips pageerror: " + e.message));
     const got = [];
@@ -774,6 +787,119 @@ console.log("\n— the real rendered clips —");
           row.audio_source === "clip" && took > 3 && took < 20,
           `${row.audio_source}, script took ${took.toFixed(1)} s`);
     await c.close();
+  }
+}
+
+// ---------------------------------------------------------------- the school term
+// engine/term.py ships the real autumn lists, but which one is live depends on the
+// date, so these checks build a term around TODAY: last week's list and this week's.
+// The dates are UTC, the same as the app's today().
+console.log("\n— the school term —");
+{
+  const iso = (d) => d.toISOString().slice(0, 10);
+  const now = new Date();
+  const monday = new Date(Date.UTC(now.getUTCFullYear(), now.getUTCMonth(),
+    now.getUTCDate() - ((now.getUTCDay() + 6) % 7)));
+  const plus = (d, n) => new Date(d.getTime() + n * 86400000);
+  const week = (setOn, words, theme) => ({
+    id: `week-${iso(setOn)}`, words, hints: {}, set_on: iso(setOn),
+    test_on: iso(plus(setOn, 4)), done: false, theme, source: "term" });
+  const lastWeek = week(plus(monday, -7), ["tomorrow", "business", "wednesday"], "Last week");
+  const thisWeek = week(monday, ["co-operate", "re-enter", "man-eating"], "Hyphens");
+  const termCtx = async (kv = {}) => {
+    const c = await browser.newContext({ viewport: { width: 820, height: 1180 } });
+    await noClips(c);
+    await c.route("**/data/term.json", (r) => r.fulfill({
+      contentType: "application/json", body: JSON.stringify({ weeks: [lastWeek, thisWeek] }) }));
+    const w = await c.newPage();
+    const errs = [];
+    w.on("pageerror", (e) => errs.push(e.message));
+    await w.goto(BASE, { waitUntil: "networkidle" });
+    await w.waitForSelector("#screen-home.on");
+    if (Object.keys(kv).length) {
+      // Seed what a device would already hold, then boot again on top of it.
+      await w.evaluate(async (entries) => {
+        const db = await new Promise((res) => { const r = indexedDB.open("spelling", 1); r.onsuccess = () => res(r.result); });
+        await new Promise((res) => {
+          const t = db.transaction("kv", "readwrite");
+          for (const [key, value] of Object.entries(entries)) t.objectStore("kv").put({ key, value });
+          t.oncomplete = res;
+        });
+      }, kv);
+      await w.reload({ waitUntil: "networkidle" });
+      await w.waitForSelector("#screen-home.on");
+    }
+    return { c, w, errs };
+  };
+
+  {
+    const { c, w } = await termCtx();
+    const shown = await w.textContent("#home-week-words");
+    check("this week's list switches on with nobody typing it",
+          await w.locator("#home-week").isVisible() && shown.includes("co-operate"), shown);
+    await c.close();
+  }
+  {
+    const pasted = { id: `week-${iso(plus(monday, -6))}`, words: ["hostile", "frantic"], hints: {},
+                     set_on: iso(plus(monday, -6)), test_on: iso(plus(monday, -3)), done: false };
+    const { c, w } = await termCtx({ weekly_list: pasted });
+    const shown = await w.textContent("#home-week-words");
+    check("a list saved last week gives way on Monday", shown.includes("re-enter"), shown);
+    await c.close();
+  }
+  {
+    const mine = { id: `week-${iso(now)}`, words: ["obstinate", "calamitous"], hints: {},
+                   set_on: iso(now), test_on: iso(plus(monday, 4)), done: false };
+    const { c, w } = await termCtx({ weekly_list: mine });
+    const shown = await w.textContent("#home-week-words");
+    check("an adult's own list for this week is kept", shown.includes("obstinate"), shown);
+    await c.close();
+  }
+  {
+    // She practised 'tomorrow' last week and it is due again today. It is in the saved
+    // state but not on this week's list. That once crashed the session outright.
+    const { c, w, errs } = await termCtx({
+      scheduler_state: { tomorrow: { box: 2, due: iso(plus(monday, -1)), seen: 2, wrong: 1 } } });
+    await w.click("#btn-practise");
+    const started = await w.waitForSelector("#screen-attempt.on", { timeout: 5000 })
+      .then(() => true).catch(() => false);
+    check("a word from an earlier list coming due does not break practice",
+          started && errs.length === 0, errs.join(" | ") || "attempt screen up");
+    await c.close();
+  }
+  {
+    const { c, w, errs } = await termCtx();
+    await w.click("#btn-practise");
+    await w.waitForSelector("#screen-attempt.on");
+    const answer = async (text) => {
+      await w.waitForFunction(() => !document.querySelector("#attempt-input").disabled);
+      await w.fill("#attempt-input", text);
+      await w.click("#attempt-submit");
+      await w.waitForSelector("#screen-reveal.on");
+      return { verdict: await w.textContent("#reveal-verdict"),
+               target: await w.textContent("#reveal-target"),
+               marked: await w.textContent("#reveal-marked") };
+    };
+    // The week's words come first, least seen first, in list order: co-operate.
+    const missing = await answer("cooperate");
+    check("leaving out the hyphen is marked wrong, and says it is the hyphen",
+          /hyphen/i.test(missing.verdict) && missing.target === "co-operate",
+          `${missing.verdict} | ${missing.target}`);
+    check("the marked answer shows where the hyphen goes", missing.marked === "co-operate",
+          missing.marked);
+    await c.close();
+    // A fresh device, so the first word is co-operate again.
+    const again = await termCtx();
+    await again.w.click("#btn-practise");
+    await again.w.waitForSelector("#screen-attempt.on");
+    await again.w.fill("#attempt-input", "co-operate");
+    await again.w.click("#attempt-submit");
+    await again.w.waitForSelector("#screen-reveal.on");
+    const verdict = await again.w.textContent("#reveal-verdict");
+    check("a hyphenated word typed with its hyphen is right", /correct/i.test(verdict), verdict);
+    check("the hyphen weeks raise no page errors",
+          errs.length === 0 && again.errs.length === 0, [...errs, ...again.errs].join(" | "));
+    await again.c.close();
   }
 }
 

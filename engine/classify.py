@@ -79,10 +79,46 @@ SPLITTERS = {"'": "an apostrophe", "\u2019": "an apostrophe",
              "-": "a hyphen", "\u2010": "a hyphen", "\u2011": "a hyphen"}
 
 
+HYPHENS = ("-", "\u2010", "\u2011")
+
+
+def hyphen_problem(raw, word):
+    """
+    For a word that OWNS a hyphen, is hers there, and in the right place?
+
+    Only asked once every letter is known to be right. 'cooperate' for
+    'co-operate' is the error two weeks of the school list exist to teach, and
+    normalise() cannot see it: it strips hyphens so the aligner compares
+    letters. None when the hyphens match.
+    """
+    if "-" not in word:
+        return None
+    mine = (raw or "").strip().lower()
+    for h in HYPHENS[1:]:
+        mine = mine.replace(h, "-")
+    mine = re.sub(r"[^a-z\-\s]", "", mine)
+    # 'co - operate' has its hyphen in the right place; the spaces are a
+    # separate fault, which mark_scheme_penalty() names.
+    mine = re.sub(r"\s*-\s*", "-", mine)
+    if mine == word:
+        return None
+    parts = word.split("-")
+    where = " and ".join(parts) if len(parts) == 2 else ", ".join(parts)
+    if "-" in mine:
+        return f"the hyphen is in the wrong place: it goes between {where}"
+    if re.search(r"\s", mine):
+        return f"a space does not join the parts: put a hyphen between {where}"
+    return f"every letter is right, but it needs a hyphen between {where}"
+
+
 def mark_scheme_penalty(raw, word):
     """Why the mark scheme would refuse a letter-perfect attempt. None if it would not."""
     raw = (raw or "").strip()
     for ch, name in SPLITTERS.items():
+        # Any kind of hyphen is right in a word that owns one: hyphen_problem()
+        # has already checked it is in the right place.
+        if ch in HYPHENS and "-" in word:
+            continue
         if ch in raw and ch not in word:
             return f"the letters are right, but {name} inside a word scores zero"
     if re.search(r"\s", raw):
@@ -203,13 +239,21 @@ def classify(attempt, entry):
     raw = (attempt or "").strip()
     attempt = normalise(raw)
     letters_right = target == attempt
-    penalty = mark_scheme_penalty(raw, entry["word"]) if letters_right else None
+    hyphen = hyphen_problem(raw, entry["word"]) if letters_right else None
+    penalty = hyphen or (mark_scheme_penalty(raw, entry["word"]) if letters_right else None)
     r = {"word": entry["word"], "attempt": attempt, "raw": raw,
          "correct": letters_right and penalty is None,
          "type": None, "detail": "", "edits": [], "patterns": [],
          "sounds_right": letters_right, "trap": None, "mark_scheme": penalty}
     if r["correct"]:
         r["type"] = "correct"
+        return r
+    if hyphen:
+        # Unlike a stray apostrophe, this IS the pattern at fault, so it is
+        # charged to the hyphen rule and the scheduler hears about it.
+        r.update(type="hyphen", detail=hyphen,
+                 patterns=[p for p in entry["patterns"] if p.startswith("hyphen")]
+                 or ["hyphen-compound"])
         return r
     if letters_right:
         # Every letter is right. We still mark it wrong, because the test would.
@@ -240,6 +284,19 @@ def classify(attempt, entry):
             return out("vowel-choice", f"right consonants, wrong vowel: {swaps}",
                        [p for p in pats if p == "schwa"] or ["schwa"])
         return out("transposition", "every letter is right, the order is not", ["sequencing"])
+
+    # 2b. a letter lost where two parts meet. Without the hyphen, 're-enter'
+    # becomes 'renter' and 'co-operate' becomes 'coperate': the two vowels merge.
+    # Keeping both is the reason the hyphen is there, so say that, before the
+    # sound rules call it a grapheme choice.
+    if "-" in entry["word"] and single and single["tag"] == "delete" and len(single["target"]) == 1:
+        head, tail = entry["word"].split("-", 1)
+        join = len(normalise(head))
+        if single["at"] in (join - 1, join):
+            return out("omission",
+                       f"left out '{single['target']}' where {head} meets "
+                       f"{tail.replace('-', ' ')}: the hyphen keeps both",
+                       [p for p in pats if p.startswith("hyphen")] or ["letter-level"])
 
     # 3. doubling
     for e in r["edits"]:
@@ -313,6 +370,7 @@ def out_penalty(r, penalty):
 
 HEADLINES = {
     "mark-scheme": "Every letter is right. The test would still mark this wrong.",
+    "hyphen": "Every letter is right. The hyphen is part of the spelling.",
     "transposition": "The letters are all right, the order slipped.",
     "doubling": "This is a doubling decision, not a sound.",
     "suffix-choice": "The ending is the decision point.",

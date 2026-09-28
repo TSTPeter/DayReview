@@ -75,9 +75,18 @@ class TestTheTextContract(unittest.TestCase):
 
 class TestTheRenderer(unittest.TestCase):
     def test_every_word_with_a_sentence_has_two_distinct_lines(self):
-        lines = render_audio.utterances()
+        lines = render_audio.utterances(include_unreviewed=True)
         self.assertEqual(len(lines), 2 * len(sentences.SENTENCES))
         self.assertEqual(len({t for t, _ in lines}), len(lines))
+
+    def test_an_unreviewed_sentence_is_not_rendered(self):
+        # docs/05 decision 2: nothing unreviewed reaches a child, and a clip is how
+        # a sentence reaches her. Held back until an adult has read it.
+        words = {w for _, w in render_audio.utterances()}
+        self.assertTrue(sentences.UNREVIEWED)
+        self.assertFalse(words & sentences.UNREVIEWED)
+        self.assertEqual(len(render_audio.utterances()),
+                         2 * len(set(sentences.SENTENCES) - sentences.UNREVIEWED))
 
     def test_clip_names_change_with_anything_that_changes_the_audio(self):
         base = render_audio.clip_name("The word is cat.", "voiceA")

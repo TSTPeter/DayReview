@@ -7,7 +7,7 @@
 // A local-time Date would shift the test day across a timezone or a DST
 // boundary, and "which day is the test" is not a question to get wrong.
 
-import { derive, hintFor, makeEntry, normalise } from "./derive.js";
+import { derive, hintFor, makeEntry, normalise, wordForm, HYPHEN_VARIANTS } from "./derive.js";
 
 export const FRIDAY = 5;            // JS getUTCDay(): Sunday is 0
 export const WEEKLY_SHARE = 2 / 3;
@@ -52,23 +52,43 @@ export function parseEntries(text) {
   if (!text) return [];
   const out = [];
   const seen = new Set();
-  for (const line of String(text).split(LINES)) {
+  for (let line of String(text).split(LINES)) {
     if (HEADING.test(line)) continue;
+    for (const h of HYPHEN_VARIANTS) line = line.split(h).join("-");
     // Split the line into segments so a tag attaches to the word before it:
     // 'advice (N) / advise (V)' is two items, not one with two tags.
     for (const segment of line.split(/[/,;]|\s{2,}/)) {
       const tag = TAG.exec(segment);
       const hint = tag ? TAG_MEANING.get(tag[1].trim().toLowerCase()) : null;
       for (const token of segment.replace(TAG_ALL, " ").split(/[^A-Za-z'’-]+/)) {
-        const w = token.toLowerCase().replace(/[^a-z]/g, "");
+        // The hyphen stays: 'co-operate' is the spelling being taught.
+        const w = wordForm(token);
         // Numbering and stray initials are noise; real Y5/6 words are 3+.
-        if (w.length < 3 || seen.has(w)) continue;
+        if (normalise(w).length < 3 || seen.has(w)) continue;
         seen.add(w);
         out.push({ word: w, hint: hint || hintFor(w) });
       }
     }
   }
   return out;
+}
+
+/**
+ * The term's list for today: the latest week that has started. See weekly.py.
+ * ISO dates compare correctly as strings.
+ */
+export function scheduledWeek(weeks, todayISO) {
+  const day = todayISO || today();
+  let current = null;
+  for (const week of weeks || []) if (week.set_on <= day) current = week;
+  return current;
+}
+
+/** Which list to practise: the adult's own for this week wins. See weekly.py. */
+export function chooseWeek(stored, scheduled) {
+  if (!scheduled) return stored;
+  if (stored && (stored.set_on || "") >= scheduled.set_on) return stored;
+  return scheduled;
 }
 
 /** Just the words. See parseEntries for the tags. */
@@ -101,7 +121,7 @@ export function makeList(text, setOn, testOn, listId) {
 
 /** The tag to speak and show for a word, from the list first, then the table. */
 export function hintOf(list, word) {
-  const w = normalise(word);
+  const w = wordForm(word);
   return (list && list.hints && list.hints[w]) || hintFor(w);
 }
 

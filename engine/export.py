@@ -16,11 +16,14 @@ import pathlib
 
 import probe
 import sentences
+import term
+from derive import SCHOOL_PATTERNS
 from words import PATTERNS, WORDS
 
 ROOT = pathlib.Path(__file__).resolve().parents[1]
 OUT = ROOT / "web" / "data" / "words.json"
 OUT_SENTENCES = ROOT / "web" / "data" / "sentences.json"
+OUT_TERM = ROOT / "web" / "data" / "term.json"
 
 
 # Six half-terms is a school year, which is as far ahead as the probe needs to be
@@ -39,6 +42,10 @@ def build():
         "generated_by": "engine/export.py",
         "list": "dfe-y5y6-statutory",
         "patterns": PATTERNS,
+        # Rule cards for patterns only school words carry (the hyphen rules).
+        # Separate from "patterns" because the garden assigns its pieces by
+        # sorting those keys, and new keys there would repaint earned pieces.
+        "school_patterns": SCHOOL_PATTERNS,
         "probe_patterns": probe.PROBE_PATTERNS,
         "probes": probes,
         "words": [{**w, "on_list": True} for w in WORDS],
@@ -50,6 +57,8 @@ def build_sentences():
     return {"generated_by": "engine/sentences.py",
             "review_note": "Read these before a child does. See engine/sentences.py.",
             "sentences": sentences.SENTENCES,
+            # Drafts an adult has not read yet. The grown-up view lists them.
+            "unreviewed": sorted(sentences.UNREVIEWED),
             "pronunciation_watchlist": sentences.PRONUNCIATION_WATCHLIST}
 
 
@@ -67,6 +76,12 @@ if __name__ == "__main__":
     print(f"wrote {OUT_SENTENCES.relative_to(ROOT)}  "
           f"{len(spoken['sentences'])} sentences, "
           f"{len(spoken['pronunciation_watchlist'])} on the pronunciation watchlist")
+
+    weeks = term.weeks()
+    OUT_TERM.write_text(json.dumps({"generated_by": "engine/term.py", "weeks": weeks},
+                                   indent=1) + "\n")
+    print(f"wrote {OUT_TERM.relative_to(ROOT)}  {len(weeks)} weeks, "
+          f"{len(term.words())} words")
 
     gaps = sentences.missing([w["word"] for w in payload["words"]]
                              + [w["word"] for w in payload["off_list"]])

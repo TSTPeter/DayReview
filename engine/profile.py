@@ -92,8 +92,13 @@ def compute(marks, strategy_responses=None):
 
     # Transfer: the off-list slice. docs/04 predicts this lags, and it is the number
     # that separates "learned the rule" from "learned the word".
-    off = [m for m in marks if not m["entry"].get("on_list", True)]
-    on = [m for m in marks if m["entry"].get("on_list", True)]
+    # Untaught means the off-list transfer set, which the app never practises. A
+    # school word is off the statutory list too, but it IS taught, so counting it
+    # as untaught made the gap meaningless once a weekly list had been practised.
+    def untaught(e):
+        return not e.get("on_list", True) and not e.get("derived")
+    off = [m for m in marks if untaught(m["entry"])]
+    on = [m for m in marks if not untaught(m["entry"])]
 
     def accuracy(rows):
         return round(sum(1 for m in rows if m["diagnosis"]["correct"]) / len(rows), 3) if rows else None

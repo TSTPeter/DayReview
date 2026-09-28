@@ -110,10 +110,22 @@ SPOKEN_OVERRIDES = {}
 API = "https://api.elevenlabs.io/v1"
 
 
-def utterances():
-    """Every line the app can dictate from a clip: [(key_text, word)]."""
+def utterances(include_unreviewed=False):
+    """
+    Every line the app can dictate from a clip: [(key_text, word)].
+
+    A sentence still in sentences.UNREVIEWED is held back. docs/05 decision 2
+    keeps unreviewed content away from a child, and a clip is exactly how a
+    sentence reaches her; rendering one that review then changes also wastes the
+    credits. Until it is reviewed the item uses the device voice. Pass
+    include_unreviewed to render them anyway, to review them BY EAR in the voice
+    she will hear (--include-unreviewed).
+    """
+    held = set() if include_unreviewed else set(getattr(sentences, "UNREVIEWED", ()))
     out = []
     for word, sentence in sorted(sentences.SENTENCES.items()):
+        if word in held:
+            continue
         out.append((sentences.naming_line(word, derive.hint_for(word)), word))
         out.append((sentence, word))
     seen, unique = set(), []
@@ -246,9 +258,12 @@ def main(argv=None):
                     help="render ONLY these words' lines, replacing any existing clips")
     ap.add_argument("--keep-orphans", action="store_true",
                     help="do not delete clips the manifest no longer uses")
+    ap.add_argument("--include-unreviewed", action="store_true",
+                    help="also render sentences still in sentences.UNREVIEWED, to review "
+                         "them by ear (she will hear them too once deployed)")
     args = ap.parse_args(argv)
 
-    lines = utterances()
+    lines = utterances(include_unreviewed=args.include_unreviewed)
     known = {w for _, w in lines}
     unknown = sorted(set(args.only or []) - known)
     if unknown:

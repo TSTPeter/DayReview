@@ -48,6 +48,8 @@ const STRATEGY_OPTIONS = [
 
 const app = {
   data: null, byWord: new Map(), sentences: {},
+  curated: new Map(),        // statutory and off-list entries, as shipped
+  term: [],                  // the school's lists for the term (engine/term.py)
   scheduler: null, session: null, queue: [], index: 0,
   marks: [], strategy: [], keys: new Keystrokes(),
   mode: "practice",          // practice | probe
@@ -63,23 +65,32 @@ const app = {
 // --------------------------------------------------------------- boot
 
 async function boot() {
-  const [words, sentences, clips] = await Promise.all([
+  const [words, sentences, clips, term] = await Promise.all([
     fetch("data/words.json").then((r) => r.json()),
     fetch("data/sentences.json").then((r) => r.json()).catch(() => ({})),
     // Pre-rendered dictation (tools/render_audio.py). Missing or empty is fine: every
     // item then uses the device voice, exactly as before clips existed.
     fetch("data/audio.json").then((r) => r.json()).catch(() => ({})),
+    // The school's lists for the whole term (engine/term.py). Missing is fine: the
+    // adult can still paste a list each week, as before.
+    fetch("data/term.json").then((r) => r.json()).catch(() => ({})),
   ]);
   audio.setClips(clips);
   app.data = words;
   app.sentences = sentences.sentences || {};
-  for (const w of [...words.words, ...words.off_list]) app.byWord.set(w.word, w);
+  app.term = term.weeks || [];
+  for (const w of [...words.words, ...words.off_list]) app.curated.set(w.word, w);
+  app.byWord = new Map(app.curated);
   assignArt(Object.keys(words.patterns));   // one distinct piece per rule
 
   audio.setOverrides(await store.getKV("pronunciation_overrides", {}));
   applyComfort(await store.getKV("comfort", { size: "default", theme: "light" }));
 
-  app.week = await store.getKV("weekly_list", null);
+  // Each Monday the term's list switches on by itself. A list the adult saved
+  // this week is theirs and wins. See weekly.py choose_week().
+  const stored = await store.getKV("weekly_list", null);
+  app.week = weekly.chooseWeek(stored, weekly.scheduledWeek(app.term, today()));
+  if (app.week !== stored) await store.setKV("weekly_list", app.week);
   await rebuildScheduler();
 
   wire();
@@ -123,9 +134,15 @@ async function boot() {
 async function rebuildScheduler() {
   const state = await store.getKV("scheduler_state", null);
   const patterns = await store.getKV("pattern_state", null);
-  const extra = app.week
-    ? weekly.entriesFor(app.week.words, app.byWord).filter((e) => !app.byWord.has(e.word))
-    : [];
+  // Every word the scheduler holds a record for needs an entry, not just this
+  // week's. Last week's words stay in the saved state on purpose (that is the
+  // spacing), and building entries for this week only made the first one of them
+  // to come due crash the session. Rebuilt from the curated set each time, so a
+  // second save in one sitting cannot drop words either.
+  const wanted = [...new Set([...(app.week ? app.week.words : []),
+                              ...Object.keys(state || {})])];
+  const extra = weekly.entriesFor(wanted, app.curated).filter((e) => !app.curated.has(e.word));
+  app.byWord = new Map(app.curated);
   for (const e of extra) app.byWord.set(e.word, e);
   app.scheduler = new Scheduler([...app.data.words, ...extra], today(), state, patterns);
 }
@@ -137,7 +154,13 @@ async function loadCollection() {
 }
 
 function paintWorld(el) {
-  renderWorld(el, [...app.cracked], app.curios, app.data ? app.data.patterns : {});
+  renderWorld(el, [...app.cracked], app.curios, ruleNames());
+}
+
+// Every rule card's text: the statutory patterns, plus the ones only a school
+// word can carry (the hyphen rules). See engine/derive.py SCHOOL_PATTERNS.
+function ruleNames() {
+  return app.data ? { ...(app.data.school_patterns || {}), ...app.data.patterns } : {};
 }
 
 async function persistScheduler() {
@@ -304,7 +327,10 @@ async function saveWeek() {
     return;
   }
   const testOn = $("#week-test").value || weekly.nextTestDay();
+  const theme = app.week && app.week.theme;
   app.week = weekly.makeList($("#week-input").value, today(), testOn);
+  // An edit to the term's list is still that week's list, so keep its theme.
+  if (theme) app.week.theme = theme;
   await store.setKV("weekly_list", app.week);
   await rebuildScheduler();
   await persistScheduler();
@@ -313,8 +339,13 @@ async function saveWeek() {
 }
 
 async function clearWeek() {
-  app.week = null;
-  await store.setKV("weekly_list", null);
+  // Cleared means cleared until next Monday, not until the next reload: an empty
+  // list dated this week holds off the term's list, which would otherwise return.
+  const scheduled = weekly.scheduledWeek(app.term, today());
+  app.week = scheduled
+    ? { ...scheduled, words: [], hints: {}, set_on: today(), cleared: true }
+    : null;
+  await store.setKV("weekly_list", app.week);
   await rebuildScheduler();
   await refreshHome();
   show("home");
@@ -357,7 +388,8 @@ function clozeFor(entry) {
   const frag = document.createDocumentFragment();
   const sentence = app.sentences[entry.word] || "";
   if (!sentence) { frag.append(el("span", { className: "gap" })); return frag; }
-  // The word is plain [a-z]+ (enforced by tests/test_words.py), so it is regex-safe.
+  // The word is [a-z] with at most internal hyphens (word_form in derive.py), and a
+  // hyphen is literal outside a character class, so it is regex-safe.
   const parts = sentence.split(new RegExp(`\\b${entry.word}\\b`, "gi"));
   parts.forEach((part, i) => {
     if (part) frag.append(document.createTextNode(part));
@@ -470,13 +502,22 @@ async function recordAttempt(entry, raw, prompt) {
 
 // --------------------------------------------------------------- 2. reveal
 
-function markedUp(target, attempt) {
+function markedUp(target, attempt, word = "") {
   // Show HER letters, with the wrong ones marked, against the target. docs/01: the
   // feedback that works is task and process level (d = 0.99), not "correct/wrong"
   // (d = 0.24). Note we never display a misspelling as the OBJECT of study: DysEggxia
   // deliberately does that and docs/01 flags it as a choice we do not copy.
   const frag = document.createDocumentFragment();
   if (!attempt) { frag.append(el("span", { className: "miss", textContent: "(nothing typed)" })); return frag; }
+  // Every letter right, hyphen missing: her letters, with a gap marked where the
+  // hyphen belongs. The aligner compares letters only, so it cannot show this.
+  if (word.includes("-") && attempt === target) {
+    word.split("-").forEach((part, i) => {
+      if (i) frag.append(el("span", { className: "miss", textContent: "-" }));
+      frag.append(el("span", { className: "ok", textContent: part }));
+    });
+    return frag;
+  }
   for (const [tag, i1, i2, j1, j2] of getOpcodes(target, attempt)) {
     if (tag === "equal") frag.append(el("span", { className: "ok", textContent: attempt.slice(j1, j2) }));
     else if (tag === "insert" || tag === "replace") frag.append(el("span", { className: "bad", textContent: attempt.slice(j1, j2) }));
@@ -491,7 +532,8 @@ function showReveal(entry, d) {
   v.className = `verdict ${d.correct ? "right" : "wrong"}`;
   v.textContent = d.correct ? "Correct." : f.headline;
 
-  $("#reveal-marked").replaceChildren(markedUp(normalise(entry.word), d.attempt));
+  $("#reveal-marked").replaceChildren(markedUp(normalise(entry.word), d.attempt,
+    d.type === "hyphen" ? entry.word : ""));
   $("#reveal-target").textContent = entry.word;
   $("#reveal-target-wrap").hidden = d.correct;
   $("#reveal-detail").textContent = d.correct ? "" : d.detail;
@@ -541,11 +583,13 @@ function showRule() {
   $("#rule-name").textContent = pair ? "noun or verb" : key.replace(/-/g, " ");
   // For the -ce/-se pairs the generic homophone card is true and useless. This
   // is one of the few completely regular spelling rules in English, so say it.
-  $("#rule-explain").textContent = pair ? PAIR_RULE : (app.data.patterns[key] || "");
+  $("#rule-explain").textContent = pair ? PAIR_RULE : (ruleNames()[key] || "");
   const siblings = pair
     ? [...NOUN_VERB_PAIRS.keys()].filter((w) => w !== entry.word).map((word) => ({ word }))
         .slice(0, 6)
-    : [...app.data.words, ...app.data.off_list]
+    // Every word the app holds, the week's school words included: the hyphen
+    // rules have no statutory words, so their siblings are all on the list.
+    : [...app.byWord.values()]
         .filter((w) => w.word !== entry.word && w.patterns.includes(key))
         .slice(0, 6);
   $("#rule-siblings").replaceChildren(...siblings.map((w) => el("span", { textContent: w.word })));
@@ -615,7 +659,7 @@ async function endSession() {
 
 function renderUnlocks(host, outcome) {
   host.replaceChildren();
-  const names = app.data ? app.data.patterns : {};
+  const names = ruleNames();
   for (const pattern of outcome.pieces) {
     const card = el("div", { className: "unlock" });
     const art = el("div", { className: "art" });
