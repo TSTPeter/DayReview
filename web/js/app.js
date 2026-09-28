@@ -23,6 +23,7 @@ import { Keystrokes, fluency } from "./keystrokes.js";
 import { crackedPatterns, settle, renderWorld, artFor, assignArt } from "./rewards.js";
 import * as weekly from "./engine/weekly.js";
 import { NOUN_VERB_PAIRS, PAIR_RULE, makeEntry } from "./engine/derive.js";
+import * as games from "./games.js";
 
 const $ = (sel) => document.querySelector(sel);
 const el = (tag, props = {}, kids = []) => {
@@ -66,7 +67,7 @@ const app = {
 // --------------------------------------------------------------- boot
 
 async function boot() {
-  const [words, sentences, clips, term] = await Promise.all([
+  const [words, sentences, clips, term, gameData] = await Promise.all([
     fetch("data/words.json").then((r) => r.json()),
     fetch("data/sentences.json").then((r) => r.json()).catch(() => ({})),
     // Pre-rendered dictation (tools/render_audio.py). Missing or empty is fine: every
@@ -75,10 +76,14 @@ async function boot() {
     // The school's lists for the whole term (engine/term.py). Missing is fine: the
     // adult can still paste a list each week, as before.
     fetch("data/term.json").then((r) => r.json()).catch(() => ({})),
+    // The games' content (engine/games.py). Missing means the games hub says so.
+    fetch("data/games.json").then((r) => r.json()).catch(() => ({ words: {}, weeks: {} })),
   ]);
   audio.setClips(clips);
   app.data = words;
   app.sentences = sentences.sentences || {};
+  app.unreviewed = new Set(sentences.unreviewed || []);
+  app.games = gameData;
   app.term = term.weeks || [];
   for (const w of [...words.words, ...words.off_list]) app.curated.set(w.word, w);
   // The term's school words, written up by hand: origin, parts, why, family.
@@ -96,7 +101,18 @@ async function boot() {
   if (app.week !== stored) await store.setKV("weekly_list", app.week);
   await rebuildScheduler();
 
+  games.init({
+    $, el, show, store, sfx,
+    data: () => app.games,
+    // The games follow the term's calendar, not an edited list: their content
+    // is written per school week.
+    week: () => weekly.scheduledWeek(app.term, today()),
+    weeksSoFar: () => app.term.filter((w) => w.set_on <= today()),
+    entryFor: (word) => app.byWord.get(word) || app.authored.get(word) || makeEntry(word),
+    markedUp: (word, d) => markedUp(normalise(word), d.attempt, d.type === "hyphen" ? word : ""),
+  });
   wire();
+  games.wire();
   // Find out whether this device can speak BEFORE dictating into silence. With no
   // voice the prompt degrades to a cloze, which is still free-typed retrieval and
   // still never shows the spelling. prompt_mode records which one she actually got,
@@ -238,15 +254,45 @@ function setProgress(done, total) {
 
 async function refreshHome() {
   const attempts = await store.allAttempts();
-  const due = app.scheduler.due().length;
-  $("#home-summary").textContent = attempts.length
-    ? `${due} words ready to practise.`
-    : "Nothing practised yet. Start with the challenge so the app knows what to teach.";
+  const name = await store.getKV("learner_name", "");
+  $("#home-hello").textContent = name ? `Hi ${name}!` : "Hi there!";
+  $("#home-summary").textContent = readyLine();
   paintWorld($("#home-world"));
   paintWeekCard();
   $("#home-probe-note").textContent = attempts.length
     ? "Re-run the challenge every half term. The change over time is the measure that matters."
-    : "";
+    : "New here? Start with the challenge, so the app knows what to teach.";
+}
+
+// What is ready for her today, from the session she would actually get. This is
+// the encouragement to come back, and it is the scheduler's spacing said out
+// loud: a word is 'ready for another go' because its interval has come round,
+// which is when practising it helps. Never a count of visits or days. docs/11.
+function readyLine() {
+  const queue = weekly.compose(app.scheduler, app.week, SESSION_SIZE, today());
+  if (!queue.length) {
+    const next = Object.values(app.scheduler.state).map((st) => st.due)
+      .filter((d) => d > today()).sort()[0];
+    return next
+      ? `Nothing is due today. Your next words are ready on ${dayName(next)}.`
+      : "Nothing is due today.";
+  }
+  const again = queue.filter((w) => (app.scheduler.state[w]?.seen || 0) > 0).length;
+  const fresh = queue.length - again;
+  const words = (n) => `${n} word${n === 1 ? "" : "s"}`;
+  if (again && fresh) {
+    return `${words(again)} ${again === 1 ? "is" : "are"} ready for another go, `
+      + `and ${fresh} ${fresh === 1 ? "is" : "are"} new.`;
+  }
+  if (again) return `${words(again)} ${again === 1 ? "is" : "are"} ready for another go.`;
+  return `${words(fresh)} ${fresh === 1 ? "is" : "are"} ready for you, all new.`;
+}
+
+function dayName(iso) {
+  const days = Math.round((Date.parse(iso) - Date.parse(today())) / 86400000);
+  if (days === 1) return "tomorrow";
+  return new Date(`${iso}T12:00:00Z`).toLocaleDateString("en-GB",
+    { weekday: "long", timeZone: "UTC" });
 }
 
 function paintWeekCard() {
@@ -256,6 +302,8 @@ function paintWeekCard() {
   const left = weekly.daysUntil(app.week.test_on);
   const active = weekly.isActive(app.week);
   $("#home-week-tab").textContent = active ? "This week" : "Last week";
+  $("#home-week-theme").hidden = !app.week.theme;
+  $("#home-week-theme").textContent = app.week.theme ? app.week.theme : "";
   $("#home-week-words").textContent = app.week.words.join("  ·  ");
   $("#home-week-state").textContent = !active
     ? "Tested. These are still coming back, spaced out, so they stick."
@@ -659,6 +707,9 @@ async function endSession() {
   paintWorld($("#end-world"));
   sfx.play(outcome.curio || newly.length ? "unlock" : "complete");
 
+  const name = await store.getKV("learner_name", "");
+  $("#screen-end h1").textContent = name ? `Done for now, ${name}` : "Done for now";
+
   await pushAggregates();
   await refreshHome();
   show("end");
@@ -896,12 +947,39 @@ async function showGrownUp() {
   $("#gu-fluency").textContent = f.median_inter_key_ms
     ? `${f.median_inter_key_ms} ms between keys. ${f.note}` : f.note;
 
+  $("#opt-name").value = await store.getKV("learner_name", "");
+  await paintGamesSummary();
+  const drafts = app.week ? app.week.words.filter((w) => app.unreviewed.has(w)) : [];
+  $("#gu-week-drafts").hidden = !drafts.length;
+  $("#gu-week-drafts").textContent = drafts.length
+    ? `Draft sentences waiting for you to check (engine/sentences.py, UNREVIEWED): `
+      + `${drafts.join(", ")}. Until they are checked these use the iPad's own voice.`
+    : "";
+
   $("#opt-sound").value = sfx.isMuted() ? "off" : "on";
   const comfort = await store.getKV("comfort", {});
   $("#comfort-size").value = comfort.size || "default";
   $("#comfort-theme").value = comfort.theme || "light";
 
   show("grownup");
+}
+
+// Games, for the adult: how much, and whether it is crowding out the dictation.
+async function paintGamesSummary() {
+  const log = await store.getKV("game_log", []);
+  const pts = await store.getKV("game_points", { earned: 0, rounds: 0 });
+  const since = Date.now() - 7 * 86400000;
+  const recent = log.filter((r) => Date.parse(r.at) >= since);
+  const count = (g) => recent.filter((r) => r.game === g).length;
+  const sessions = (await store.allSessions())
+    .filter((x) => x.kind === "practice" && Date.parse(x.started_at) >= since).length;
+  const words = new Set(recent.flatMap((r) => r.items.map((i) => i.word)).filter(Boolean));
+  $("#gu-games-summary").textContent = log.length
+    ? `Last 7 days: ${count("jigsaw")} jigsaw, ${count("match")} root match, `
+      + `${count("sort")} pattern sort and ${count("bonus")} bonus rounds, `
+      + `touching ${words.size} words; ${sessions} dictation sessions. `
+      + `${pts.earned || 0} points earned in all.`
+    : "No games played yet.";
 }
 
 function delayedAccuracy(attempts) {
@@ -928,6 +1006,17 @@ function wire() {
   $("#btn-probe").onclick = startProbe;
   $("#btn-grownup").onclick = showGrownUp;
   $("#btn-week").onclick = showWeek;
+  $("#btn-games").onclick = () => games.openHub();
+  $("#games-home").onclick = async () => { await refreshHome(); show("home"); };
+  $("#opt-name-save").onclick = async () => {
+    // First name only, trimmed, kept on this device. See the note on screen.
+    const name = $("#opt-name").value.trim().split(/\s+/)[0] || "";
+    await store.setKV("learner_name", name.slice(0, 30));
+    $("#opt-name").value = name;
+    $("#opt-name-note").textContent = name
+      ? `Saved. The welcome screen will say "Hi ${name}!". It stays on this iPad.`
+      : "Cleared. The welcome screen will say \"Hi there!\".";
+  };
   $("#week-input").addEventListener("input", paintParsed);
   $("#week-save").onclick = saveWeek;
   $("#week-clear").onclick = clearWeek;

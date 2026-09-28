@@ -65,7 +65,7 @@ class TestTheSheet(unittest.TestCase):
         for w in self.weeks:
             with self.subTest(week=w["id"]):
                 self.assertTrue(w["theme"])
-                self.assertNotRegex(w["theme"], "[–—]")
+                self.assertNotRegex(w["theme"], "[\u2013\u2014]")
 
     def test_the_exported_file_is_current(self):
         shipped = json.loads((ROOT / "web" / "data" / "term.json").read_text())

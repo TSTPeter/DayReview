@@ -15,7 +15,7 @@
  * Headless Chromium ships no speech voices, so this also exercises the no-audio path,
  * which is the one a borrowed device is most likely to hit.
  */
-import { existsSync } from "node:fs";
+import { existsSync, readFileSync } from "node:fs";
 import { chromium } from "playwright-core";
 import { namingLine } from "../../web/js/audio.js";
 import { hintFor } from "../../web/js/engine/derive.js";
@@ -952,6 +952,249 @@ for (const f of served) {
   if (/pushDay\s*\(\s*["'`]/.test(body)) names.push(`${f}: literal sync key`);
 }
 check("the sync key is never a hardcoded string", names.length === 0, names.join("; "));
+
+// ---------------------------------------------------------------- welcome and games
+// The real term and the real game content, whatever week it is: every answer is
+// read from web/data/games.json, never assumed, so this holds on any date the term
+// covers (it stays on the last week after 23 October).
+console.log("\n— the welcome page —");
+const gameData = await (await fetch(new URL("data/games.json", BASE))).json();
+const termData = await (await fetch(new URL("data/term.json", BASE))).json();
+const todayISO = new Date().toISOString().slice(0, 10);
+const liveWeek = termData.weeks.filter((w) => w.set_on <= todayISO).pop();
+const gctx = await browser.newContext({ viewport: { width: 820, height: 1180 }, acceptDownloads: true });
+await noClips(gctx);
+const g = await gctx.newPage();
+const gErrors = [];
+g.on("pageerror", (e) => gErrors.push(e.message));
+await g.goto(BASE, { waitUntil: "networkidle" });
+await g.waitForSelector("#screen-home.on");
+check("with no name set, the welcome says hello anyway",
+      (await g.textContent("#home-hello")) === "Hi there!");
+const ready = await g.textContent("#home-summary");
+check("the welcome says what is ready today", /ready|due/i.test(ready), ready);
+await g.click("#btn-grownup");
+await g.waitForSelector("#screen-grownup.on");
+await g.fill("#opt-name", "  Beatrix Example ");
+await g.click("#opt-name-save");
+await g.click("#gu-home");
+await g.waitForSelector("#screen-home.on");
+check("the welcome calls her by her first name",
+      (await g.textContent("#home-hello")) === "Hi Beatrix!");
+check("this week's theme is on the welcome page",
+      !liveWeek || (await g.textContent("#home-week-theme")) === liveWeek.theme,
+      liveWeek ? liveWeek.theme : "no term week today");
+const homeText = await g.innerText("#screen-home");
+check("the welcome never counts her visits or days",
+      !/\b(\d+\s*(visits?|times)|\d+ days?( in a row)?|streak)\b/i.test(homeText.replace(/Tested in \d+ days/, "")),
+      homeText.split("\n").slice(0, 3).join(" | "));
+
+console.log("\n— the games —");
+if (!liveWeek) {
+  console.log("  skip  no term week today");
+} else {
+  const content = gameData.weeks[liveWeek.id];
+  const readPoints = () => g.evaluate(async () => {
+    const db = await new Promise((res) => { const r = indexedDB.open("spelling", 1); r.onsuccess = () => res(r.result); });
+    return await new Promise((res) => {
+      const t = db.transaction("kv", "readonly").objectStore("kv").get("game_points");
+      t.onsuccess = () => res(t.result ? t.result.value : { earned: 0, rounds: 0 });
+    });
+  });
+  const wordForClue = (clue) => liveWeek.words.find((w) => gameData.words[w].meaning === clue);
+
+  await g.click("#btn-games");
+  await g.waitForSelector("#screen-games.on");
+  check("the games hub shows this week's theme",
+        (await g.textContent("#games-week")).includes(liveWeek.theme));
+  check("the bonus round starts locked, with points to go",
+        await g.locator("#game-bonus").isDisabled()
+        && /more points/.test(await g.textContent("#games-bonus-state")));
+
+  // --- word jigsaw: solve a round, getting ONE word wrong first on purpose
+  await g.click("#game-jigsaw");
+  await g.waitForSelector("#screen-jigsaw.on");
+  let decoyTried = false, expected = 0, leftMisspelling = false, jigOk = true;
+  for (let i = 0; i < 5; i++) {
+    const word = wordForClue(await g.textContent("#jig-clue"));
+    if (!word) { jigOk = false; break; }
+    const c = gameData.words[word];
+    const place = async (text) => g.click(`#jig-tray .piece[data-text="${text}"]`);
+    if (!decoyTried && c.decoys.length) {
+      for (const p of c.parts.slice(0, -1)) await place(p.text);
+      await place(c.decoys[0].text);
+      await g.click("#jig-check");
+      await g.waitForTimeout(500);
+      const fb = await g.textContent("#jig-feedback");
+      const board = await g.$$eval("#jig-board .piece", (ps) => ps.map((p) => p.dataset.text).join(""));
+      leftMisspelling = board.endsWith(c.decoys[0].text);
+      check("a wrong ending is explained, and bounces back off the board",
+            /Not that ending/.test(fb) && !leftMisspelling, `${fb} | board: ${board}`);
+      await place(c.parts[c.parts.length - 1].text);
+      decoyTried = true;
+    } else {
+      for (const p of c.parts) await place(p.text);
+      expected += 10;
+    }
+    await g.click("#jig-check");
+    const next = await g.waitForSelector("#jig-next:not([hidden])", { timeout: 3000 })
+      .then(() => true).catch(() => false);
+    if (!next || !/\./.test(await g.textContent("#jig-feedback"))) jigOk = false;
+    await g.click("#jig-next");
+  }
+  // Finishing saves the round before it says so: wait for the screen, not a timer.
+  const finished = await g.waitForFunction(() =>
+    document.querySelector("#jig-count").textContent === "Round finished", null, { timeout: 5000 })
+    .then(() => true).catch(() => false);
+  const afterJig = await readPoints();
+  check("a jigsaw round is solved by building each word from its parts",
+        jigOk && finished,
+        await g.textContent("#jig-clue"));
+  check("points come only for words right at the first go", afterJig.earned === expected,
+        `${afterJig.earned} points, expected ${expected}`);
+
+  // --- root match: one wrong link first, then all five
+  await g.click("#jig-quit");
+  await g.click("#game-match");
+  await g.waitForSelector("#screen-match.on");
+  const lefts = await g.$$eval("#match-left button", (bs) => bs.map((b) => b.textContent));
+  const meanOf = (part) => content.roots.find((r) => r.part === part).means;
+  const exactly = (t) => new RegExp(`^${t.replace(/[.*+?^${}()|[\]\\]/g, "\\$&")}$`);
+  // Unmatched buttons only, by their whole text: a matched one has grown a caption.
+  const leftBtn = (part) => g.locator("#match-left button:not(.matched)").filter({ hasText: exactly(part) });
+  const rightBtn = (means) => g.locator("#match-right button:not(.matched)").filter({ hasText: exactly(means) });
+  await leftBtn(lefts[0]).click();
+  await rightBtn(meanOf(lefts[1])).click();
+  check("a wrong link is drawn and taken back", /Not those two/.test(await g.textContent("#match-feedback")));
+  await g.waitForTimeout(800);
+  for (const part of lefts) {
+    await leftBtn(part).click();
+    await rightBtn(meanOf(part)).click();
+  }
+  const lines = await g.locator("#match-lines path").count();
+  check("every match leaves a swirly line between the pair", lines === lefts.length, `${lines} lines`);
+  const afterMatch = await readPoints();
+  check("the pair got wrong first earns nothing, the rest earn 5",
+        afterMatch.earned - afterJig.earned === 5 * (lefts.length - 1),
+        `+${afterMatch.earned - afterJig.earned}`);
+
+  // --- pattern sort: the first card into the wrong bin first
+  await g.click("#match-quit");
+  if (!content.sort) {
+    console.log("  skip  no pattern sort this week");
+  } else {
+    await g.click("#game-sort");
+    await g.waitForSelector("#screen-sort.on");
+    let sortRight = 0, first = true;
+    for (let i = 0; i < 10; i++) {
+      const shown = await g.textContent("#sort-card");
+      const card = content.sort.cards.find((c) => c.show[0] + c.show[1] === shown);
+      if (!card) break;
+      if (first) {
+        const wrong = content.sort.bins.find((b) => b.key !== card.answer).key;
+        await g.click(`#sort-bins button[data-key="${wrong}"]`);
+        check("a card in the wrong bin gets the rule, not a buzzer",
+              /Not this time/.test(await g.textContent("#sort-feedback")));
+        first = false;
+      } else {
+        sortRight += 1;
+      }
+      await g.click(`#sort-bins button[data-key="${card.answer}"]`);
+      await g.waitForTimeout(1250);
+    }
+    check("a sort round ends with the pattern laid out in its bins",
+          await g.locator("#sort-result").isVisible()
+          && (await g.locator("#sort-result li").count()) === 10);
+    const afterSort = await readPoints();
+    check("sorting earns 5 a card at the first go",
+          afterSort.earned - afterMatch.earned === 5 * sortRight, `+${afterSort.earned - afterMatch.earned}`);
+    await g.click("#sort-quit");
+  }
+
+  // --- the bonus round: open, answer every square, one wrong on purpose
+  await g.waitForSelector("#screen-games.on");
+  const beforeBonus = await readPoints();
+  const canPlay = Math.floor(beforeBonus.earned / 50) - beforeBonus.rounds > 0;
+  check("enough points open the bonus round", canPlay === !(await g.locator("#game-bonus").isDisabled()),
+        `${beforeBonus.earned} points`);
+  if (canPlay) {
+    await g.click("#game-bonus");
+    await g.waitForSelector("#screen-bonus.on");
+    const tiles = await g.locator("#bonus-board button").count();
+    let right = 0, typedWrong = false;
+    for (let t = 0; t < tiles; t++) {
+      await g.click(`#bonus-board button >> nth=${t}`);
+      const clue = await g.textContent("#bonus-clue-text");
+      const word = Object.keys(gameData.words).find((w) => gameData.words[w].meaning === clue);
+      await g.fill("#bonus-input", typedWrong ? word : "zzz");
+      await g.click("#bonus-check");
+      if (!typedWrong) {
+        typedWrong = true;
+        check("a wrong answer shows her attempt against the word, with the why",
+              (await g.textContent("#bonus-marked")) === "zzz"
+              && (await g.textContent("#bonus-why")).startsWith(word),
+              await g.textContent("#bonus-why"));
+      } else if (/Correct/.test(await g.textContent("#bonus-verdict"))) {
+        right += 1;
+      }
+      await g.click("#bonus-back");
+    }
+    await g.waitForSelector("#bonus-end:not([hidden])", { timeout: 5000 }).catch(() => {});
+    const end = await g.textContent("#bonus-end-text");
+    const after = await readPoints();
+    check("the bonus round is typed recall, marked by the real classifier",
+          tiles === 9 && /You scored \d+/.test(end), end);
+    check("playing the bonus round uses it up", after.rounds === beforeBonus.rounds + 1,
+          `${after.rounds} played`);
+    check("every word typed right is marked right", right === tiles - 1, `${right} of ${tiles - 1}`);
+    await g.click("#bonus-quit");
+  }
+
+  // --- none of it reaches the practice screens
+  await g.click("#games-home");
+  await g.waitForSelector("#screen-home.on");
+  const leaksAfter = await g.evaluate((ids) => ids.map((id) => {
+    const el = document.querySelector(`#screen-${id}`);
+    el.style.display = "block";
+    const text = el.innerText;
+    el.style.display = "";
+    return [id, text];
+  }), CHILD_SCREENS);
+  const hit = leaksAfter.map(([id, t]) => [id, t.match(BANNED)]).find(([, m]) => m);
+  check("points never reach the practice screens, even once she has some", !hit,
+        hit ? `${hit[0]}: "${hit[1][0]}"` : "");
+
+  // --- the adult's view and the export
+  await g.click("#btn-grownup");
+  await g.waitForSelector("#screen-grownup.on");
+  check("the grown-up view reports the games against dictation",
+        /jigsaw/.test(await g.textContent("#gu-games-summary"))
+        && /dictation sessions/.test(await g.textContent("#gu-games-summary")));
+  const [download] = await Promise.all([g.waitForEvent("download"), g.click("#gu-export")]);
+  const exported = readFileSync(await download.path(), "utf8");
+  check("the export carries the games but never her name",
+        exported.includes("game_points") && !/Beatrix/.test(exported));
+
+  // --- the new screens fit an iPad
+  for (const [name, vw, vh] of [["iPad portrait", 820, 1180], ["iPad landscape", 1180, 820]]) {
+    await g.setViewportSize({ width: vw, height: vh });
+    for (const s of ["games", "jigsaw", "match", "sort", "bonus"]) {
+      const res = await g.evaluate((id) => {
+        for (const x of document.querySelectorAll(".screen")) x.classList.toggle("on", x.id === `screen-${id}`);
+        const over = document.documentElement.scrollWidth > document.documentElement.clientWidth + 1;
+        const small = [...document.querySelectorAll(`#screen-${id} button`)]
+          .filter((b) => b.offsetParent !== null)
+          .filter((b) => Math.min(b.getBoundingClientRect().width, b.getBoundingClientRect().height) < 44)
+          .length;
+        return { over, small };
+      }, s);
+      check(`${name}: the ${s} screen fits, with every tap target 44px or more`,
+            !res.over && res.small === 0, JSON.stringify(res));
+    }
+  }
+}
+check("the welcome and the games raise no page errors", gErrors.length === 0, gErrors.join(" | "));
+await gctx.close();
 
 console.log("\n— tablet —");
 for (const [name, w, h] of [["iPad portrait", 820, 1180], ["iPad landscape", 1180, 820]]) {

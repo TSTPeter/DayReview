@@ -39,7 +39,7 @@ class TestTheShippedFiles(unittest.TestCase):
         for name in ("games.json", "term.json"):
             text = (ROOT / "web" / "data" / name).read_text()
             with self.subTest(file=name):
-                self.assertNotRegex(text, "[–—]")
+                self.assertNotRegex(text, "[\u2013\u2014]")
 
 
 class TestEveryWord(unittest.TestCase):
@@ -80,6 +80,12 @@ class TestEveryWord(unittest.TestCase):
                 for p in c["parts"]:
                     if len(p["text"]) >= 5:
                         self.assertNotRegex(text, rf"\b{re.escape(p['text'])}")
+
+    def test_no_two_words_share_a_meaning(self):
+        # The game-show clue is the meaning: two words with one meaning make a clue
+        # with two right answers, one of which would be marked wrong.
+        meanings = [c["meaning"] for c in SHIPPED["words"].values()]
+        self.assertEqual(len(set(meanings)), len(meanings))
 
     def test_every_word_has_an_origin_and_a_why(self):
         for w, c in SHIPPED["words"].items():
