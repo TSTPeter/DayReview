@@ -130,10 +130,9 @@ etymologies. Thirteen were checked against a source (etymonline.com, and the Fol
 text of *Othello* for *green-eyed*); twelve matched, and the thirteenth, the date for
 *pig-headed*, was wrong and is corrected. The rest have not been checked one by one.
 
-**None of it has been reviewed.** Nor have the 42 new sentences in
-`engine/sentences.py`. `docs/05` decision 2 says nothing unreviewed reaches a child, so
-read `engine/games.py` and the sentences before deploying this. The sentences are
-already held back from rendering until they are marked reviewed (`docs/14`).
+**The game content has not been reviewed.** `docs/05` decision 2 says nothing
+unreviewed reaches a child, so read `engine/games.py` before deploying this. The 42 new
+sentences that go with it were reviewed by Peter on 28 September.
 
 ## What is measured
 
@@ -150,7 +149,7 @@ into games. Worth doing if the games prove popular.
 
 - **Nobody has played it on an iPad.** Tapping is tested in Chromium; dragging a
   piece is written for touch but has only been tried with a mouse.
-- **The content and 42 sentences are unreviewed.** See above.
+- **The game content is unreviewed.** See above. The sentences are reviewed.
 - **Novelty.** Gamified engagement is documented to decline after the first weeks
   ([link](https://onlinelibrary.wiley.com/doi/abs/10.1111/jcal.12385)). Judge the
   games at eight weeks, not at one.

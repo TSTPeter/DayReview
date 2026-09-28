@@ -155,8 +155,8 @@ SENTENCES = {
     "prophecy": "The old prophecy came true at last.",
     "prophesy": "Nobody can prophesy what will happen next.",
     # ------------------------------------------------------------------------
-    # The autumn 2026 school lists (engine/term.py). DRAFTED 28 September 2026
-    # and NOT YET REVIEWED: read these before she hears them. Written to the same
+    # The autumn 2026 school lists (engine/term.py). Drafted 28 September 2026
+    # and reviewed by Peter the same day. Written to the same
     # rules as everything above, plus two of their own:
     #
     #   * No related word appears in the sentence. 'observation' would hand over
@@ -213,19 +213,13 @@ SENTENCES = {
     "short-tempered": "Being tired made him short-tempered.",
 }
 
-# Drafted for the autumn term and waiting for an adult to read them. See the
-# block above. Remove a word from here once its sentence has been checked.
-UNREVIEWED = {
-    "hostile", "obstinate", "frantic", "calamitous", "spectacular",
-    "observant", "observance", "expectant", "expectancy", "hesitant", "hesitancy",
-    "tolerant", "tolerance", "relevance",
-    "innocent", "innocence", "decent", "decency", "excellence", "confident",
-    "confidence", "existent",
-    "co-operate", "co-ordinate", "co-own", "co-author", "re-enter", "re-educate",
-    "re-examine", "re-evaluate", "re-energise", "re-elect",
-    "man-eating", "little-used", "rock-bottom", "wide-eyed", "pig-headed",
-    "tight-fisted", "cold-hearted", "stone-faced", "green-eyed", "short-tempered",
-}
+# Sentences drafted but not yet read by an adult. tools/render_audio.py will not
+# render one of these, so until it is checked its item uses the device voice.
+# Add a word here with its new sentence; remove it once an adult has read it.
+#
+# Empty since 28 September 2026, when Peter reviewed the 42 drafted for the
+# autumn term's lists.
+UNREVIEWED = set()
 
 # British text-to-speech mispronounces some of these reliably enough to teach the wrong
 # model of the word, which is worse than no audio. docs/05 decision 3 says check all of

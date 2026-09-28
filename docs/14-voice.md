@@ -200,7 +200,8 @@ Blob storage.
 ## Unreviewed sentences are not rendered
 
 `engine/sentences.py` `UNREVIEWED` lists sentences drafted but not yet read by an adult
-(42, for the autumn term's lists). `tools/render_audio.py` skips them: a clip is how a
+(empty since 28 September, when Peter reviewed the 42 drafted for the autumn
+term's lists). `tools/render_audio.py` skips them: a clip is how a
 sentence reaches her, and `docs/05` decision 2 keeps unreviewed content away from a
 child, and re-rendering after review edits would waste the credits anyway. Those items
 use the device voice until then. To review them by ear in Stephen's voice first, run

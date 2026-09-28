@@ -178,11 +178,10 @@ measure counted school words as untaught.
 
 What to distrust, in the order to deal with it:
 
-- **Read `engine/games.py` and the 42 new sentences before she sees them.** All of it was
-  written in this build and none of it has been reviewed. Thirteen origins were checked
-  against a source and one was wrong (corrected); the rest were not checked one by one.
-  The sentences are held back from rendering until marked reviewed, but the games
-  content is not: it ships as soon as this is deployed.
+- **Read `engine/games.py` before she sees it.** It was written in this build and has not
+  been reviewed. Thirteen origins were checked against a source and one was wrong
+  (corrected); the rest were not checked one by one. It ships as soon as this is deployed.
+  The 42 new sentences were reviewed by Peter on 28 September and wait to be rendered.
 - **Hear `co-own` first.** Nine words were added to the pronunciation watchlist, and read
   as one word *co-own* comes out as a different and unkind word.
 - **Nobody has played the games on an iPad.** Tapping is tested in Chromium at both iPad

@@ -81,12 +81,17 @@ class TestTheRenderer(unittest.TestCase):
 
     def test_an_unreviewed_sentence_is_not_rendered(self):
         # docs/05 decision 2: nothing unreviewed reaches a child, and a clip is how
-        # a sentence reaches her. Held back until an adult has read it.
-        words = {w for _, w in render_audio.utterances()}
-        self.assertTrue(sentences.UNREVIEWED)
-        self.assertFalse(words & sentences.UNREVIEWED)
-        self.assertEqual(len(render_audio.utterances()),
-                         2 * len(set(sentences.SENTENCES) - sentences.UNREVIEWED))
+        # a sentence reaches her. Held back until an adult has read it. Checked with
+        # a word marked unreviewed for the test, since the real set is often empty.
+        saved = set(sentences.UNREVIEWED)
+        try:
+            sentences.UNREVIEWED = saved | {"yacht"}
+            words = {w for _, w in render_audio.utterances()}
+            self.assertNotIn("yacht", words)
+            self.assertIn("yacht", {w for _, w in
+                                    render_audio.utterances(include_unreviewed=True)})
+        finally:
+            sentences.UNREVIEWED = saved
 
     def test_clip_names_change_with_anything_that_changes_the_audio(self):
         base = render_audio.clip_name("The word is cat.", "voiceA")

@@ -263,6 +263,5 @@ explains why a derived word hides its origin card: a guessed root is worse than 
 The 52 term words without a curated entry now have a written-up one in
 `engine/games.py`, so the card shows. See `docs/15` for how they were checked.
 
-**42 new sentences, not yet reviewed.** They are marked `UNREVIEWED` in
-`engine/sentences.py`, listed for the adult in the grown-up view, and held back from
-rendering until checked, so those items use the device voice (`docs/14`).
+**42 new sentences, reviewed by Peter on 28 September.** Until they are rendered in
+Stephen's voice those items use the device voice (`docs/14`).
