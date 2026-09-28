@@ -104,3 +104,34 @@ scored at the 28-day delayed test. If engagement is the real problem — if she
 will not open the app at all — that is a different problem from the one the
 evidence above is about, and worth saying out loud rather than solving with
 points by default.
+
+## 28 September 2026: points, inside the games only
+
+Peter asked for points again, this time to unlock a quiz, along with learning games
+and a welcome page that encourages her to come back. Asked twice, it is his decision,
+and this section records the change so the trail stays honest. `docs/15` has the detail.
+
+**What changed.**
+
+- **Points exist, in the games area only.** They are earned for a right answer at the
+  first go, which is performance-contingent (d = -0.28), the least harmful of the three
+  expected classes. Nothing is given for taking part (d = -0.40) or for finishing.
+- **There is a target there now.** "30 more points to open the bonus round" is exactly
+  the count-to-go this document ruled out. It is confined to the games hub, and it is
+  the price of the unlock Peter asked for.
+
+**What did not change.**
+
+- The practice screens never show a point, a count, or a target. The browser suite
+  checks them, and checks them again once she has earned points.
+- **The dictation is the daily quiz, and it never locks.** Peter chose that over points
+  unlocking the quiz. A day of only games would otherwise have had no dictation at all.
+- **The welcome page says what is ready today, not how often she has come.** "3 words
+  are ready for another go" is the scheduler's spacing said out loud. Her visits stay
+  in the grown-up view.
+- The garden keeps its rules: permanent, no targets, and rules cracked, not points spent.
+- Nothing in the games touches the scheduler or the attempt log.
+
+**How to tell if it was a mistake.** The grown-up view now counts game rounds against
+dictation sessions. If games start replacing dictation, that is the finding this
+document predicted, and the games should give way.

@@ -47,8 +47,10 @@ export function compute(marks, strategyResponses = []) {
   const patternStrength = {};
   for (const p of Object.keys(seen).sort()) patternStrength[p] = r3((right[p] || 0) / seen[p]);
 
-  const off = marks.filter((m) => m.entry.on_list === false);
-  const on = marks.filter((m) => m.entry.on_list !== false);
+  // Untaught means the off-list transfer set only: a school word is taught. See profile.py.
+  const untaught = (e) => e.on_list === false && !e.derived;
+  const off = marks.filter((m) => untaught(m.entry));
+  const on = marks.filter((m) => !untaught(m.entry));
   const acc = (rows) =>
     rows.length ? r3(rows.filter((m) => m.diagnosis.correct).length / rows.length) : null;
 

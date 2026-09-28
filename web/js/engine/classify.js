@@ -125,9 +125,29 @@ export function normalise(text) {
   return (text || "").toLowerCase().replace(/[^a-z]/g, "");
 }
 
+const HYPHENS = ["-", "\u2010", "\u2011"];
+
+// For a word that OWNS a hyphen: is hers there, and in the right place? Only
+// asked once every letter is right. See classify.py hyphen_problem().
+export function hyphenProblem(raw, word) {
+  if (!word.includes("-")) return null;
+  let mine = (raw || "").trim().toLowerCase();
+  for (const h of HYPHENS.slice(1)) mine = mine.split(h).join("-");
+  mine = mine.replace(/[^a-z\-\s]/g, "");
+  mine = mine.replace(/\s*-\s*/g, "-");
+  if (mine === word) return null;
+  const parts = word.split("-");
+  const where = parts.length === 2 ? parts.join(" and ") : parts.join(", ");
+  if (mine.includes("-")) return `the hyphen is in the wrong place: it goes between ${where}`;
+  if (/\s/.test(mine)) return `a space does not join the parts: put a hyphen between ${where}`;
+  return `every letter is right, but it needs a hyphen between ${where}`;
+}
+
 export function markSchemePenalty(raw, word) {
   raw = (raw || "").trim();
   for (const [ch, name] of Object.entries(SPLITTERS)) {
+    // Any kind of hyphen is right in a word that owns one. See classify.py.
+    if (HYPHENS.includes(ch) && word.includes("-")) continue;
     if (raw.includes(ch) && !word.includes(ch)) {
       return `the letters are right, but ${name} inside a word scores zero`;
     }
@@ -256,13 +276,20 @@ export function classify(rawAttempt, entry) {
   const raw = (rawAttempt || "").trim();
   const attempt = normalise(raw);
   const lettersRight = target === attempt;
-  const penalty = lettersRight ? markSchemePenalty(raw, entry.word) : null;
+  const hyphen = lettersRight ? hyphenProblem(raw, entry.word) : null;
+  const penalty = hyphen || (lettersRight ? markSchemePenalty(raw, entry.word) : null);
 
   const r = { word: entry.word, attempt, raw, correct: lettersRight && penalty === null,
               type: null, detail: "", edits: [], patterns: [],
               sounds_right: lettersRight, trap: null, mark_scheme: penalty };
 
   if (r.correct) { r.type = "correct"; return r; }
+  if (hyphen) {
+    // This IS the pattern at fault, so it is charged to the hyphen rule.
+    const hp = entry.patterns.filter((p) => p.startsWith("hyphen"));
+    r.type = "hyphen"; r.detail = hyphen; r.patterns = hp.length ? hp : ["hyphen-compound"];
+    return r;
+  }
   if (lettersRight) { r.type = "mark-scheme"; r.detail = penalty; r.patterns = []; return r; }
 
   r.edits = edits(target, attempt);
@@ -286,6 +313,20 @@ export function classify(rawAttempt, entry) {
                  pats.filter((p) => p === "schwa").length ? pats.filter((p) => p === "schwa") : ["schwa"]);
     }
     return out("transposition", "every letter is right, the order is not", ["sequencing"]);
+  }
+
+  // 2b. a letter lost where two parts meet: 're-enter' written 'renter'. See classify.py.
+  if (entry.word.includes("-") && single && single.tag === "delete" && single.target.length === 1) {
+    const cut = entry.word.indexOf("-");
+    const head = entry.word.slice(0, cut);
+    const tail = entry.word.slice(cut + 1);
+    const join = normalise(head).length;
+    if (single.at === join - 1 || single.at === join) {
+      const hp = pats.filter((p) => p.startsWith("hyphen"));
+      return out("omission",
+        `left out '${single.target}' where ${head} meets ${tail.split("-").join(" ")}: the hyphen keeps both`,
+        hp.length ? hp : ["letter-level"]);
+    }
   }
 
   // 3. doubling
@@ -367,6 +408,7 @@ export function classify(rawAttempt, entry) {
 
 export const HEADLINES = {
   "mark-scheme": "Every letter is right. The test would still mark this wrong.",
+  "hyphen": "Every letter is right. The hyphen is part of the spelling.",
   "transposition": "The letters are all right, the order slipped.",
   "doubling": "This is a doubling decision, not a sound.",
   "suffix-choice": "The ending is the decision point.",

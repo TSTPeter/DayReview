@@ -23,6 +23,7 @@ import { Keystrokes, fluency } from "./keystrokes.js";
 import { crackedPatterns, settle, renderWorld, artFor, assignArt } from "./rewards.js";
 import * as weekly from "./engine/weekly.js";
 import { NOUN_VERB_PAIRS, PAIR_RULE, makeEntry } from "./engine/derive.js";
+import * as games from "./games.js";
 
 const $ = (sel) => document.querySelector(sel);
 const el = (tag, props = {}, kids = []) => {
@@ -48,6 +49,9 @@ const STRATEGY_OPTIONS = [
 
 const app = {
   data: null, byWord: new Map(), sentences: {},
+  curated: new Map(),        // statutory and off-list entries, as shipped
+  authored: new Map(),       // the term's school words, written up by hand
+  term: [],                  // the school's lists for the term (engine/term.py)
   scheduler: null, session: null, queue: [], index: 0,
   marks: [], strategy: [], keys: new Keystrokes(),
   mode: "practice",          // practice | probe
@@ -63,26 +67,52 @@ const app = {
 // --------------------------------------------------------------- boot
 
 async function boot() {
-  const [words, sentences, clips] = await Promise.all([
+  const [words, sentences, clips, term, gameData] = await Promise.all([
     fetch("data/words.json").then((r) => r.json()),
     fetch("data/sentences.json").then((r) => r.json()).catch(() => ({})),
     // Pre-rendered dictation (tools/render_audio.py). Missing or empty is fine: every
     // item then uses the device voice, exactly as before clips existed.
     fetch("data/audio.json").then((r) => r.json()).catch(() => ({})),
+    // The school's lists for the whole term (engine/term.py). Missing is fine: the
+    // adult can still paste a list each week, as before.
+    fetch("data/term.json").then((r) => r.json()).catch(() => ({})),
+    // The games' content (engine/games.py). Missing means the games hub says so.
+    fetch("data/games.json").then((r) => r.json()).catch(() => ({ words: {}, weeks: {} })),
   ]);
   audio.setClips(clips);
   app.data = words;
   app.sentences = sentences.sentences || {};
-  for (const w of [...words.words, ...words.off_list]) app.byWord.set(w.word, w);
+  app.unreviewed = new Set(sentences.unreviewed || []);
+  app.games = gameData;
+  app.term = term.weeks || [];
+  for (const w of [...words.words, ...words.off_list]) app.curated.set(w.word, w);
+  // The term's school words, written up by hand: origin, parts, why, family.
+  app.authored = new Map((term.entries || []).map((e) => [e.word, e]));
+  app.byWord = new Map(app.curated);
   assignArt(Object.keys(words.patterns));   // one distinct piece per rule
 
   audio.setOverrides(await store.getKV("pronunciation_overrides", {}));
   applyComfort(await store.getKV("comfort", { size: "default", theme: "light" }));
 
-  app.week = await store.getKV("weekly_list", null);
+  // Each Monday the term's list switches on by itself. A list the adult saved
+  // this week is theirs and wins. See weekly.py choose_week().
+  const stored = await store.getKV("weekly_list", null);
+  app.week = weekly.chooseWeek(stored, weekly.scheduledWeek(app.term, today()));
+  if (app.week !== stored) await store.setKV("weekly_list", app.week);
   await rebuildScheduler();
 
+  games.init({
+    $, el, show, store, sfx,
+    data: () => app.games,
+    // The games follow the term's calendar, not an edited list: their content
+    // is written per school week.
+    week: () => weekly.scheduledWeek(app.term, today()),
+    weeksSoFar: () => app.term.filter((w) => w.set_on <= today()),
+    entryFor: (word) => app.byWord.get(word) || app.authored.get(word) || makeEntry(word),
+    markedUp: (word, d) => markedUp(normalise(word), d.attempt, d.type === "hyphen" ? word : ""),
+  });
   wire();
+  games.wire();
   // Find out whether this device can speak BEFORE dictating into silence. With no
   // voice the prompt degrades to a cloze, which is still free-typed retrieval and
   // still never shows the spelling. prompt_mode records which one she actually got,
@@ -123,9 +153,17 @@ async function boot() {
 async function rebuildScheduler() {
   const state = await store.getKV("scheduler_state", null);
   const patterns = await store.getKV("pattern_state", null);
-  const extra = app.week
-    ? weekly.entriesFor(app.week.words, app.byWord).filter((e) => !app.byWord.has(e.word))
-    : [];
+  // Every word the scheduler holds a record for needs an entry, not just this
+  // week's. Last week's words stay in the saved state on purpose (that is the
+  // spacing), and building entries for this week only made the first one of them
+  // to come due crash the session. Rebuilt from the curated set each time, so a
+  // second save in one sitting cannot drop words either.
+  const wanted = [...new Set([...(app.week ? app.week.words : []),
+                              ...Object.keys(state || {})])];
+  // A term word gets its authored entry; any other school word is derived.
+  const lookup = new Map([...app.curated, ...app.authored]);
+  const extra = weekly.entriesFor(wanted, lookup).filter((e) => !app.curated.has(e.word));
+  app.byWord = new Map(app.curated);
   for (const e of extra) app.byWord.set(e.word, e);
   app.scheduler = new Scheduler([...app.data.words, ...extra], today(), state, patterns);
 }
@@ -137,7 +175,13 @@ async function loadCollection() {
 }
 
 function paintWorld(el) {
-  renderWorld(el, [...app.cracked], app.curios, app.data ? app.data.patterns : {});
+  renderWorld(el, [...app.cracked], app.curios, ruleNames());
+}
+
+// Every rule card's text: the statutory patterns, plus the ones only a school
+// word can carry (the hyphen rules). See engine/derive.py SCHOOL_PATTERNS.
+function ruleNames() {
+  return app.data ? { ...(app.data.school_patterns || {}), ...app.data.patterns } : {};
 }
 
 async function persistScheduler() {
@@ -210,15 +254,45 @@ function setProgress(done, total) {
 
 async function refreshHome() {
   const attempts = await store.allAttempts();
-  const due = app.scheduler.due().length;
-  $("#home-summary").textContent = attempts.length
-    ? `${due} words ready to practise.`
-    : "Nothing practised yet. Start with the challenge so the app knows what to teach.";
+  const name = await store.getKV("learner_name", "");
+  $("#home-hello").textContent = name ? `Hi ${name}!` : "Hi there!";
+  $("#home-summary").textContent = readyLine();
   paintWorld($("#home-world"));
   paintWeekCard();
   $("#home-probe-note").textContent = attempts.length
     ? "Re-run the challenge every half term. The change over time is the measure that matters."
-    : "";
+    : "New here? Start with the challenge, so the app knows what to teach.";
+}
+
+// What is ready for her today, from the session she would actually get. This is
+// the encouragement to come back, and it is the scheduler's spacing said out
+// loud: a word is 'ready for another go' because its interval has come round,
+// which is when practising it helps. Never a count of visits or days. docs/11.
+function readyLine() {
+  const queue = weekly.compose(app.scheduler, app.week, SESSION_SIZE, today());
+  if (!queue.length) {
+    const next = Object.values(app.scheduler.state).map((st) => st.due)
+      .filter((d) => d > today()).sort()[0];
+    return next
+      ? `Nothing is due today. Your next words are ready on ${dayName(next)}.`
+      : "Nothing is due today.";
+  }
+  const again = queue.filter((w) => (app.scheduler.state[w]?.seen || 0) > 0).length;
+  const fresh = queue.length - again;
+  const words = (n) => `${n} word${n === 1 ? "" : "s"}`;
+  if (again && fresh) {
+    return `${words(again)} ${again === 1 ? "is" : "are"} ready for another go, `
+      + `and ${fresh} ${fresh === 1 ? "is" : "are"} new.`;
+  }
+  if (again) return `${words(again)} ${again === 1 ? "is" : "are"} ready for another go.`;
+  return `${words(fresh)} ${fresh === 1 ? "is" : "are"} ready for you, all new.`;
+}
+
+function dayName(iso) {
+  const days = Math.round((Date.parse(iso) - Date.parse(today())) / 86400000);
+  if (days === 1) return "tomorrow";
+  return new Date(`${iso}T12:00:00Z`).toLocaleDateString("en-GB",
+    { weekday: "long", timeZone: "UTC" });
 }
 
 function paintWeekCard() {
@@ -228,6 +302,8 @@ function paintWeekCard() {
   const left = weekly.daysUntil(app.week.test_on);
   const active = weekly.isActive(app.week);
   $("#home-week-tab").textContent = active ? "This week" : "Last week";
+  $("#home-week-theme").hidden = !app.week.theme;
+  $("#home-week-theme").textContent = app.week.theme ? app.week.theme : "";
   $("#home-week-words").textContent = app.week.words.join("  ·  ");
   $("#home-week-state").textContent = !active
     ? "Tested. These are still coming back, spaced out, so they stick."
@@ -261,7 +337,8 @@ function paintParsed() {
   if (!words.length) { $("#week-parsed").textContent = ""; return; }
   // Say plainly which words the app knows properly and which it is reading
   // from the letters alone, so the thinner reveal is never a surprise.
-  const curated = words.filter((w) => app.byWord.has(w) && !app.byWord.get(w).derived);
+  const curated = words.filter((w) => app.authored.has(w)
+    || (app.byWord.has(w) && !app.byWord.get(w).derived));
   const parts = [`${words.length} word${words.length === 1 ? "" : "s"}`];
   // Show the tags back. If the school wrote '(N)' and the app did not read it,
   // that has to be visible here rather than discovered mid-dictation.
@@ -304,7 +381,10 @@ async function saveWeek() {
     return;
   }
   const testOn = $("#week-test").value || weekly.nextTestDay();
+  const theme = app.week && app.week.theme;
   app.week = weekly.makeList($("#week-input").value, today(), testOn);
+  // An edit to the term's list is still that week's list, so keep its theme.
+  if (theme) app.week.theme = theme;
   await store.setKV("weekly_list", app.week);
   await rebuildScheduler();
   await persistScheduler();
@@ -313,8 +393,13 @@ async function saveWeek() {
 }
 
 async function clearWeek() {
-  app.week = null;
-  await store.setKV("weekly_list", null);
+  // Cleared means cleared until next Monday, not until the next reload: an empty
+  // list dated this week holds off the term's list, which would otherwise return.
+  const scheduled = weekly.scheduledWeek(app.term, today());
+  app.week = scheduled
+    ? { ...scheduled, words: [], hints: {}, set_on: today(), cleared: true }
+    : null;
+  await store.setKV("weekly_list", app.week);
   await rebuildScheduler();
   await refreshHome();
   show("home");
@@ -357,7 +442,8 @@ function clozeFor(entry) {
   const frag = document.createDocumentFragment();
   const sentence = app.sentences[entry.word] || "";
   if (!sentence) { frag.append(el("span", { className: "gap" })); return frag; }
-  // The word is plain [a-z]+ (enforced by tests/test_words.py), so it is regex-safe.
+  // The word is [a-z] with at most internal hyphens (word_form in derive.py), and a
+  // hyphen is literal outside a character class, so it is regex-safe.
   const parts = sentence.split(new RegExp(`\\b${entry.word}\\b`, "gi"));
   parts.forEach((part, i) => {
     if (part) frag.append(document.createTextNode(part));
@@ -470,13 +556,22 @@ async function recordAttempt(entry, raw, prompt) {
 
 // --------------------------------------------------------------- 2. reveal
 
-function markedUp(target, attempt) {
+function markedUp(target, attempt, word = "") {
   // Show HER letters, with the wrong ones marked, against the target. docs/01: the
   // feedback that works is task and process level (d = 0.99), not "correct/wrong"
   // (d = 0.24). Note we never display a misspelling as the OBJECT of study: DysEggxia
   // deliberately does that and docs/01 flags it as a choice we do not copy.
   const frag = document.createDocumentFragment();
   if (!attempt) { frag.append(el("span", { className: "miss", textContent: "(nothing typed)" })); return frag; }
+  // Every letter right, hyphen missing: her letters, with a gap marked where the
+  // hyphen belongs. The aligner compares letters only, so it cannot show this.
+  if (word.includes("-") && attempt === target) {
+    word.split("-").forEach((part, i) => {
+      if (i) frag.append(el("span", { className: "miss", textContent: "-" }));
+      frag.append(el("span", { className: "ok", textContent: part }));
+    });
+    return frag;
+  }
   for (const [tag, i1, i2, j1, j2] of getOpcodes(target, attempt)) {
     if (tag === "equal") frag.append(el("span", { className: "ok", textContent: attempt.slice(j1, j2) }));
     else if (tag === "insert" || tag === "replace") frag.append(el("span", { className: "bad", textContent: attempt.slice(j1, j2) }));
@@ -491,7 +586,8 @@ function showReveal(entry, d) {
   v.className = `verdict ${d.correct ? "right" : "wrong"}`;
   v.textContent = d.correct ? "Correct." : f.headline;
 
-  $("#reveal-marked").replaceChildren(markedUp(normalise(entry.word), d.attempt));
+  $("#reveal-marked").replaceChildren(markedUp(normalise(entry.word), d.attempt,
+    d.type === "hyphen" ? entry.word : ""));
   $("#reveal-target").textContent = entry.word;
   $("#reveal-target-wrap").hidden = d.correct;
   $("#reveal-detail").textContent = d.correct ? "" : d.detail;
@@ -500,8 +596,9 @@ function showReveal(entry, d) {
   // A school word we only know from its letters has no origin, no morphemes
   // and no word family. Hiding that card is the honest answer: a guessed root
   // told to a child is worse than a missing one. She still gets the marking,
-  // the named error and the rule. See docs/12.
-  $("#reveal-about").hidden = !!entry.derived;
+  // the named error and the rule. See docs/12. The term's words are written up
+  // by hand (engine/games.py), so they show it.
+  $("#reveal-about").hidden = !entry.root;
 
   $("#reveal-morph").innerHTML = "";
   entry.morph.split("+").forEach((m, i, arr) => {
@@ -541,11 +638,13 @@ function showRule() {
   $("#rule-name").textContent = pair ? "noun or verb" : key.replace(/-/g, " ");
   // For the -ce/-se pairs the generic homophone card is true and useless. This
   // is one of the few completely regular spelling rules in English, so say it.
-  $("#rule-explain").textContent = pair ? PAIR_RULE : (app.data.patterns[key] || "");
+  $("#rule-explain").textContent = pair ? PAIR_RULE : (ruleNames()[key] || "");
   const siblings = pair
     ? [...NOUN_VERB_PAIRS.keys()].filter((w) => w !== entry.word).map((word) => ({ word }))
         .slice(0, 6)
-    : [...app.data.words, ...app.data.off_list]
+    // Every word the app holds, the week's school words included: the hyphen
+    // rules have no statutory words, so their siblings are all on the list.
+    : [...app.byWord.values()]
         .filter((w) => w.word !== entry.word && w.patterns.includes(key))
         .slice(0, 6);
   $("#rule-siblings").replaceChildren(...siblings.map((w) => el("span", { textContent: w.word })));
@@ -608,6 +707,9 @@ async function endSession() {
   paintWorld($("#end-world"));
   sfx.play(outcome.curio || newly.length ? "unlock" : "complete");
 
+  const name = await store.getKV("learner_name", "");
+  $("#screen-end h1").textContent = name ? `Done for now, ${name}` : "Done for now";
+
   await pushAggregates();
   await refreshHome();
   show("end");
@@ -615,7 +717,7 @@ async function endSession() {
 
 function renderUnlocks(host, outcome) {
   host.replaceChildren();
-  const names = app.data ? app.data.patterns : {};
+  const names = ruleNames();
   for (const pattern of outcome.pieces) {
     const card = el("div", { className: "unlock" });
     const art = el("div", { className: "art" });
@@ -845,12 +947,39 @@ async function showGrownUp() {
   $("#gu-fluency").textContent = f.median_inter_key_ms
     ? `${f.median_inter_key_ms} ms between keys. ${f.note}` : f.note;
 
+  $("#opt-name").value = await store.getKV("learner_name", "");
+  await paintGamesSummary();
+  const drafts = app.week ? app.week.words.filter((w) => app.unreviewed.has(w)) : [];
+  $("#gu-week-drafts").hidden = !drafts.length;
+  $("#gu-week-drafts").textContent = drafts.length
+    ? `Draft sentences waiting for you to check (engine/sentences.py, UNREVIEWED): `
+      + `${drafts.join(", ")}. Until they are checked these use the iPad's own voice.`
+    : "";
+
   $("#opt-sound").value = sfx.isMuted() ? "off" : "on";
   const comfort = await store.getKV("comfort", {});
   $("#comfort-size").value = comfort.size || "default";
   $("#comfort-theme").value = comfort.theme || "light";
 
   show("grownup");
+}
+
+// Games, for the adult: how much, and whether it is crowding out the dictation.
+async function paintGamesSummary() {
+  const log = await store.getKV("game_log", []);
+  const pts = await store.getKV("game_points", { earned: 0, rounds: 0 });
+  const since = Date.now() - 7 * 86400000;
+  const recent = log.filter((r) => Date.parse(r.at) >= since);
+  const count = (g) => recent.filter((r) => r.game === g).length;
+  const sessions = (await store.allSessions())
+    .filter((x) => x.kind === "practice" && Date.parse(x.started_at) >= since).length;
+  const words = new Set(recent.flatMap((r) => r.items.map((i) => i.word)).filter(Boolean));
+  $("#gu-games-summary").textContent = log.length
+    ? `Last 7 days: ${count("jigsaw")} jigsaw, ${count("match")} root match, `
+      + `${count("sort")} pattern sort and ${count("bonus")} bonus rounds, `
+      + `touching ${words.size} words; ${sessions} dictation sessions. `
+      + `${pts.earned || 0} points earned in all.`
+    : "No games played yet.";
 }
 
 function delayedAccuracy(attempts) {
@@ -877,6 +1006,17 @@ function wire() {
   $("#btn-probe").onclick = startProbe;
   $("#btn-grownup").onclick = showGrownUp;
   $("#btn-week").onclick = showWeek;
+  $("#btn-games").onclick = () => games.openHub();
+  $("#games-home").onclick = async () => { await refreshHome(); show("home"); };
+  $("#opt-name-save").onclick = async () => {
+    // First name only, trimmed, kept on this device. See the note on screen.
+    const name = $("#opt-name").value.trim().split(/\s+/)[0] || "";
+    await store.setKV("learner_name", name.slice(0, 30));
+    $("#opt-name").value = name;
+    $("#opt-name-note").textContent = name
+      ? `Saved. The welcome screen will say "Hi ${name}!". It stays on this iPad.`
+      : "Cleared. The welcome screen will say \"Hi there!\".";
+  };
   $("#week-input").addEventListener("input", paintParsed);
   $("#week-save").onclick = saveWeek;
   $("#week-clear").onclick = clearWeek;

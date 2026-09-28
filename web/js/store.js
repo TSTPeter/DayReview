@@ -132,6 +132,10 @@ export async function exportAll() {
     profiles: await allProfiles(),
     scheduler_state: await getKV("scheduler_state"),
     pattern_state: await getKV("pattern_state"),
+    game_points: await getKV("game_points"),
+    game_log: await getKV("game_log"),
+    // Deliberately absent: learner_name. docs/06 standard 8 keeps a name out of
+    // the learner record, and an export is the record leaving the device.
   };
 }
 

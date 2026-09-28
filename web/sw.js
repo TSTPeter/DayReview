@@ -16,8 +16,9 @@ const SHELL = [
   "js/app.js", "js/store.js", "js/audio.js", "js/keystrokes.js",
   "js/sfx.js", "js/rewards.js", "js/dashboard.js", "js/sync.js",
   "js/engine/classify.js", "js/engine/schedule.js", "js/engine/profile.js",
-  "js/engine/derive.js", "js/engine/weekly.js",
-  "data/words.json", "data/sentences.json", "data/audio.json",
+  "js/engine/derive.js", "js/engine/weekly.js", "js/games.js",
+  "data/words.json", "data/sentences.json", "data/audio.json", "data/term.json",
+  "data/games.json",
 ];
 // Clips are NOT in the shell: all of them is several megabytes on a first visit.
 // app.js warms the ones the next session needs, and any clip heard online is kept.

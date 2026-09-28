@@ -76,15 +76,19 @@ def parse_entries(text):
     for line in str(text).splitlines():
         if HEADING.search(line):
             continue
+        for h in derive.HYPHEN_VARIANTS:
+            line = line.replace(h, "-")
         # Split the line into segments so a tag attaches to the word before it:
         # 'advice (N) / advise (V)' is two items, not one with two tags.
         for segment in re.split(r"[/,;]|\s{2,}", line):
             tag = TAG.search(segment)
             hint = TAG_MEANING.get(tag.group(1).strip().lower()) if tag else None
             for token in re.split(r"[^A-Za-z'’-]+", TAG.sub(" ", segment)):
-                w = re.sub(r"[^a-z]", "", token.lower())
+                # The hyphen stays: 'co-operate' is the spelling being taught,
+                # and stripping it once made the app accept 'cooperate'.
+                w = derive.word_form(token)
                 # Numbering and stray initials are noise; real Y5/6 words are 3+.
-                if len(w) < 3 or w in seen:
+                if len(derive.normalise(w)) < 3 or w in seen:
                     continue
                 seen.add(w)
                 out.append({"word": w, "hint": hint or derive.hint_for(w)})
@@ -98,8 +102,35 @@ def parse(text):
 
 def hint_of(lst, word):
     """The tag to speak and show for a word: the list's own first, then the table."""
-    w = derive.normalise(word)
+    w = derive.word_form(word)
     return ((lst or {}).get("hints") or {}).get(w) or derive.hint_for(w)
+
+
+def scheduled_week(weeks, today=None):
+    """
+    The term's list for today: the latest week that has started. After the last
+    one it stays the answer, so that week's words keep their afterglow.
+    """
+    today = (today or date.today())
+    iso = today if isinstance(today, str) else today.isoformat()
+    current = None
+    for week in weeks or []:
+        if week["set_on"] <= iso:
+            current = week
+    return current
+
+
+def choose_week(stored, scheduled):
+    """
+    Which list to practise. A list the adult saved on or after the scheduled
+    week began is theirs for this week and wins; an older one gives way, which
+    is what makes each Monday's list switch on by itself.
+    """
+    if not scheduled:
+        return stored
+    if stored and stored.get("set_on", "") >= scheduled["set_on"]:
+        return stored
+    return scheduled
 
 
 def next_test_day(from_day=None, weekday=FRIDAY):

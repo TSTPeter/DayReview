@@ -22,6 +22,7 @@ const list = weekly.makeList(input.listText, input.setOn);
 // must land on the right word on BOTH sides, or one device dictates an item the
 // other cannot ask.
 const tagged = weekly.makeList(input.taggedText, input.setOn);
+const hyphened = weekly.makeList(input.hyphenText || "", input.setOn);
 const hints = Object.fromEntries(
   input.words.map((w) => [w, weekly.hintOf(tagged, w)]));
 const extra = weekly.entriesFor(list.words, byWord).filter((e) => !byWord.has(e.word));
@@ -39,4 +40,4 @@ for (const offset of input.offsets) {
   log.push({ day, queue, coverage: weekly.coverage(list, scheduler) });
 }
 
-process.stdout.write(JSON.stringify({ derived, list, tagged, hints, log }));
+process.stdout.write(JSON.stringify({ derived, list, tagged, hyphened, hints, log }));

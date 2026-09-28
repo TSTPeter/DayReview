@@ -14,13 +14,18 @@ Writes web/data/words.json. Run it after any change to words.py or probe.py.
 import json
 import pathlib
 
+import games
 import probe
 import sentences
+import term
+from derive import NOUN_VERB_PAIRS, SCHOOL_PATTERNS
 from words import PATTERNS, WORDS
 
 ROOT = pathlib.Path(__file__).resolve().parents[1]
 OUT = ROOT / "web" / "data" / "words.json"
 OUT_SENTENCES = ROOT / "web" / "data" / "sentences.json"
+OUT_TERM = ROOT / "web" / "data" / "term.json"
+OUT_GAMES = ROOT / "web" / "data" / "games.json"
 
 
 # Six half-terms is a school year, which is as far ahead as the probe needs to be
@@ -39,6 +44,10 @@ def build():
         "generated_by": "engine/export.py",
         "list": "dfe-y5y6-statutory",
         "patterns": PATTERNS,
+        # Rule cards for patterns only school words carry (the hyphen rules).
+        # Separate from "patterns" because the garden assigns its pieces by
+        # sorting those keys, and new keys there would repaint earned pieces.
+        "school_patterns": SCHOOL_PATTERNS,
         "probe_patterns": probe.PROBE_PATTERNS,
         "probes": probes,
         "words": [{**w, "on_list": True} for w in WORDS],
@@ -50,6 +59,8 @@ def build_sentences():
     return {"generated_by": "engine/sentences.py",
             "review_note": "Read these before a child does. See engine/sentences.py.",
             "sentences": sentences.SENTENCES,
+            # Drafts an adult has not read yet. The grown-up view lists them.
+            "unreviewed": sorted(sentences.UNREVIEWED),
             "pronunciation_watchlist": sentences.PRONUNCIATION_WATCHLIST}
 
 
@@ -67,6 +78,22 @@ if __name__ == "__main__":
     print(f"wrote {OUT_SENTENCES.relative_to(ROOT)}  "
           f"{len(spoken['sentences'])} sentences, "
           f"{len(spoken['pronunciation_watchlist'])} on the pronunciation watchlist")
+
+    weeks = term.weeks()
+    # The term's school words that have no curated entry get their authored one, so
+    # the reveal can show how each is built. engine/games.py ENTRIES.
+    entries = games.term_entries()
+    OUT_TERM.write_text(json.dumps({"generated_by": "engine/term.py", "weeks": weeks,
+                                    "entries": entries}, indent=1) + "\n")
+    print(f"wrote {OUT_TERM.relative_to(ROOT)}  {len(weeks)} weeks, "
+          f"{len(term.words())} words, {len(entries)} authored entries")
+
+    curated = {w["word"]: w for w in payload["words"] + payload["off_list"]}
+    content = games.build(weeks, curated, sentences.SENTENCES, list(NOUN_VERB_PAIRS))
+    OUT_GAMES.write_text(json.dumps(content, indent=1) + "\n")
+    print(f"wrote {OUT_GAMES.relative_to(ROOT)}  {len(content['words'])} words, "
+          f"{sum(len(w['roots']) for w in content['weeks'].values())} root pairs, "
+          f"{sum(len(w['sort']['cards']) for w in content['weeks'].values() if w['sort'])} sort cards")
 
     gaps = sentences.missing([w["word"] for w in payload["words"]]
                              + [w["word"] for w in payload["off_list"]])

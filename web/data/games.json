@@ -1,0 +1,3640 @@
+{
+ "generated_by": "engine/games.py",
+ "review_note": "Written offline. Read these before a child does. See engine/games.py.",
+ "rules": {
+  "ant": "Use -ant, -ance or -ancy if a related word has an 'a' sound in the right place: -ation endings are often a clue.",
+  "ent": "Use -ent, -ence or -ency after a soft c (an 's' sound), a soft g or qu, or if a related word has a clear 'e' sound in the right place.",
+  "learn": "The curriculum says some of these just have to be learnt, and this is one.",
+  "hyphen-prefix": "A hyphen can join a prefix to a word, especially when the prefix ends in a vowel and the word starts with one: co-operate, re-enter.",
+  "hyphen-compound": "Two words that team up to describe something are joined by a hyphen: a man-eating shark is not a man eating a shark.",
+  "noun-verb": "The noun has a c, the verb has an s. Advice is a thing; advise is doing."
+ },
+ "words": {
+  "aggressive": {
+   "parts": [
+    {
+     "text": "ag",
+     "kind": "prefix"
+    },
+    {
+     "text": "gress",
+     "kind": "root"
+    },
+    {
+     "text": "ive",
+     "kind": "suffix"
+    }
+   ],
+   "decoys": [],
+   "meaning": "Ready to attack or fight.",
+   "why": "Ad becomes ag before gress, to step at someone. Then gress keeps its ss.",
+   "origin": {
+    "lang": "Latin",
+    "root": "ad + gradi, gressus",
+    "gloss": "to step"
+   }
+  },
+  "hostile": {
+   "parts": [
+    {
+     "text": "host",
+     "kind": "root"
+    },
+    {
+     "text": "ile",
+     "kind": "suffix"
+    }
+   ],
+   "decoys": [],
+   "meaning": "Unfriendly and ready to fight.",
+   "why": "From the Latin for an enemy. The ending is -ile, as in fragile.",
+   "origin": {
+    "lang": "Latin",
+    "root": "hostis",
+    "gloss": "an enemy, a stranger"
+   }
+  },
+  "awkward": {
+   "parts": [
+    {
+     "text": "awk",
+     "kind": "root"
+    },
+    {
+     "text": "ward",
+     "kind": "suffix"
+    }
+   ],
+   "decoys": [],
+   "meaning": "Clumsy, or uncomfortable and embarrassing.",
+   "why": "Norse afugr means back to front, plus -ward, direction. Three letters, w-k-w.",
+   "origin": {
+    "lang": "Old Norse",
+    "root": "afugr + -ward",
+    "gloss": "turned the wrong way"
+   }
+  },
+  "obstinate": {
+   "parts": [
+    {
+     "text": "obstin",
+     "kind": "root"
+    },
+    {
+     "text": "ate",
+     "kind": "suffix"
+    }
+   ],
+   "decoys": [],
+   "meaning": "Refusing to change your mind, however hard others try.",
+   "why": "Someone who stands their ground. The ending says 'nut' but is spelt -ate.",
+   "origin": {
+    "lang": "Latin",
+    "root": "obstinare",
+    "gloss": "to stand firm, to persist"
+   }
+  },
+  "desperate": {
+   "parts": [
+    {
+     "text": "de",
+     "kind": "prefix"
+    },
+    {
+     "text": "sper",
+     "kind": "root"
+    },
+    {
+     "text": "ate",
+     "kind": "suffix"
+    }
+   ],
+   "decoys": [],
+   "meaning": "Willing to try anything because things are so bad.",
+   "why": "Despair is inside it, hope gone. Sperare gives -per-, never -par-.",
+   "origin": {
+    "lang": "Latin",
+    "root": "de + sperare",
+    "gloss": "to hope"
+   }
+  },
+  "frantic": {
+   "parts": [
+    {
+     "text": "frant",
+     "kind": "root"
+    },
+    {
+     "text": "ic",
+     "kind": "suffix"
+    }
+   ],
+   "decoys": [],
+   "meaning": "Wild with worry or hurry.",
+   "why": "From a Greek word for a mind in a frenzy, as in frenzy itself.",
+   "origin": {
+    "lang": "Greek",
+    "root": "phren",
+    "gloss": "the mind"
+   }
+  },
+  "disastrous": {
+   "parts": [
+    {
+     "text": "dis",
+     "kind": "prefix"
+    },
+    {
+     "text": "astr",
+     "kind": "root"
+    },
+    {
+     "text": "ous",
+     "kind": "suffix"
+    }
+   ],
+   "decoys": [],
+   "meaning": "Going terribly wrong.",
+   "why": "Disaster loses its e before -ous. An ill-starred event.",
+   "origin": {
+    "lang": "Latin",
+    "root": "dis + astrum",
+    "gloss": "bad star"
+   }
+  },
+  "calamitous": {
+   "parts": [
+    {
+     "text": "calamit",
+     "kind": "root"
+    },
+    {
+     "text": "ous",
+     "kind": "suffix"
+    }
+   ],
+   "decoys": [],
+   "meaning": "Causing terrible damage.",
+   "why": "Calamity plus -ous: the y changes to i before the ending.",
+   "origin": {
+    "lang": "Latin",
+    "root": "calamitas",
+    "gloss": "damage, a disaster"
+   }
+  },
+  "marvellous": {
+   "parts": [
+    {
+     "text": "marvel",
+     "kind": "root"
+    },
+    {
+     "text": "lous",
+     "kind": "suffix"
+    }
+   ],
+   "decoys": [],
+   "meaning": "Wonderful.",
+   "why": "British English doubles the l of marvel before -ous. American English does not.",
+   "origin": {
+    "lang": "French",
+    "root": "mirabilia",
+    "gloss": "wonderful things"
+   }
+  },
+  "spectacular": {
+   "parts": [
+    {
+     "text": "spectacul",
+     "kind": "root"
+    },
+    {
+     "text": "ar",
+     "kind": "suffix"
+    }
+   ],
+   "decoys": [],
+   "meaning": "Amazing to look at.",
+   "why": "Something worth watching: spectacle, spectator, inspect.",
+   "origin": {
+    "lang": "Latin",
+    "root": "spectare",
+    "gloss": "to watch"
+   }
+  },
+  "accommodate": {
+   "parts": [
+    {
+     "text": "ac",
+     "kind": "prefix"
+    },
+    {
+     "text": "com",
+     "kind": "prefix"
+    },
+    {
+     "text": "mod",
+     "kind": "root"
+    },
+    {
+     "text": "ate",
+     "kind": "suffix"
+    }
+   ],
+   "decoys": [],
+   "meaning": "To have enough room for people or things.",
+   "why": "Two prefixes stack up, so two doubles: ad becomes ac, then com keeps its m.",
+   "origin": {
+    "lang": "Latin",
+    "root": "ad + com + modus",
+    "gloss": "measure, fit"
+   }
+  },
+  "accompany": {
+   "parts": [
+    {
+     "text": "ac",
+     "kind": "prefix"
+    },
+    {
+     "text": "com",
+     "kind": "prefix"
+    },
+    {
+     "text": "pan",
+     "kind": "root"
+    },
+    {
+     "text": "y",
+     "kind": "suffix"
+    }
+   ],
+   "decoys": [],
+   "meaning": "To go somewhere with someone.",
+   "why": "A companion shares bread with you. Double c from ad, single p from panis.",
+   "origin": {
+    "lang": "Latin",
+    "root": "ad + com + panis",
+    "gloss": "with bread"
+   }
+  },
+  "according": {
+   "parts": [
+    {
+     "text": "ac",
+     "kind": "prefix"
+    },
+    {
+     "text": "cord",
+     "kind": "root"
+    },
+    {
+     "text": "ing",
+     "kind": "suffix"
+    }
+   ],
+   "decoys": [],
+   "meaning": "As someone or something says.",
+   "why": "To accord is to bring hearts together, so cord, with cc from ad.",
+   "origin": {
+    "lang": "Latin",
+    "root": "ad + cor, cordis",
+    "gloss": "heart"
+   }
+  },
+  "achieve": {
+   "parts": [
+    {
+     "text": "a",
+     "kind": "prefix"
+    },
+    {
+     "text": "chieve",
+     "kind": "root"
+    }
+   ],
+   "decoys": [],
+   "meaning": "To succeed in doing something through effort.",
+   "why": "You bring a thing to a head, to a chief. The i comes before the e.",
+   "origin": {
+    "lang": "French",
+    "root": "a chief",
+    "gloss": "to a head"
+   }
+  },
+  "amateur": {
+   "parts": [
+    {
+     "text": "amat",
+     "kind": "root"
+    },
+    {
+     "text": "eur",
+     "kind": "suffix"
+    }
+   ],
+   "decoys": [],
+   "meaning": "Someone who does something for fun rather than as a job.",
+   "why": "An amateur does it for love. The -eur ending is French and stays whole.",
+   "origin": {
+    "lang": "French",
+    "root": "amator, amare",
+    "gloss": "to love"
+   }
+  },
+  "advice": {
+   "parts": [
+    {
+     "text": "ad",
+     "kind": "prefix"
+    },
+    {
+     "text": "vice",
+     "kind": "root"
+    }
+   ],
+   "decoys": [
+    {
+     "text": "vise",
+     "kind": "root"
+    }
+   ],
+   "meaning": "Words that help someone decide what to do (a thing).",
+   "why": "How someone sees it. The noun has a c, like ice.",
+   "origin": {
+    "lang": "Latin",
+    "root": "ad + videre",
+    "gloss": "to see"
+   }
+  },
+  "advise": {
+   "parts": [
+    {
+     "text": "ad",
+     "kind": "prefix"
+    },
+    {
+     "text": "vise",
+     "kind": "root"
+    }
+   ],
+   "decoys": [
+    {
+     "text": "vice",
+     "kind": "root"
+    }
+   ],
+   "meaning": "To tell someone what you think they should do (doing).",
+   "why": "The verb, so it takes s: I advise you.",
+   "origin": {
+    "lang": "Latin",
+    "root": "ad + videre",
+    "gloss": "to see"
+   }
+  },
+  "device": {
+   "parts": [
+    {
+     "text": "de",
+     "kind": "prefix"
+    },
+    {
+     "text": "vice",
+     "kind": "root"
+    }
+   ],
+   "decoys": [
+    {
+     "text": "vise",
+     "kind": "root"
+    }
+   ],
+   "meaning": "A gadget made to do a job (a thing).",
+   "why": "Once meant a plan worked out; now a gadget. The noun has a c.",
+   "origin": {
+    "lang": "Latin",
+    "root": "dividere",
+    "gloss": "to divide"
+   }
+  },
+  "devise": {
+   "parts": [
+    {
+     "text": "de",
+     "kind": "prefix"
+    },
+    {
+     "text": "vise",
+     "kind": "root"
+    }
+   ],
+   "decoys": [
+    {
+     "text": "vice",
+     "kind": "root"
+    }
+   ],
+   "meaning": "To think up a plan or an idea (doing).",
+   "why": "To work out a plan. The verb takes s.",
+   "origin": {
+    "lang": "Latin",
+    "root": "dividere",
+    "gloss": "to divide"
+   }
+  },
+  "licence": {
+   "parts": [
+    {
+     "text": "lic",
+     "kind": "root"
+    },
+    {
+     "text": "ence",
+     "kind": "suffix"
+    }
+   ],
+   "decoys": [
+    {
+     "text": "ance",
+     "kind": "suffix"
+    }
+   ],
+   "meaning": "A document that allows you to do something (a thing).",
+   "why": "A permission you can hold. The noun has a c.",
+   "origin": {
+    "lang": "Latin",
+    "root": "licere",
+    "gloss": "to be allowed"
+   }
+  },
+  "license": {
+   "parts": [
+    {
+     "text": "lic",
+     "kind": "root"
+    },
+    {
+     "text": "ense",
+     "kind": "suffix"
+    }
+   ],
+   "decoys": [
+    {
+     "text": "ence",
+     "kind": "suffix"
+    }
+   ],
+   "meaning": "To give official permission (doing).",
+   "why": "To give permission. The verb takes s.",
+   "origin": {
+    "lang": "Latin",
+    "root": "licere",
+    "gloss": "to be allowed"
+   }
+  },
+  "practice": {
+   "parts": [
+    {
+     "text": "pract",
+     "kind": "root"
+    },
+    {
+     "text": "ice",
+     "kind": "suffix"
+    }
+   ],
+   "decoys": [
+    {
+     "text": "ise",
+     "kind": "suffix"
+    }
+   ],
+   "meaning": "Time spent doing something to get better at it (a thing).",
+   "why": "Doing something again and again. The noun has a c.",
+   "origin": {
+    "lang": "Greek",
+    "root": "prassein",
+    "gloss": "to do"
+   }
+  },
+  "practise": {
+   "parts": [
+    {
+     "text": "pract",
+     "kind": "root"
+    },
+    {
+     "text": "ise",
+     "kind": "suffix"
+    }
+   ],
+   "decoys": [
+    {
+     "text": "ice",
+     "kind": "suffix"
+    }
+   ],
+   "meaning": "To do something again and again to get better (doing).",
+   "why": "The verb, so it takes s: you practise the piano.",
+   "origin": {
+    "lang": "Greek",
+    "root": "prassein",
+    "gloss": "to do"
+   }
+  },
+  "prophecy": {
+   "parts": [
+    {
+     "text": "pro",
+     "kind": "prefix"
+    },
+    {
+     "text": "phe",
+     "kind": "root"
+    },
+    {
+     "text": "cy",
+     "kind": "suffix"
+    }
+   ],
+   "decoys": [
+    {
+     "text": "sy",
+     "kind": "suffix"
+    }
+   ],
+   "meaning": "A statement of what will happen in the future (a thing).",
+   "why": "Spoken before it happens. The noun ends -cy, said 'see'.",
+   "origin": {
+    "lang": "Greek",
+    "root": "pro + phanai",
+    "gloss": "to speak before"
+   }
+  },
+  "prophesy": {
+   "parts": [
+    {
+     "text": "pro",
+     "kind": "prefix"
+    },
+    {
+     "text": "phe",
+     "kind": "root"
+    },
+    {
+     "text": "sy",
+     "kind": "suffix"
+    }
+   ],
+   "decoys": [
+    {
+     "text": "cy",
+     "kind": "suffix"
+    }
+   ],
+   "meaning": "To say what will happen in the future (doing).",
+   "why": "The verb ends -sy, said 'sigh'. Say it out loud to hear the difference.",
+   "origin": {
+    "lang": "Greek",
+    "root": "pro + phanai",
+    "gloss": "to speak before"
+   }
+  },
+  "ancient": {
+   "parts": [
+    {
+     "text": "anci",
+     "kind": "root"
+    },
+    {
+     "text": "ent",
+     "kind": "suffix"
+    }
+   ],
+   "decoys": [
+    {
+     "text": "ant",
+     "kind": "suffix"
+    }
+   ],
+   "meaning": "Very, very old.",
+   "why": "The /sh/ here is spelled ci, the same trick as in sufficient.",
+   "origin": {
+    "lang": "French",
+    "root": "ante",
+    "gloss": "before"
+   }
+  },
+  "apparent": {
+   "parts": [
+    {
+     "text": "ap",
+     "kind": "prefix"
+    },
+    {
+     "text": "par",
+     "kind": "root"
+    },
+    {
+     "text": "ent",
+     "kind": "suffix"
+    }
+   ],
+   "decoys": [
+    {
+     "text": "ant",
+     "kind": "suffix"
+    }
+   ],
+   "meaning": "Clear to see or understand.",
+   "why": "It appears, so ad plus parere gives pp. Latin -ent verbs take -ent.",
+   "origin": {
+    "lang": "Latin",
+    "root": "ad + parere",
+    "gloss": "to appear"
+   }
+  },
+  "appreciate": {
+   "parts": [
+    {
+     "text": "ap",
+     "kind": "prefix"
+    },
+    {
+     "text": "preci",
+     "kind": "root"
+    },
+    {
+     "text": "ate",
+     "kind": "suffix"
+    }
+   ],
+   "decoys": [],
+   "meaning": "To be grateful for something.",
+   "why": "To appreciate is to set a price on it. Price gives the ci.",
+   "origin": {
+    "lang": "Latin",
+    "root": "ad + pretium",
+    "gloss": "price"
+   }
+  },
+  "attached": {
+   "parts": [
+    {
+     "text": "at",
+     "kind": "prefix"
+    },
+    {
+     "text": "tach",
+     "kind": "root"
+    },
+    {
+     "text": "ed",
+     "kind": "suffix"
+    }
+   ],
+   "decoys": [],
+   "meaning": "Fixed or joined on to something.",
+   "why": "Ad becomes at before tach. One t would make a different word.",
+   "origin": {
+    "lang": "French",
+    "root": "atachier",
+    "gloss": "to fasten"
+   }
+  },
+  "available": {
+   "parts": [
+    {
+     "text": "a",
+     "kind": "prefix"
+    },
+    {
+     "text": "vail",
+     "kind": "root"
+    },
+    {
+     "text": "able",
+     "kind": "suffix"
+    }
+   ],
+   "decoys": [
+    {
+     "text": "ible",
+     "kind": "suffix"
+    }
+   ],
+   "meaning": "Free to be used or had.",
+   "why": "Avail means to be of worth. Add -able because avail is a whole word.",
+   "origin": {
+    "lang": "Latin",
+    "root": "ad + valere",
+    "gloss": "to be strong, worth"
+   }
+  },
+  "observant": {
+   "parts": [
+    {
+     "text": "observ",
+     "kind": "root"
+    },
+    {
+     "text": "ant",
+     "kind": "suffix"
+    }
+   ],
+   "decoys": [
+    {
+     "text": "ent",
+     "kind": "suffix"
+    }
+   ],
+   "meaning": "Good at noticing things.",
+   "why": "Observation has -ation, so the ending is -ant.",
+   "origin": {
+    "lang": "Latin",
+    "root": "observare",
+    "gloss": "to watch over"
+   }
+  },
+  "observance": {
+   "parts": [
+    {
+     "text": "observ",
+     "kind": "root"
+    },
+    {
+     "text": "ance",
+     "kind": "suffix"
+    }
+   ],
+   "decoys": [
+    {
+     "text": "ence",
+     "kind": "suffix"
+    }
+   ],
+   "meaning": "Keeping to a rule or a custom.",
+   "why": "Observation has -ation, so the ending is -ance.",
+   "origin": {
+    "lang": "Latin",
+    "root": "observare",
+    "gloss": "to watch over"
+   }
+  },
+  "expectant": {
+   "parts": [
+    {
+     "text": "expect",
+     "kind": "root"
+    },
+    {
+     "text": "ant",
+     "kind": "suffix"
+    }
+   ],
+   "decoys": [
+    {
+     "text": "ent",
+     "kind": "suffix"
+    }
+   ],
+   "meaning": "Waiting eagerly for something to happen.",
+   "why": "Expectation has -ation, so the ending is -ant.",
+   "origin": {
+    "lang": "Latin",
+    "root": "ex + spectare",
+    "gloss": "to look out for"
+   }
+  },
+  "expectancy": {
+   "parts": [
+    {
+     "text": "expect",
+     "kind": "root"
+    },
+    {
+     "text": "ancy",
+     "kind": "suffix"
+    }
+   ],
+   "decoys": [
+    {
+     "text": "ency",
+     "kind": "suffix"
+    }
+   ],
+   "meaning": "The feeling that something is about to happen.",
+   "why": "Expectation has -ation, so the ending is -ancy.",
+   "origin": {
+    "lang": "Latin",
+    "root": "ex + spectare",
+    "gloss": "to look out for"
+   }
+  },
+  "hesitant": {
+   "parts": [
+    {
+     "text": "hesit",
+     "kind": "root"
+    },
+    {
+     "text": "ant",
+     "kind": "suffix"
+    }
+   ],
+   "decoys": [
+    {
+     "text": "ent",
+     "kind": "suffix"
+    }
+   ],
+   "meaning": "Unsure, and slow to act or speak.",
+   "why": "Hesitation has -ation, so the ending is -ant.",
+   "origin": {
+    "lang": "Latin",
+    "root": "haesitare",
+    "gloss": "to stick, to hold back"
+   }
+  },
+  "hesitancy": {
+   "parts": [
+    {
+     "text": "hesit",
+     "kind": "root"
+    },
+    {
+     "text": "ancy",
+     "kind": "suffix"
+    }
+   ],
+   "decoys": [
+    {
+     "text": "ency",
+     "kind": "suffix"
+    }
+   ],
+   "meaning": "Being slow to act because you are unsure.",
+   "why": "Hesitation has -ation, so the ending is -ancy.",
+   "origin": {
+    "lang": "Latin",
+    "root": "haesitare",
+    "gloss": "to stick, to hold back"
+   }
+  },
+  "tolerant": {
+   "parts": [
+    {
+     "text": "toler",
+     "kind": "root"
+    },
+    {
+     "text": "ant",
+     "kind": "suffix"
+    }
+   ],
+   "decoys": [
+    {
+     "text": "ent",
+     "kind": "suffix"
+    }
+   ],
+   "meaning": "Willing to accept people and ideas that differ from yours.",
+   "why": "Toleration has -ation, so the ending is -ant.",
+   "origin": {
+    "lang": "Latin",
+    "root": "tolerare",
+    "gloss": "to bear, to put up with"
+   }
+  },
+  "tolerance": {
+   "parts": [
+    {
+     "text": "toler",
+     "kind": "root"
+    },
+    {
+     "text": "ance",
+     "kind": "suffix"
+    }
+   ],
+   "decoys": [
+    {
+     "text": "ence",
+     "kind": "suffix"
+    }
+   ],
+   "meaning": "Being able to put up with something.",
+   "why": "Toleration has -ation, so the ending is -ance.",
+   "origin": {
+    "lang": "Latin",
+    "root": "tolerare",
+    "gloss": "to bear, to put up with"
+   }
+  },
+  "relevant": {
+   "parts": [
+    {
+     "text": "relev",
+     "kind": "root"
+    },
+    {
+     "text": "ant",
+     "kind": "suffix"
+    }
+   ],
+   "decoys": [
+    {
+     "text": "ent",
+     "kind": "suffix"
+    }
+   ],
+   "meaning": "Connected to what is being talked about.",
+   "why": "It lifts the point up. Levare also gives lever and elevate.",
+   "origin": {
+    "lang": "Latin",
+    "root": "re + levare",
+    "gloss": "to lift up"
+   }
+  },
+  "relevance": {
+   "parts": [
+    {
+     "text": "relev",
+     "kind": "root"
+    },
+    {
+     "text": "ance",
+     "kind": "suffix"
+    }
+   ],
+   "decoys": [
+    {
+     "text": "ence",
+     "kind": "suffix"
+    }
+   ],
+   "meaning": "How closely something is connected to what matters.",
+   "why": "No related word gives the a away: relevance just has to be learnt.",
+   "origin": {
+    "lang": "Latin",
+    "root": "re + levare",
+    "gloss": "to lift up"
+   }
+  },
+  "average": {
+   "parts": [
+    {
+     "text": "aver",
+     "kind": "root"
+    },
+    {
+     "text": "age",
+     "kind": "suffix"
+    }
+   ],
+   "decoys": [],
+   "meaning": "Normal or usual; not special.",
+   "why": "A sea-trade word for sharing damage costs. The middle e is a lazy 'uh'.",
+   "origin": {
+    "lang": "Arabic",
+    "root": "awar",
+    "gloss": "damage to cargo"
+   }
+  },
+  "bargain": {
+   "parts": [
+    {
+     "text": "bar",
+     "kind": "root"
+    },
+    {
+     "text": "gain",
+     "kind": "root"
+    }
+   ],
+   "decoys": [],
+   "meaning": "Something bought for less than it is worth.",
+   "why": "The ending is -ain, the same lazy ending as captain and mountain.",
+   "origin": {
+    "lang": "French",
+    "root": "bargaignier",
+    "gloss": "to haggle"
+   }
+  },
+  "bruise": {
+   "parts": [
+    {
+     "text": "bruise",
+     "kind": "root"
+    }
+   ],
+   "decoys": [],
+   "meaning": "A dark mark on the skin from a bump.",
+   "why": "Old English crushing plus a French spelling, so ui, and s not z.",
+   "origin": {
+    "lang": "Old English",
+    "root": "brysan",
+    "gloss": "to crush"
+   }
+  },
+  "category": {
+   "parts": [
+    {
+     "text": "categor",
+     "kind": "root"
+    },
+    {
+     "text": "y",
+     "kind": "suffix"
+    }
+   ],
+   "decoys": [],
+   "meaning": "A group of things that are alike.",
+   "why": "Greek word for a public statement. The middle e and the -ory are both schwa.",
+   "origin": {
+    "lang": "Greek",
+    "root": "kategoria",
+    "gloss": "a statement, an accusation"
+   }
+  },
+  "innocent": {
+   "parts": [
+    {
+     "text": "in",
+     "kind": "prefix"
+    },
+    {
+     "text": "noc",
+     "kind": "root"
+    },
+    {
+     "text": "ent",
+     "kind": "suffix"
+    }
+   ],
+   "decoys": [
+    {
+     "text": "ant",
+     "kind": "suffix"
+    }
+   ],
+   "meaning": "Not guilty of doing anything wrong.",
+   "why": "The c says 's' before the ending, so it is -ent.",
+   "origin": {
+    "lang": "Latin",
+    "root": "in + nocere",
+    "gloss": "not harming"
+   }
+  },
+  "innocence": {
+   "parts": [
+    {
+     "text": "in",
+     "kind": "prefix"
+    },
+    {
+     "text": "noc",
+     "kind": "root"
+    },
+    {
+     "text": "ence",
+     "kind": "suffix"
+    }
+   ],
+   "decoys": [
+    {
+     "text": "ance",
+     "kind": "suffix"
+    }
+   ],
+   "meaning": "Being free from guilt, or not knowing about bad things.",
+   "why": "The c says 's' before the ending, so it is -ence.",
+   "origin": {
+    "lang": "Latin",
+    "root": "in + nocere",
+    "gloss": "not harming"
+   }
+  },
+  "decent": {
+   "parts": [
+    {
+     "text": "dec",
+     "kind": "root"
+    },
+    {
+     "text": "ent",
+     "kind": "suffix"
+    }
+   ],
+   "decoys": [
+    {
+     "text": "ant",
+     "kind": "suffix"
+    }
+   ],
+   "meaning": "Good, kind and fair.",
+   "why": "The c says 's' before the ending, so it is -ent.",
+   "origin": {
+    "lang": "Latin",
+    "root": "decere",
+    "gloss": "to be fitting"
+   }
+  },
+  "decency": {
+   "parts": [
+    {
+     "text": "dec",
+     "kind": "root"
+    },
+    {
+     "text": "ency",
+     "kind": "suffix"
+    }
+   ],
+   "decoys": [
+    {
+     "text": "ancy",
+     "kind": "suffix"
+    }
+   ],
+   "meaning": "Behaving in a good, kind and fair way.",
+   "why": "The c says 's' before the ending, so it is -ency.",
+   "origin": {
+    "lang": "Latin",
+    "root": "decere",
+    "gloss": "to be fitting"
+   }
+  },
+  "excellent": {
+   "parts": [
+    {
+     "text": "ex",
+     "kind": "prefix"
+    },
+    {
+     "text": "cell",
+     "kind": "root"
+    },
+    {
+     "text": "ent",
+     "kind": "suffix"
+    }
+   ],
+   "decoys": [
+    {
+     "text": "ant",
+     "kind": "suffix"
+    }
+   ],
+   "meaning": "Extremely good.",
+   "why": "Excel doubles its l before -ent. Rising above the rest.",
+   "origin": {
+    "lang": "Latin",
+    "root": "ex + cellere",
+    "gloss": "to rise above"
+   }
+  },
+  "excellence": {
+   "parts": [
+    {
+     "text": "ex",
+     "kind": "prefix"
+    },
+    {
+     "text": "cell",
+     "kind": "root"
+    },
+    {
+     "text": "ence",
+     "kind": "suffix"
+    }
+   ],
+   "decoys": [
+    {
+     "text": "ance",
+     "kind": "suffix"
+    }
+   ],
+   "meaning": "Being very, very good at something.",
+   "why": "No rule gives the e away: excellence just has to be learnt. Think excel.",
+   "origin": {
+    "lang": "Latin",
+    "root": "ex + cellere",
+    "gloss": "to rise above"
+   }
+  },
+  "confident": {
+   "parts": [
+    {
+     "text": "con",
+     "kind": "prefix"
+    },
+    {
+     "text": "fid",
+     "kind": "root"
+    },
+    {
+     "text": "ent",
+     "kind": "suffix"
+    }
+   ],
+   "decoys": [
+    {
+     "text": "ant",
+     "kind": "suffix"
+    }
+   ],
+   "meaning": "Sure that you can do something.",
+   "why": "You can hear the e in confidential, so the ending is -ent.",
+   "origin": {
+    "lang": "Latin",
+    "root": "con + fidere",
+    "gloss": "to trust fully"
+   }
+  },
+  "confidence": {
+   "parts": [
+    {
+     "text": "con",
+     "kind": "prefix"
+    },
+    {
+     "text": "fid",
+     "kind": "root"
+    },
+    {
+     "text": "ence",
+     "kind": "suffix"
+    }
+   ],
+   "decoys": [
+    {
+     "text": "ance",
+     "kind": "suffix"
+    }
+   ],
+   "meaning": "The feeling of being sure you can do something.",
+   "why": "You can hear the e in confidential, so the ending is -ence.",
+   "origin": {
+    "lang": "Latin",
+    "root": "con + fidere",
+    "gloss": "to trust fully"
+   }
+  },
+  "existent": {
+   "parts": [
+    {
+     "text": "ex",
+     "kind": "prefix"
+    },
+    {
+     "text": "ist",
+     "kind": "root"
+    },
+    {
+     "text": "ent",
+     "kind": "suffix"
+    }
+   ],
+   "decoys": [
+    {
+     "text": "ant",
+     "kind": "suffix"
+    }
+   ],
+   "meaning": "Real, and still there.",
+   "why": "You can hear the e in existential, so the ending is -ent.",
+   "origin": {
+    "lang": "Latin",
+    "root": "ex + sistere",
+    "gloss": "to stand out"
+   }
+  },
+  "existence": {
+   "parts": [
+    {
+     "text": "ex",
+     "kind": "prefix"
+    },
+    {
+     "text": "ist",
+     "kind": "root"
+    },
+    {
+     "text": "ence",
+     "kind": "suffix"
+    }
+   ],
+   "decoys": [
+    {
+     "text": "ance",
+     "kind": "suffix"
+    }
+   ],
+   "meaning": "Being real, or being alive.",
+   "why": "To exist is to stand out. Latin -ere verbs take -ence, not -ance.",
+   "origin": {
+    "lang": "Latin",
+    "root": "ex + sistere",
+    "gloss": "to stand out"
+   }
+  },
+  "cemetery": {
+   "parts": [
+    {
+     "text": "cemeter",
+     "kind": "root"
+    },
+    {
+     "text": "y",
+     "kind": "suffix"
+    }
+   ],
+   "decoys": [],
+   "meaning": "A place where people are buried.",
+   "why": "Greek for a sleeping place. Three e's in a row of syllables, no a anywhere.",
+   "origin": {
+    "lang": "Greek",
+    "root": "koimeterion",
+    "gloss": "sleeping place"
+   }
+  },
+  "committee": {
+   "parts": [
+    {
+     "text": "com",
+     "kind": "prefix"
+    },
+    {
+     "text": "mitt",
+     "kind": "root"
+    },
+    {
+     "text": "ee",
+     "kind": "suffix"
+    }
+   ],
+   "decoys": [],
+   "meaning": "A group of people chosen to make decisions.",
+   "why": "Commit doubles its t before -ee. Two m, two t, two e, in that order.",
+   "origin": {
+    "lang": "Latin",
+    "root": "com + mittere",
+    "gloss": "to send with"
+   }
+  },
+  "communicate": {
+   "parts": [
+    {
+     "text": "commun",
+     "kind": "root"
+    },
+    {
+     "text": "ic",
+     "kind": "root"
+    },
+    {
+     "text": "ate",
+     "kind": "suffix"
+    }
+   ],
+   "decoys": [],
+   "meaning": "To share information or ideas.",
+   "why": "From common. Double m from com plus mun, then a single n.",
+   "origin": {
+    "lang": "Latin",
+    "root": "communis",
+    "gloss": "common, shared"
+   }
+  },
+  "community": {
+   "parts": [
+    {
+     "text": "commun",
+     "kind": "root"
+    },
+    {
+     "text": "ity",
+     "kind": "suffix"
+    }
+   ],
+   "decoys": [],
+   "meaning": "The people living in one place.",
+   "why": "Same root as common and communicate, so the same double m.",
+   "origin": {
+    "lang": "Latin",
+    "root": "communis",
+    "gloss": "common, shared"
+   }
+  },
+  "competition": {
+   "parts": [
+    {
+     "text": "com",
+     "kind": "prefix"
+    },
+    {
+     "text": "pet",
+     "kind": "root"
+    },
+    {
+     "text": "ition",
+     "kind": "suffix"
+    }
+   ],
+   "decoys": [],
+   "meaning": "A contest to see who is best.",
+   "why": "Compete keeps its e even though you cannot hear it. Then -ition.",
+   "origin": {
+    "lang": "Latin",
+    "root": "com + petere",
+    "gloss": "to seek together"
+   }
+  },
+  "co-operate": {
+   "parts": [
+    {
+     "text": "co",
+     "kind": "prefix"
+    },
+    {
+     "text": "-",
+     "kind": "hyphen"
+    },
+    {
+     "text": "operate",
+     "kind": "root"
+    }
+   ],
+   "decoys": [],
+   "meaning": "To work together with others.",
+   "why": "co ends in o and operate starts with o: the hyphen keeps them apart.",
+   "origin": {
+    "lang": "Latin",
+    "root": "co + operari",
+    "gloss": "to work together"
+   }
+  },
+  "co-ordinate": {
+   "parts": [
+    {
+     "text": "co",
+     "kind": "prefix"
+    },
+    {
+     "text": "-",
+     "kind": "hyphen"
+    },
+    {
+     "text": "ordinate",
+     "kind": "root"
+    }
+   ],
+   "decoys": [],
+   "meaning": "To make different parts work together smoothly.",
+   "why": "co ends in o and ordinate starts with o, so a hyphen goes between.",
+   "origin": {
+    "lang": "Latin",
+    "root": "co + ordinare",
+    "gloss": "to put in order together"
+   }
+  },
+  "co-own": {
+   "parts": [
+    {
+     "text": "co",
+     "kind": "prefix"
+    },
+    {
+     "text": "-",
+     "kind": "hyphen"
+    },
+    {
+     "text": "own",
+     "kind": "root"
+    }
+   ],
+   "decoys": [],
+   "meaning": "To have something together with someone else.",
+   "why": "Without the hyphen it would look like coown. The hyphen keeps co and own apart.",
+   "origin": {
+    "lang": "English",
+    "root": "co + own",
+    "gloss": "to have together"
+   }
+  },
+  "co-author": {
+   "parts": [
+    {
+     "text": "co",
+     "kind": "prefix"
+    },
+    {
+     "text": "-",
+     "kind": "hyphen"
+    },
+    {
+     "text": "author",
+     "kind": "root"
+    }
+   ],
+   "decoys": [],
+   "meaning": "To write something together with someone else.",
+   "why": "co ends in a vowel and author starts with one, so a hyphen joins them.",
+   "origin": {
+    "lang": "Latin",
+    "root": "co + auctor",
+    "gloss": "a maker, together"
+   }
+  },
+  "re-enter": {
+   "parts": [
+    {
+     "text": "re",
+     "kind": "prefix"
+    },
+    {
+     "text": "-",
+     "kind": "hyphen"
+    },
+    {
+     "text": "enter",
+     "kind": "root"
+    }
+   ],
+   "decoys": [],
+   "meaning": "To go back in.",
+   "why": "re ends in e and enter starts with e: the hyphen keeps both.",
+   "origin": {
+    "lang": "Latin",
+    "root": "re + intrare",
+    "gloss": "to go in again"
+   }
+  },
+  "re-educate": {
+   "parts": [
+    {
+     "text": "re",
+     "kind": "prefix"
+    },
+    {
+     "text": "-",
+     "kind": "hyphen"
+    },
+    {
+     "text": "educate",
+     "kind": "root"
+    }
+   ],
+   "decoys": [],
+   "meaning": "To teach someone again, or teach them a new way.",
+   "why": "re ends in e and educate starts with e, so a hyphen goes between.",
+   "origin": {
+    "lang": "Latin",
+    "root": "re + educare",
+    "gloss": "to bring up again"
+   }
+  },
+  "re-examine": {
+   "parts": [
+    {
+     "text": "re",
+     "kind": "prefix"
+    },
+    {
+     "text": "-",
+     "kind": "hyphen"
+    },
+    {
+     "text": "examine",
+     "kind": "root"
+    }
+   ],
+   "decoys": [],
+   "meaning": "To look at something carefully again.",
+   "why": "re ends in e and examine starts with e: the hyphen keeps both.",
+   "origin": {
+    "lang": "Latin",
+    "root": "re + examinare",
+    "gloss": "to weigh up again"
+   }
+  },
+  "re-evaluate": {
+   "parts": [
+    {
+     "text": "re",
+     "kind": "prefix"
+    },
+    {
+     "text": "-",
+     "kind": "hyphen"
+    },
+    {
+     "text": "evaluate",
+     "kind": "root"
+    }
+   ],
+   "decoys": [],
+   "meaning": "To think again about how good or useful something is.",
+   "why": "re ends in e and evaluate starts with e, so a hyphen goes between.",
+   "origin": {
+    "lang": "French",
+    "root": "re + evaluer",
+    "gloss": "to judge the worth again"
+   }
+  },
+  "re-energise": {
+   "parts": [
+    {
+     "text": "re",
+     "kind": "prefix"
+    },
+    {
+     "text": "-",
+     "kind": "hyphen"
+    },
+    {
+     "text": "energise",
+     "kind": "root"
+    }
+   ],
+   "decoys": [],
+   "meaning": "To give someone back their get-up-and-go.",
+   "why": "re ends in e and energise starts with e: the hyphen keeps both.",
+   "origin": {
+    "lang": "Greek",
+    "root": "re + energeia",
+    "gloss": "activity, once more"
+   }
+  },
+  "re-elect": {
+   "parts": [
+    {
+     "text": "re",
+     "kind": "prefix"
+    },
+    {
+     "text": "-",
+     "kind": "hyphen"
+    },
+    {
+     "text": "elect",
+     "kind": "root"
+    }
+   ],
+   "decoys": [],
+   "meaning": "To choose the same person again in a vote.",
+   "why": "re ends in e and elect starts with e, so a hyphen goes between.",
+   "origin": {
+    "lang": "Latin",
+    "root": "re + eligere",
+    "gloss": "to pick out again"
+   }
+  },
+  "conscience": {
+   "parts": [
+    {
+     "text": "con",
+     "kind": "prefix"
+    },
+    {
+     "text": "sci",
+     "kind": "root"
+    },
+    {
+     "text": "ence",
+     "kind": "suffix"
+    }
+   ],
+   "decoys": [
+    {
+     "text": "ance",
+     "kind": "suffix"
+    }
+   ],
+   "meaning": "The feeling inside that tells you right from wrong.",
+   "why": "Hidden inside is science, to know. Knowing with yourself.",
+   "origin": {
+    "lang": "Latin",
+    "root": "com + scire",
+    "gloss": "to know with"
+   }
+  },
+  "conscious": {
+   "parts": [
+    {
+     "text": "con",
+     "kind": "prefix"
+    },
+    {
+     "text": "sci",
+     "kind": "root"
+    },
+    {
+     "text": "ous",
+     "kind": "suffix"
+    }
+   ],
+   "decoys": [],
+   "meaning": "Awake and aware.",
+   "why": "Same hidden science as conscience, then -ous for the adjective.",
+   "origin": {
+    "lang": "Latin",
+    "root": "com + scire",
+    "gloss": "to know with"
+   }
+  },
+  "controversy": {
+   "parts": [
+    {
+     "text": "contro",
+     "kind": "prefix"
+    },
+    {
+     "text": "vers",
+     "kind": "root"
+    },
+    {
+     "text": "y",
+     "kind": "suffix"
+    }
+   ],
+   "decoys": [],
+   "meaning": "A big disagreement about something.",
+   "why": "Contra means against, vers means turn. Turned against each other.",
+   "origin": {
+    "lang": "Latin",
+    "root": "contra + vertere",
+    "gloss": "to turn against"
+   }
+  },
+  "convenience": {
+   "parts": [
+    {
+     "text": "con",
+     "kind": "prefix"
+    },
+    {
+     "text": "veni",
+     "kind": "root"
+    },
+    {
+     "text": "ence",
+     "kind": "suffix"
+    }
+   ],
+   "decoys": [
+    {
+     "text": "ance",
+     "kind": "suffix"
+    }
+   ],
+   "meaning": "Being easy and useful.",
+   "why": "Things that come together suit you. Venire gives -ien, then -ence.",
+   "origin": {
+    "lang": "Latin",
+    "root": "com + venire",
+    "gloss": "to come together"
+   }
+  },
+  "correspond": {
+   "parts": [
+    {
+     "text": "cor",
+     "kind": "prefix"
+    },
+    {
+     "text": "respond",
+     "kind": "root"
+    }
+   ],
+   "decoys": [],
+   "meaning": "To write letters to each other.",
+   "why": "Com becomes cor before respond, so two r's meet in the middle.",
+   "origin": {
+    "lang": "Latin",
+    "root": "com + respondere",
+    "gloss": "to answer together"
+   }
+  },
+  "man-eating": {
+   "parts": [
+    {
+     "text": "man",
+     "kind": "word"
+    },
+    {
+     "text": "-",
+     "kind": "hyphen"
+    },
+    {
+     "text": "eating",
+     "kind": "word"
+    }
+   ],
+   "decoys": [],
+   "meaning": "Describes a shark or a tiger that hunts people for food.",
+   "why": "Man and eating team up to describe the shark, so they are joined.",
+   "origin": {
+    "lang": "English",
+    "root": "man + eating",
+    "gloss": "that eats people"
+   }
+  },
+  "little-used": {
+   "parts": [
+    {
+     "text": "little",
+     "kind": "word"
+    },
+    {
+     "text": "-",
+     "kind": "hyphen"
+    },
+    {
+     "text": "used",
+     "kind": "word"
+    }
+   ],
+   "decoys": [],
+   "meaning": "Rarely needed, rarely visited.",
+   "why": "Joined, it means hardly used. A little used car is a small second-hand one.",
+   "origin": {
+    "lang": "English",
+    "root": "little + used",
+    "gloss": "hardly ever used"
+   }
+  },
+  "rock-bottom": {
+   "parts": [
+    {
+     "text": "rock",
+     "kind": "word"
+    },
+    {
+     "text": "-",
+     "kind": "hyphen"
+    },
+    {
+     "text": "bottom",
+     "kind": "word"
+    }
+   ],
+   "decoys": [],
+   "meaning": "As low as it can possibly go.",
+   "why": "Two words working as one describing word before 'prices'.",
+   "origin": {
+    "lang": "English",
+    "root": "rock + bottom",
+    "gloss": "the very lowest"
+   }
+  },
+  "wide-eyed": {
+   "parts": [
+    {
+     "text": "wide",
+     "kind": "word"
+    },
+    {
+     "text": "-",
+     "kind": "hyphen"
+    },
+    {
+     "text": "eyed",
+     "kind": "word"
+    }
+   ],
+   "decoys": [],
+   "meaning": "Looking amazed and full of wonder.",
+   "why": "One of a family: wide-eyed, green-eyed, pig-headed, cold-hearted.",
+   "origin": {
+    "lang": "English",
+    "root": "wide + eyed",
+    "gloss": "with eyes wide open"
+   }
+  },
+  "pig-headed": {
+   "parts": [
+    {
+     "text": "pig",
+     "kind": "word"
+    },
+    {
+     "text": "-",
+     "kind": "hyphen"
+    },
+    {
+     "text": "headed",
+     "kind": "word"
+    }
+   ],
+   "decoys": [],
+   "meaning": "Stubborn, refusing to change your mind.",
+   "why": "Joined, it means stubborn. 'A pig headed for the mud' is a pig going somewhere.",
+   "origin": {
+    "lang": "English",
+    "root": "pig + headed",
+    "gloss": "stubborn"
+   }
+  },
+  "tight-fisted": {
+   "parts": [
+    {
+     "text": "tight",
+     "kind": "word"
+    },
+    {
+     "text": "-",
+     "kind": "hyphen"
+    },
+    {
+     "text": "fisted",
+     "kind": "word"
+    }
+   ],
+   "decoys": [],
+   "meaning": "Not willing to spend or share money.",
+   "why": "A hand clenched round its money: two words making one describing word.",
+   "origin": {
+    "lang": "English",
+    "root": "tight + fisted",
+    "gloss": "mean with money"
+   }
+  },
+  "cold-hearted": {
+   "parts": [
+    {
+     "text": "cold",
+     "kind": "word"
+    },
+    {
+     "text": "-",
+     "kind": "hyphen"
+    },
+    {
+     "text": "hearted",
+     "kind": "word"
+    }
+   ],
+   "decoys": [],
+   "meaning": "Unkind, without any warm feelings.",
+   "why": "Cold and hearted team up to describe a person, so they are joined.",
+   "origin": {
+    "lang": "English",
+    "root": "cold + hearted",
+    "gloss": "unkind, unfeeling"
+   }
+  },
+  "stone-faced": {
+   "parts": [
+    {
+     "text": "stone",
+     "kind": "word"
+    },
+    {
+     "text": "-",
+     "kind": "hyphen"
+    },
+    {
+     "text": "faced",
+     "kind": "word"
+    }
+   ],
+   "decoys": [],
+   "meaning": "Showing no feelings at all, as still as a statue.",
+   "why": "A face as still as stone. Joined, because together they describe the guard.",
+   "origin": {
+    "lang": "English",
+    "root": "stone + faced",
+    "gloss": "showing no feeling"
+   }
+  },
+  "green-eyed": {
+   "parts": [
+    {
+     "text": "green",
+     "kind": "word"
+    },
+    {
+     "text": "-",
+     "kind": "hyphen"
+    },
+    {
+     "text": "eyed",
+     "kind": "word"
+    }
+   ],
+   "decoys": [],
+   "meaning": "Jealous. Shakespeare gave jealousy a monster with eyes this colour.",
+   "why": "Shakespeare called jealousy 'the green-eyed monster' in Othello.",
+   "origin": {
+    "lang": "English",
+    "root": "green + eyed",
+    "gloss": "jealous"
+   }
+  },
+  "short-tempered": {
+   "parts": [
+    {
+     "text": "short",
+     "kind": "word"
+    },
+    {
+     "text": "-",
+     "kind": "hyphen"
+    },
+    {
+     "text": "tempered",
+     "kind": "word"
+    }
+   ],
+   "decoys": [],
+   "meaning": "Quick to get angry.",
+   "why": "A temper with a short fuse. Two words joined into one describing word.",
+   "origin": {
+    "lang": "English",
+    "root": "short + tempered",
+    "gloss": "quick to get angry"
+   }
+  },
+  "criticise": {
+   "parts": [
+    {
+     "text": "critic",
+     "kind": "root"
+    },
+    {
+     "text": "ise",
+     "kind": "suffix"
+    }
+   ],
+   "decoys": [
+    {
+     "text": "ice",
+     "kind": "suffix"
+    }
+   ],
+   "meaning": "To say what is wrong with something.",
+   "why": "From critic. The c stays c, and British English takes -ise.",
+   "origin": {
+    "lang": "Greek",
+    "root": "kritikos",
+    "gloss": "able to judge"
+   }
+  },
+  "curiosity": {
+   "parts": [
+    {
+     "text": "curi",
+     "kind": "root"
+    },
+    {
+     "text": "os",
+     "kind": "root"
+    },
+    {
+     "text": "ity",
+     "kind": "suffix"
+    }
+   ],
+   "decoys": [],
+   "meaning": "Wanting to know or learn about things.",
+   "why": "Curious loses its u when it becomes curiosity. Care, not carelessness.",
+   "origin": {
+    "lang": "Latin",
+    "root": "cura",
+    "gloss": "care"
+   }
+  },
+  "definite": {
+   "parts": [
+    {
+     "text": "de",
+     "kind": "prefix"
+    },
+    {
+     "text": "fin",
+     "kind": "root"
+    },
+    {
+     "text": "ite",
+     "kind": "suffix"
+    }
+   ],
+   "decoys": [
+    {
+     "text": "ate",
+     "kind": "suffix"
+    }
+   ],
+   "meaning": "Certain and fixed.",
+   "why": "Finis means end, so there is a finite hiding inside. Never an a.",
+   "origin": {
+    "lang": "Latin",
+    "root": "de + finis",
+    "gloss": "boundary, end"
+   }
+  },
+  "determined": {
+   "parts": [
+    {
+     "text": "de",
+     "kind": "prefix"
+    },
+    {
+     "text": "termin",
+     "kind": "root"
+    },
+    {
+     "text": "ed",
+     "kind": "suffix"
+    }
+   ],
+   "decoys": [],
+   "meaning": "Having decided firmly to do something.",
+   "why": "You set a limit, a terminus. One r, and -mined like the word mine.",
+   "origin": {
+    "lang": "Latin",
+    "root": "de + terminus",
+    "gloss": "limit, boundary"
+   }
+  }
+ },
+ "weeks": {
+  "week-2026-09-07": {
+   "roots": [
+    {
+     "part": "gress",
+     "means": "step",
+     "from": "Latin gradi",
+     "words": [
+      "aggressive"
+     ]
+    },
+    {
+     "part": "host",
+     "means": "enemy, stranger",
+     "from": "Latin hostis",
+     "words": [
+      "hostile"
+     ]
+    },
+    {
+     "part": "awk",
+     "means": "turned the wrong way",
+     "from": "Old Norse afugr",
+     "words": [
+      "awkward"
+     ]
+    },
+    {
+     "part": "obstin",
+     "means": "stand firm",
+     "from": "Latin obstinare",
+     "words": [
+      "obstinate"
+     ]
+    },
+    {
+     "part": "sper",
+     "means": "hope",
+     "from": "Latin sperare",
+     "words": [
+      "desperate"
+     ]
+    },
+    {
+     "part": "frant",
+     "means": "the mind",
+     "from": "Greek phren",
+     "words": [
+      "frantic"
+     ]
+    },
+    {
+     "part": "astr",
+     "means": "star",
+     "from": "Latin astrum",
+     "words": [
+      "disastrous"
+     ]
+    },
+    {
+     "part": "calamit",
+     "means": "damage, disaster",
+     "from": "Latin calamitas",
+     "words": [
+      "calamitous"
+     ]
+    },
+    {
+     "part": "marvel",
+     "means": "wonderful things",
+     "from": "French, from Latin mirabilia",
+     "words": [
+      "marvellous"
+     ]
+    },
+    {
+     "part": "spect",
+     "means": "watch",
+     "from": "Latin spectare",
+     "words": [
+      "spectacular"
+     ]
+    },
+    {
+     "part": "mod",
+     "means": "measure, fit",
+     "from": "Latin modus",
+     "words": [
+      "accommodate"
+     ]
+    },
+    {
+     "part": "cord",
+     "means": "heart",
+     "from": "Latin cor, cordis",
+     "words": [
+      "according"
+     ]
+    },
+    {
+     "part": "amat",
+     "means": "love",
+     "from": "Latin amare",
+     "words": [
+      "amateur"
+     ]
+    }
+   ],
+   "sort": null
+  },
+  "week-2026-09-21": {
+   "roots": [
+    {
+     "part": "advice, advise",
+     "means": "a way of seeing",
+     "from": "Latin videre",
+     "words": [
+      "advice",
+      "advise"
+     ]
+    },
+    {
+     "part": "device, devise",
+     "means": "a plan worked out",
+     "from": "Latin dividere",
+     "words": [
+      "device",
+      "devise"
+     ]
+    },
+    {
+     "part": "licence, license",
+     "means": "being allowed",
+     "from": "Latin licere",
+     "words": [
+      "licence",
+      "license"
+     ]
+    },
+    {
+     "part": "practice, practise",
+     "means": "doing",
+     "from": "Greek prassein",
+     "words": [
+      "practice",
+      "practise"
+     ]
+    },
+    {
+     "part": "prophecy, prophesy",
+     "means": "speaking before",
+     "from": "Greek phanai",
+     "words": [
+      "prophecy",
+      "prophesy"
+     ]
+    },
+    {
+     "part": "anci",
+     "means": "before",
+     "from": "Latin ante",
+     "words": [
+      "ancient"
+     ]
+    },
+    {
+     "part": "par",
+     "means": "appear",
+     "from": "Latin parere",
+     "words": [
+      "apparent"
+     ]
+    },
+    {
+     "part": "preci",
+     "means": "price",
+     "from": "Latin pretium",
+     "words": [
+      "appreciate"
+     ]
+    },
+    {
+     "part": "tach",
+     "means": "fasten",
+     "from": "Old French atachier",
+     "words": [
+      "attached"
+     ]
+    },
+    {
+     "part": "vail",
+     "means": "be strong, be worth",
+     "from": "Latin valere",
+     "words": [
+      "available"
+     ]
+    }
+   ],
+   "sort": {
+    "title": "c or s?",
+    "bins": [
+     {
+      "key": "c",
+      "label": "c",
+      "note": "a thing (noun)"
+     },
+     {
+      "key": "s",
+      "label": "s",
+      "note": "doing (verb)"
+     }
+    ],
+    "cards": [
+     {
+      "word": "advice",
+      "show": [
+       "She gave me some good advi",
+       "e about the test."
+      ],
+      "answer": "c",
+      "full": "She gave me some good advice about the test.",
+      "explain": "advice is a thing (noun), so it takes c."
+     },
+     {
+      "word": "advise",
+      "show": [
+       "I would advi",
+       "e you to take a coat."
+      ],
+      "answer": "s",
+      "full": "I would advise you to take a coat.",
+      "explain": "advise is a doing word (verb), so it takes s."
+     },
+     {
+      "word": "device",
+      "show": [
+       "He plugged the small devi",
+       "e into the wall."
+      ],
+      "answer": "c",
+      "full": "He plugged the small device into the wall.",
+      "explain": "device is a thing (noun), so it takes c."
+     },
+     {
+      "word": "devise",
+      "show": [
+       "They had to devi",
+       "e a plan very quickly."
+      ],
+      "answer": "s",
+      "full": "They had to devise a plan very quickly.",
+      "explain": "devise is a doing word (verb), so it takes s."
+     },
+     {
+      "word": "licence",
+      "show": [
+       "My uncle keeps his licen",
+       "e in his wallet."
+      ],
+      "answer": "c",
+      "full": "My uncle keeps his licence in his wallet.",
+      "explain": "licence is a thing (noun), so it takes c."
+     },
+     {
+      "word": "license",
+      "show": [
+       "The council will licen",
+       "e the new market."
+      ],
+      "answer": "s",
+      "full": "The council will license the new market.",
+      "explain": "license is a doing word (verb), so it takes s."
+     },
+     {
+      "word": "practice",
+      "show": [
+       "She was late for netball practi",
+       "e again."
+      ],
+      "answer": "c",
+      "full": "She was late for netball practice again.",
+      "explain": "practice is a thing (noun), so it takes c."
+     },
+     {
+      "word": "practise",
+      "show": [
+       "You should practi",
+       "e the piano every day."
+      ],
+      "answer": "s",
+      "full": "You should practise the piano every day.",
+      "explain": "practise is a doing word (verb), so it takes s."
+     },
+     {
+      "word": "prophecy",
+      "show": [
+       "The old prophe",
+       "y came true at last."
+      ],
+      "answer": "c",
+      "full": "The old prophecy came true at last.",
+      "explain": "prophecy is a thing (noun), so it takes c."
+     },
+     {
+      "word": "prophesy",
+      "show": [
+       "Nobody can prophe",
+       "y what will happen next."
+      ],
+      "answer": "s",
+      "full": "Nobody can prophesy what will happen next.",
+      "explain": "prophesy is a doing word (verb), so it takes s."
+     }
+    ]
+   }
+  },
+  "week-2026-09-28": {
+   "roots": [
+    {
+     "part": "observ",
+     "means": "watch over",
+     "from": "Latin observare",
+     "words": [
+      "observant",
+      "observance"
+     ]
+    },
+    {
+     "part": "expect",
+     "means": "look out for",
+     "from": "Latin exspectare",
+     "words": [
+      "expectant",
+      "expectancy"
+     ]
+    },
+    {
+     "part": "hesit",
+     "means": "stick, hold back",
+     "from": "Latin haesitare",
+     "words": [
+      "hesitant",
+      "hesitancy"
+     ]
+    },
+    {
+     "part": "toler",
+     "means": "bear, put up with",
+     "from": "Latin tolerare",
+     "words": [
+      "tolerant",
+      "tolerance"
+     ]
+    },
+    {
+     "part": "relev",
+     "means": "lift up",
+     "from": "Latin relevare",
+     "words": [
+      "relevant",
+      "relevance"
+     ]
+    },
+    {
+     "part": "aver",
+     "means": "damage to cargo",
+     "from": "Arabic awar",
+     "words": [
+      "average"
+     ]
+    },
+    {
+     "part": "bargain",
+     "means": "haggle",
+     "from": "Old French bargaignier",
+     "words": [
+      "bargain"
+     ]
+    },
+    {
+     "part": "bruise",
+     "means": "crush",
+     "from": "Old English brysan",
+     "words": [
+      "bruise"
+     ]
+    },
+    {
+     "part": "categor",
+     "means": "a statement",
+     "from": "Greek kategoria",
+     "words": [
+      "category"
+     ]
+    },
+    {
+     "part": "awk",
+     "means": "turned the wrong way",
+     "from": "Old Norse afugr",
+     "words": [
+      "awkward"
+     ]
+    }
+   ],
+   "sort": {
+    "title": "-ant or -ent?",
+    "bins": [
+     {
+      "key": "a",
+      "label": "a",
+      "note": "-ant, -ance, -ancy"
+     },
+     {
+      "key": "e",
+      "label": "e",
+      "note": "-ent, -ence, -ency"
+     }
+    ],
+    "cards": [
+     {
+      "word": "observant",
+      "show": [
+       "observ",
+       "nt"
+      ],
+      "answer": "a",
+      "full": "observant",
+      "explain": "observation has -ation, so it is -ant."
+     },
+     {
+      "word": "observance",
+      "show": [
+       "observ",
+       "nce"
+      ],
+      "answer": "a",
+      "full": "observance",
+      "explain": "observation has -ation, so it is -ance."
+     },
+     {
+      "word": "expectant",
+      "show": [
+       "expect",
+       "nt"
+      ],
+      "answer": "a",
+      "full": "expectant",
+      "explain": "expectation has -ation, so it is -ant."
+     },
+     {
+      "word": "expectancy",
+      "show": [
+       "expect",
+       "ncy"
+      ],
+      "answer": "a",
+      "full": "expectancy",
+      "explain": "expectation has -ation, so it is -ancy."
+     },
+     {
+      "word": "hesitant",
+      "show": [
+       "hesit",
+       "nt"
+      ],
+      "answer": "a",
+      "full": "hesitant",
+      "explain": "hesitation has -ation, so it is -ant."
+     },
+     {
+      "word": "hesitancy",
+      "show": [
+       "hesit",
+       "ncy"
+      ],
+      "answer": "a",
+      "full": "hesitancy",
+      "explain": "hesitation has -ation, so it is -ancy."
+     },
+     {
+      "word": "tolerant",
+      "show": [
+       "toler",
+       "nt"
+      ],
+      "answer": "a",
+      "full": "tolerant",
+      "explain": "toleration has -ation, so it is -ant."
+     },
+     {
+      "word": "tolerance",
+      "show": [
+       "toler",
+       "nce"
+      ],
+      "answer": "a",
+      "full": "tolerance",
+      "explain": "toleration has -ation, so it is -ance."
+     },
+     {
+      "word": "relevant",
+      "show": [
+       "relev",
+       "nt"
+      ],
+      "answer": "a",
+      "full": "relevant",
+      "explain": "no rule helps with relevant: it just has to be learnt."
+     },
+     {
+      "word": "relevance",
+      "show": [
+       "relev",
+       "nce"
+      ],
+      "answer": "a",
+      "full": "relevance",
+      "explain": "no rule helps with relevance: it just has to be learnt."
+     },
+     {
+      "word": "innocent",
+      "show": [
+       "innoc",
+       "nt"
+      ],
+      "answer": "e",
+      "full": "innocent",
+      "explain": "the c says 's' before the ending, so it is -ent."
+     },
+     {
+      "word": "innocence",
+      "show": [
+       "innoc",
+       "nce"
+      ],
+      "answer": "e",
+      "full": "innocence",
+      "explain": "the c says 's' before the ending, so it is -ence."
+     },
+     {
+      "word": "decent",
+      "show": [
+       "dec",
+       "nt"
+      ],
+      "answer": "e",
+      "full": "decent",
+      "explain": "the c says 's' before the ending, so it is -ent."
+     },
+     {
+      "word": "decency",
+      "show": [
+       "dec",
+       "ncy"
+      ],
+      "answer": "e",
+      "full": "decency",
+      "explain": "the c says 's' before the ending, so it is -ency."
+     },
+     {
+      "word": "excellent",
+      "show": [
+       "excell",
+       "nt"
+      ],
+      "answer": "e",
+      "full": "excellent",
+      "explain": "no rule helps with excellent: it just has to be learnt."
+     },
+     {
+      "word": "excellence",
+      "show": [
+       "excell",
+       "nce"
+      ],
+      "answer": "e",
+      "full": "excellence",
+      "explain": "no rule helps with excellence: it just has to be learnt."
+     },
+     {
+      "word": "confident",
+      "show": [
+       "confid",
+       "nt"
+      ],
+      "answer": "e",
+      "full": "confident",
+      "explain": "you can hear the e in confidential, so it is -ent."
+     },
+     {
+      "word": "confidence",
+      "show": [
+       "confid",
+       "nce"
+      ],
+      "answer": "e",
+      "full": "confidence",
+      "explain": "you can hear the e in confidential, so it is -ence."
+     },
+     {
+      "word": "existent",
+      "show": [
+       "exist",
+       "nt"
+      ],
+      "answer": "e",
+      "full": "existent",
+      "explain": "you can hear the e in existential, so it is -ent."
+     },
+     {
+      "word": "existence",
+      "show": [
+       "exist",
+       "nce"
+      ],
+      "answer": "e",
+      "full": "existence",
+      "explain": "you can hear the e in existential, so it is -ence."
+     }
+    ]
+   }
+  },
+  "week-2026-10-05": {
+   "roots": [
+    {
+     "part": "noc",
+     "means": "harm",
+     "from": "Latin nocere",
+     "words": [
+      "innocent",
+      "innocence"
+     ]
+    },
+    {
+     "part": "dec",
+     "means": "be fitting",
+     "from": "Latin decere",
+     "words": [
+      "decent",
+      "decency"
+     ]
+    },
+    {
+     "part": "cell",
+     "means": "rise above",
+     "from": "Latin excellere",
+     "words": [
+      "excellent",
+      "excellence"
+     ]
+    },
+    {
+     "part": "fid",
+     "means": "trust",
+     "from": "Latin fidere",
+     "words": [
+      "confident",
+      "confidence"
+     ]
+    },
+    {
+     "part": "sist",
+     "means": "stand",
+     "from": "Latin sistere",
+     "words": [
+      "existent",
+      "existence"
+     ]
+    },
+    {
+     "part": "cemeter",
+     "means": "a sleeping place",
+     "from": "Greek koimeterion",
+     "words": [
+      "cemetery"
+     ]
+    },
+    {
+     "part": "mitt",
+     "means": "send",
+     "from": "Latin mittere",
+     "words": [
+      "committee"
+     ]
+    },
+    {
+     "part": "commun",
+     "means": "shared by all",
+     "from": "Latin communis",
+     "words": [
+      "communicate",
+      "community"
+     ]
+    },
+    {
+     "part": "pet",
+     "means": "seek",
+     "from": "Latin petere",
+     "words": [
+      "competition"
+     ]
+    }
+   ],
+   "sort": {
+    "title": "-ent or -ant?",
+    "bins": [
+     {
+      "key": "a",
+      "label": "a",
+      "note": "-ant, -ance, -ancy"
+     },
+     {
+      "key": "e",
+      "label": "e",
+      "note": "-ent, -ence, -ency"
+     }
+    ],
+    "cards": [
+     {
+      "word": "observant",
+      "show": [
+       "observ",
+       "nt"
+      ],
+      "answer": "a",
+      "full": "observant",
+      "explain": "observation has -ation, so it is -ant."
+     },
+     {
+      "word": "observance",
+      "show": [
+       "observ",
+       "nce"
+      ],
+      "answer": "a",
+      "full": "observance",
+      "explain": "observation has -ation, so it is -ance."
+     },
+     {
+      "word": "expectant",
+      "show": [
+       "expect",
+       "nt"
+      ],
+      "answer": "a",
+      "full": "expectant",
+      "explain": "expectation has -ation, so it is -ant."
+     },
+     {
+      "word": "expectancy",
+      "show": [
+       "expect",
+       "ncy"
+      ],
+      "answer": "a",
+      "full": "expectancy",
+      "explain": "expectation has -ation, so it is -ancy."
+     },
+     {
+      "word": "hesitant",
+      "show": [
+       "hesit",
+       "nt"
+      ],
+      "answer": "a",
+      "full": "hesitant",
+      "explain": "hesitation has -ation, so it is -ant."
+     },
+     {
+      "word": "hesitancy",
+      "show": [
+       "hesit",
+       "ncy"
+      ],
+      "answer": "a",
+      "full": "hesitancy",
+      "explain": "hesitation has -ation, so it is -ancy."
+     },
+     {
+      "word": "tolerant",
+      "show": [
+       "toler",
+       "nt"
+      ],
+      "answer": "a",
+      "full": "tolerant",
+      "explain": "toleration has -ation, so it is -ant."
+     },
+     {
+      "word": "tolerance",
+      "show": [
+       "toler",
+       "nce"
+      ],
+      "answer": "a",
+      "full": "tolerance",
+      "explain": "toleration has -ation, so it is -ance."
+     },
+     {
+      "word": "relevant",
+      "show": [
+       "relev",
+       "nt"
+      ],
+      "answer": "a",
+      "full": "relevant",
+      "explain": "no rule helps with relevant: it just has to be learnt."
+     },
+     {
+      "word": "relevance",
+      "show": [
+       "relev",
+       "nce"
+      ],
+      "answer": "a",
+      "full": "relevance",
+      "explain": "no rule helps with relevance: it just has to be learnt."
+     },
+     {
+      "word": "innocent",
+      "show": [
+       "innoc",
+       "nt"
+      ],
+      "answer": "e",
+      "full": "innocent",
+      "explain": "the c says 's' before the ending, so it is -ent."
+     },
+     {
+      "word": "innocence",
+      "show": [
+       "innoc",
+       "nce"
+      ],
+      "answer": "e",
+      "full": "innocence",
+      "explain": "the c says 's' before the ending, so it is -ence."
+     },
+     {
+      "word": "decent",
+      "show": [
+       "dec",
+       "nt"
+      ],
+      "answer": "e",
+      "full": "decent",
+      "explain": "the c says 's' before the ending, so it is -ent."
+     },
+     {
+      "word": "decency",
+      "show": [
+       "dec",
+       "ncy"
+      ],
+      "answer": "e",
+      "full": "decency",
+      "explain": "the c says 's' before the ending, so it is -ency."
+     },
+     {
+      "word": "excellent",
+      "show": [
+       "excell",
+       "nt"
+      ],
+      "answer": "e",
+      "full": "excellent",
+      "explain": "no rule helps with excellent: it just has to be learnt."
+     },
+     {
+      "word": "excellence",
+      "show": [
+       "excell",
+       "nce"
+      ],
+      "answer": "e",
+      "full": "excellence",
+      "explain": "no rule helps with excellence: it just has to be learnt."
+     },
+     {
+      "word": "confident",
+      "show": [
+       "confid",
+       "nt"
+      ],
+      "answer": "e",
+      "full": "confident",
+      "explain": "you can hear the e in confidential, so it is -ent."
+     },
+     {
+      "word": "confidence",
+      "show": [
+       "confid",
+       "nce"
+      ],
+      "answer": "e",
+      "full": "confidence",
+      "explain": "you can hear the e in confidential, so it is -ence."
+     },
+     {
+      "word": "existent",
+      "show": [
+       "exist",
+       "nt"
+      ],
+      "answer": "e",
+      "full": "existent",
+      "explain": "you can hear the e in existential, so it is -ent."
+     },
+     {
+      "word": "existence",
+      "show": [
+       "exist",
+       "nce"
+      ],
+      "answer": "e",
+      "full": "existence",
+      "explain": "you can hear the e in existential, so it is -ence."
+     }
+    ]
+   }
+  },
+  "week-2026-10-12": {
+   "roots": [
+    {
+     "part": "co-",
+     "means": "together, with",
+     "from": "Latin com",
+     "words": [
+      "co-operate",
+      "co-ordinate",
+      "co-own",
+      "co-author"
+     ]
+    },
+    {
+     "part": "re-",
+     "means": "again",
+     "from": "Latin re",
+     "words": [
+      "re-enter",
+      "re-educate",
+      "re-examine",
+      "re-evaluate",
+      "re-energise",
+      "re-elect"
+     ]
+    },
+    {
+     "part": "operate",
+     "means": "work",
+     "from": "Latin operari",
+     "words": [
+      "co-operate"
+     ]
+    },
+    {
+     "part": "ordinate",
+     "means": "put in order",
+     "from": "Latin ordinare",
+     "words": [
+      "co-ordinate"
+     ]
+    },
+    {
+     "part": "author",
+     "means": "a maker, a writer",
+     "from": "Latin auctor",
+     "words": [
+      "co-author"
+     ]
+    },
+    {
+     "part": "enter",
+     "means": "go in",
+     "from": "Latin intrare",
+     "words": [
+      "re-enter"
+     ]
+    },
+    {
+     "part": "educate",
+     "means": "bring up, teach",
+     "from": "Latin educare",
+     "words": [
+      "re-educate"
+     ]
+    },
+    {
+     "part": "examine",
+     "means": "weigh up",
+     "from": "Latin examinare",
+     "words": [
+      "re-examine"
+     ]
+    },
+    {
+     "part": "elect",
+     "means": "pick out, choose",
+     "from": "Latin eligere",
+     "words": [
+      "re-elect"
+     ]
+    },
+    {
+     "part": "energise",
+     "means": "fill with energy",
+     "from": "Greek energeia",
+     "words": [
+      "re-energise"
+     ]
+    },
+    {
+     "part": "sci",
+     "means": "know",
+     "from": "Latin scire",
+     "words": [
+      "conscience",
+      "conscious"
+     ]
+    },
+    {
+     "part": "vers",
+     "means": "turn",
+     "from": "Latin vertere",
+     "words": [
+      "controversy"
+     ]
+    },
+    {
+     "part": "veni",
+     "means": "come",
+     "from": "Latin venire",
+     "words": [
+      "convenience"
+     ]
+    },
+    {
+     "part": "respond",
+     "means": "answer",
+     "from": "Latin respondere",
+     "words": [
+      "correspond"
+     ]
+    }
+   ],
+   "sort": {
+    "title": "Hyphen or not?",
+    "bins": [
+     {
+      "key": "hyphen",
+      "label": "hyphen",
+      "note": "vowel meets vowel"
+     },
+     {
+      "key": "none",
+      "label": "no hyphen",
+      "note": "starts with a consonant"
+     }
+    ],
+    "cards": [
+     {
+      "word": "co-operate",
+      "show": [
+       "co",
+       "operate"
+      ],
+      "answer": "hyphen",
+      "full": "co-operate",
+      "explain": "co ends in a vowel and operate starts with one, so a hyphen keeps them apart."
+     },
+     {
+      "word": "co-ordinate",
+      "show": [
+       "co",
+       "ordinate"
+      ],
+      "answer": "hyphen",
+      "full": "co-ordinate",
+      "explain": "co ends in a vowel and ordinate starts with one, so a hyphen keeps them apart."
+     },
+     {
+      "word": "co-own",
+      "show": [
+       "co",
+       "own"
+      ],
+      "answer": "hyphen",
+      "full": "co-own",
+      "explain": "co ends in a vowel and own starts with one, so a hyphen keeps them apart."
+     },
+     {
+      "word": "co-author",
+      "show": [
+       "co",
+       "author"
+      ],
+      "answer": "hyphen",
+      "full": "co-author",
+      "explain": "co ends in a vowel and author starts with one, so a hyphen keeps them apart."
+     },
+     {
+      "word": "re-enter",
+      "show": [
+       "re",
+       "enter"
+      ],
+      "answer": "hyphen",
+      "full": "re-enter",
+      "explain": "re ends in a vowel and enter starts with one, so a hyphen keeps them apart."
+     },
+     {
+      "word": "re-educate",
+      "show": [
+       "re",
+       "educate"
+      ],
+      "answer": "hyphen",
+      "full": "re-educate",
+      "explain": "re ends in a vowel and educate starts with one, so a hyphen keeps them apart."
+     },
+     {
+      "word": "re-examine",
+      "show": [
+       "re",
+       "examine"
+      ],
+      "answer": "hyphen",
+      "full": "re-examine",
+      "explain": "re ends in a vowel and examine starts with one, so a hyphen keeps them apart."
+     },
+     {
+      "word": "re-evaluate",
+      "show": [
+       "re",
+       "evaluate"
+      ],
+      "answer": "hyphen",
+      "full": "re-evaluate",
+      "explain": "re ends in a vowel and evaluate starts with one, so a hyphen keeps them apart."
+     },
+     {
+      "word": "re-energise",
+      "show": [
+       "re",
+       "energise"
+      ],
+      "answer": "hyphen",
+      "full": "re-energise",
+      "explain": "re ends in a vowel and energise starts with one, so a hyphen keeps them apart."
+     },
+     {
+      "word": "re-elect",
+      "show": [
+       "re",
+       "elect"
+      ],
+      "answer": "hyphen",
+      "full": "re-elect",
+      "explain": "re ends in a vowel and elect starts with one, so a hyphen keeps them apart."
+     },
+     {
+      "word": null,
+      "show": [
+       "re",
+       "turn"
+      ],
+      "answer": "none",
+      "full": "return",
+      "explain": "turn starts with a consonant, so return needs no hyphen."
+     },
+     {
+      "word": null,
+      "show": [
+       "re",
+       "wind"
+      ],
+      "answer": "none",
+      "full": "rewind",
+      "explain": "wind starts with a consonant, so rewind needs no hyphen."
+     },
+     {
+      "word": null,
+      "show": [
+       "re",
+       "build"
+      ],
+      "answer": "none",
+      "full": "rebuild",
+      "explain": "build starts with a consonant, so rebuild needs no hyphen."
+     },
+     {
+      "word": null,
+      "show": [
+       "re",
+       "play"
+      ],
+      "answer": "none",
+      "full": "replay",
+      "explain": "play starts with a consonant, so replay needs no hyphen."
+     },
+     {
+      "word": null,
+      "show": [
+       "re",
+       "cycle"
+      ],
+      "answer": "none",
+      "full": "recycle",
+      "explain": "cycle starts with a consonant, so recycle needs no hyphen."
+     }
+    ]
+   }
+  },
+  "week-2026-10-19": {
+   "roots": [
+    {
+     "part": "pig-headed",
+     "means": "stubborn",
+     "from": "English, in this sense since the 1780s",
+     "words": [
+      "pig-headed"
+     ]
+    },
+    {
+     "part": "tight-fisted",
+     "means": "mean with money",
+     "from": "English",
+     "words": [
+      "tight-fisted"
+     ]
+    },
+    {
+     "part": "cold-hearted",
+     "means": "unkind, unfeeling",
+     "from": "English",
+     "words": [
+      "cold-hearted"
+     ]
+    },
+    {
+     "part": "stone-faced",
+     "means": "showing no feeling",
+     "from": "English",
+     "words": [
+      "stone-faced"
+     ]
+    },
+    {
+     "part": "green-eyed",
+     "means": "jealous",
+     "from": "Shakespeare, Othello",
+     "words": [
+      "green-eyed"
+     ]
+    },
+    {
+     "part": "short-tempered",
+     "means": "quick to get angry",
+     "from": "English",
+     "words": [
+      "short-tempered"
+     ]
+    },
+    {
+     "part": "wide-eyed",
+     "means": "amazed",
+     "from": "English",
+     "words": [
+      "wide-eyed"
+     ]
+    },
+    {
+     "part": "rock-bottom",
+     "means": "the very lowest",
+     "from": "English",
+     "words": [
+      "rock-bottom"
+     ]
+    },
+    {
+     "part": "little-used",
+     "means": "hardly ever used",
+     "from": "English",
+     "words": [
+      "little-used"
+     ]
+    },
+    {
+     "part": "man-eating",
+     "means": "that eats people",
+     "from": "English",
+     "words": [
+      "man-eating"
+     ]
+    },
+    {
+     "part": "crit",
+     "means": "judge",
+     "from": "Greek kritikos",
+     "words": [
+      "criticise"
+     ]
+    },
+    {
+     "part": "cur",
+     "means": "care",
+     "from": "Latin cura",
+     "words": [
+      "curiosity"
+     ]
+    },
+    {
+     "part": "fin",
+     "means": "boundary, end",
+     "from": "Latin finis",
+     "words": [
+      "definite"
+     ]
+    },
+    {
+     "part": "termin",
+     "means": "limit",
+     "from": "Latin terminus",
+     "words": [
+      "determined"
+     ]
+    }
+   ],
+   "sort": {
+    "title": "Hyphen or space?",
+    "bins": [
+     {
+      "key": "hyphen",
+      "label": "hyphen",
+      "note": "one describing word"
+     },
+     {
+      "key": "space",
+      "label": "space",
+      "note": "two separate words"
+     }
+    ],
+    "cards": [
+     {
+      "word": "man-eating",
+      "show": [
+       "a man",
+       "eating shark"
+      ],
+      "answer": "hyphen",
+      "full": "a man-eating shark",
+      "explain": "man and eating describe the shark together."
+     },
+     {
+      "word": null,
+      "show": [
+       "a man",
+       "eating chips"
+      ],
+      "answer": "space",
+      "full": "a man eating chips",
+      "explain": "here a man is eating: two separate words."
+     },
+     {
+      "word": "pig-headed",
+      "show": [
+       "a pig",
+       "headed boy"
+      ],
+      "answer": "hyphen",
+      "full": "a pig-headed boy",
+      "explain": "joined, pig-headed means stubborn."
+     },
+     {
+      "word": null,
+      "show": [
+       "a pig",
+       "headed for the mud"
+      ],
+      "answer": "space",
+      "full": "a pig headed for the mud",
+      "explain": "here the pig is going somewhere."
+     },
+     {
+      "word": "little-used",
+      "show": [
+       "a little",
+       "used path"
+      ],
+      "answer": "hyphen",
+      "full": "a little-used path",
+      "explain": "joined, it means hardly ever used."
+     },
+     {
+      "word": null,
+      "show": [
+       "a little",
+       "used car"
+      ],
+      "answer": "space",
+      "full": "a little used car",
+      "explain": "a small car that someone has used before."
+     },
+     {
+      "word": "wide-eyed",
+      "show": [
+       "a wide",
+       "eyed puppy"
+      ],
+      "answer": "hyphen",
+      "full": "a wide-eyed puppy",
+      "explain": "wide and eyed describe the puppy together."
+     },
+     {
+      "word": "green-eyed",
+      "show": [
+       "a green",
+       "eyed cat"
+      ],
+      "answer": "hyphen",
+      "full": "a green-eyed cat",
+      "explain": "green and eyed describe the cat together."
+     },
+     {
+      "word": "cold-hearted",
+      "show": [
+       "a cold",
+       "hearted giant"
+      ],
+      "answer": "hyphen",
+      "full": "a cold-hearted giant",
+      "explain": "cold and hearted describe the giant together."
+     },
+     {
+      "word": "stone-faced",
+      "show": [
+       "a stone",
+       "faced guard"
+      ],
+      "answer": "hyphen",
+      "full": "a stone-faced guard",
+      "explain": "stone and faced describe the guard together."
+     },
+     {
+      "word": "tight-fisted",
+      "show": [
+       "a tight",
+       "fisted king"
+      ],
+      "answer": "hyphen",
+      "full": "a tight-fisted king",
+      "explain": "tight and fisted describe the king together."
+     },
+     {
+      "word": "short-tempered",
+      "show": [
+       "a short",
+       "tempered chef"
+      ],
+      "answer": "hyphen",
+      "full": "a short-tempered chef",
+      "explain": "short and tempered describe the chef together."
+     },
+     {
+      "word": "rock-bottom",
+      "show": [
+       "rock",
+       "bottom prices"
+      ],
+      "answer": "hyphen",
+      "full": "rock-bottom prices",
+      "explain": "rock and bottom describe the prices together."
+     }
+    ]
+   }
+  }
+ }
+}

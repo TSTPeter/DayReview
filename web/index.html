@@ -28,10 +28,14 @@
 
 <!-- ============================================ home -->
 <section id="screen-home" class="screen on">
-  <h1>Ready when you are</h1>
+  <!-- The welcome. Her name, and what is ready for her today: the scheduler's
+       spacing, said out loud. Never a count of her visits or days: shown to a
+       child that is a streak (docs/11), so it stays in the grown-up view. -->
+  <h1 id="home-hello">Hi there!</h1>
   <p id="home-summary" class="muted"></p>
   <div class="row">
     <button id="btn-practise" class="primary">Practise</button>
+    <button id="btn-games" class="games-btn">Games</button>
     <button id="btn-probe">Take the challenge</button>
   </div>
 
@@ -44,6 +48,7 @@
 
   <div class="sheet kraft torn" id="home-week" hidden>
     <span class="tab coral" id="home-week-tab">This week</span>
+    <p id="home-week-theme" class="week-theme" hidden></p>
     <p id="home-week-words" class="morphemes" style="margin-bottom:.5rem"></p>
     <p id="home-week-state" class="small muted" style="margin:0"></p>
   </div>
@@ -205,6 +210,118 @@
   <button id="paper-submit" class="primary">Save and see the profile</button>
 </section>
 
+<!-- ============================================ games
+     Learning games on this week's words. The one place points exist: they are
+     earned for a right answer at the first go, never for turning up, and they
+     open the bonus round. None of this reaches the practice screens. See
+     docs/15-games.md for what each game rests on, and what it does not. -->
+<section id="screen-games" class="screen">
+  <h1>Games</h1>
+  <p id="games-week" class="muted"></p>
+  <div class="game-grid">
+    <button id="game-jigsaw" class="game-card">
+      <span class="game-icon" aria-hidden="true"></span>
+      <b>Word jigsaw</b>
+      <span class="small muted">Build each word from its parts</span>
+    </button>
+    <button id="game-match" class="game-card">
+      <span class="game-icon" aria-hidden="true"></span>
+      <b>Root match</b>
+      <span class="small muted">Link word parts to what they mean</span>
+    </button>
+    <button id="game-sort" class="game-card">
+      <span class="game-icon" aria-hidden="true"></span>
+      <b>Pattern sort</b>
+      <span class="small muted">Sort the words by their pattern</span>
+    </button>
+  </div>
+  <div class="sheet torn bonus-card" id="games-bonus">
+    <span class="tab plum">Bonus round</span>
+    <p id="games-bonus-state" style="margin:.2rem 0 .6rem"></p>
+    <div class="progress-track"><i id="games-bonus-bar" class="bonus-bar"></i></div>
+    <button id="game-bonus" class="primary" style="margin-top:1rem" disabled>Play the bonus round</button>
+  </div>
+  <p id="games-points" class="points-line"></p>
+  <p id="games-empty" class="note" hidden>The games use the school&rsquo;s list for this
+     week, and there isn&rsquo;t one yet.</p>
+  <button id="games-home" class="link">Back</button>
+</section>
+
+<section id="screen-jigsaw" class="screen">
+  <div class="game-head"><h1>Word jigsaw</h1><span class="points-chip" id="jig-points"></span></div>
+  <p id="jig-count" class="small muted"></p>
+  <div class="sheet kraft clue-sheet">
+    <span class="tab">The clue</span>
+    <p id="jig-clue" class="clue"></p>
+  </div>
+  <div id="jig-board" class="jig-board" aria-label="Your word" aria-live="polite"></div>
+  <div id="jig-tray" class="jig-tray" aria-label="Pieces"></div>
+  <p id="jig-feedback" class="game-feedback" aria-live="polite"></p>
+  <div class="row">
+    <button id="jig-check" class="primary" disabled>Check</button>
+    <button id="jig-clear">Clear</button>
+    <button id="jig-next" class="primary" hidden>Next word</button>
+    <button id="jig-quit" class="link">Back to games</button>
+  </div>
+</section>
+
+<section id="screen-match" class="screen">
+  <div class="game-head"><h1>Root match</h1><span class="points-chip" id="match-points"></span></div>
+  <p class="small muted">Tap a word part, then tap what it means.</p>
+  <div id="match-area" class="match-area">
+    <svg id="match-lines" class="match-lines" aria-hidden="true"></svg>
+    <div id="match-left" class="match-col"></div>
+    <div id="match-right" class="match-col right"></div>
+  </div>
+  <p id="match-feedback" class="game-feedback" aria-live="polite"></p>
+  <div class="row">
+    <button id="match-again" class="primary" hidden>Another round</button>
+    <button id="match-quit" class="link">Back to games</button>
+  </div>
+</section>
+
+<section id="screen-sort" class="screen">
+  <div class="game-head"><h1 id="sort-title">Pattern sort</h1><span class="points-chip" id="sort-points"></span></div>
+  <p id="sort-count" class="small muted"></p>
+  <div id="sort-card" class="sort-card" aria-live="polite"></div>
+  <div id="sort-bins" class="sort-bins"></div>
+  <p id="sort-feedback" class="game-feedback" aria-live="polite"></p>
+  <div id="sort-result" class="sort-result" hidden></div>
+  <div class="row">
+    <button id="sort-again" class="primary" hidden>Another round</button>
+    <button id="sort-quit" class="link">Back to games</button>
+  </div>
+</section>
+
+<section id="screen-bonus" class="screen">
+  <div class="game-head"><h1>Bonus round</h1><span class="points-chip" id="bonus-score"></span></div>
+  <p class="small muted">Pick a square, read the clue, type the word.</p>
+  <div id="bonus-board" class="bonus-board"></div>
+  <div class="sheet" id="bonus-clue" hidden>
+    <span class="tab plum" id="bonus-clue-tab"></span>
+    <p id="bonus-clue-text" class="clue"></p>
+    <p id="bonus-clue-hint" class="small muted"></p>
+    <input id="bonus-input" class="spell" type="text" autocomplete="off"
+           autocapitalize="none" autocorrect="off" spellcheck="false"
+           enterkeyhint="done" aria-label="Type the word">
+    <div class="row" style="margin-top:1rem">
+      <button id="bonus-check" class="primary" disabled>Check</button>
+    </div>
+    <div id="bonus-result" hidden>
+      <p id="bonus-verdict" class="verdict"></p>
+      <div id="bonus-marked" class="marked"></div>
+      <p id="bonus-why" class="muted"></p>
+      <button id="bonus-back" class="primary">Back to the board</button>
+    </div>
+  </div>
+  <div class="sheet torn" id="bonus-end" hidden>
+    <span class="tab teal">Round over</span>
+    <p id="bonus-end-text" style="font-weight:800;font-size:1.3rem"></p>
+    <p id="bonus-end-words" class="muted"></p>
+  </div>
+  <button id="bonus-quit" class="link">Back to games</button>
+</section>
+
 <!-- ============================================ this week's spellings
      For the adult, on a Sunday evening. Paste or type the list the school
      sent home; the app works out which words it already knows properly and
@@ -263,6 +380,7 @@
     <span class="tab coral">This week&rsquo;s list</span>
     <p id="gu-week-summary"></p>
     <div id="gu-week-words" class="siblings"></div>
+    <p id="gu-week-drafts" class="note small" style="margin-top:.8rem" hidden></p>
     <p class="small muted" style="margin-top:.7rem">Words she has not met yet are
        shown plain. This is a coverage check for you, not a score for her.</p>
   </div>
@@ -308,6 +426,28 @@
     <p id="gu-fluency" class="small"></p>
     <p class="small muted">A child hunting for keys is being assessed on typing, not
        spelling. If this is slow, shift the balance towards paper rounds.</p>
+  </div>
+
+  <div class="sheet">
+    <span class="tab teal">Her name</span>
+    <div class="row">
+      <label for="opt-name" class="small">First name</label>
+      <input id="opt-name" type="text" autocomplete="off" autocapitalize="words"
+             spellcheck="false" maxlength="30" class="name-input">
+      <button id="opt-name-save">Save</button>
+    </div>
+    <p class="small muted" id="opt-name-note">The welcome screen greets her by this
+       name. It stays on this iPad: it is never synced, never exported, and not
+       part of her learning record.</p>
+  </div>
+
+  <div class="sheet" id="gu-games">
+    <span class="tab plum">Games</span>
+    <p id="gu-games-summary"></p>
+    <p class="small muted">Points exist only inside the games, for answers right at
+       the first go. They open the bonus round and never reach her practice screens.
+       The question to watch is whether the games take time from dictation practice:
+       compare this with the calendar above.</p>
   </div>
 
   <div class="sheet">

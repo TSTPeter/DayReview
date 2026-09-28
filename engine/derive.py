@@ -126,6 +126,43 @@ def normalise(text):
     return re.sub(r"[^a-z]", "", (text or "").lower())
 
 
+# The hyphen is the one piece of punctuation a spelling can own. Two weeks of
+# this term's school list are about nothing else: co-operate, re-enter,
+# man-eating. normalise() strips it, and has to, because the diff aligner and
+# the sound keys must not care about punctuation. word_form() keeps it, and is
+# what a word is STORED as. For a word with no hyphen the two are identical.
+#
+# U+2010 and U+2011 are real hyphens that arrive from pasted documents. En and
+# em dashes are not: in a pasted list they separate things, so they stay
+# separators.
+HYPHEN_VARIANTS = ("\u2010", "\u2011")
+
+
+def word_form(text):
+    t = (text or "").lower()
+    for h in HYPHEN_VARIANTS:
+        t = t.replace(h, "-")
+    t = re.sub(r"[^a-z-]", "", t)
+    return re.sub(r"-{2,}", "-", t).strip("-")
+
+
+# National Curriculum English Appendix 1, Years 5 and 6: "Hyphens can be used to
+# join a prefix to a root word, especially if the prefix ends in a vowel letter
+# and the root word also begins with one." The prefixes a Year 6 list meets.
+VOWEL_PREFIXES = ("co", "re", "pre", "de", "anti", "semi", "multi", "pro")
+
+# Rule cards for patterns only a school word can carry. Kept out of words.py
+# PATTERNS on purpose: no statutory word has a hyphen, so there they would be
+# unused rules, and the garden assigns its pieces by sorting PATTERNS, so adding
+# keys there would repaint pieces she has already earned.
+SCHOOL_PATTERNS = {
+    "hyphen-prefix": ("When a prefix ends in a vowel and the word after it starts "
+                      "with one, a hyphen keeps them apart: co-operate, re-enter."),
+    "hyphen-compound": ("Two words joined to make one describing word take a hyphen: "
+                        "a man-eating shark is not a man eating a shark."),
+}
+
+
 def _syllable_groups(word):
     """Vowel groups, as a rough stand-in for syllables. Good enough to tell a
     middle vowel from a first or last one, which is all the schwa rule needs."""
@@ -139,6 +176,10 @@ def _syllable_groups(word):
 # statutory list and would have swamped the pattern-strength number in the
 # grown-up view and sent her to the same rule card every time.
 SPECIFICITY = [
+    # When a word owns a hyphen, the hyphen is the lesson: it is what the list
+    # was set to teach, and the one mark the test gives for nothing else.
+    "hyphen-prefix",
+    "hyphen-compound",
     "homophone-trap",      # needs a lexicon; always the point when it applies
     "ough",
     "assimilated-prefix",  # explains WHY the double is there
@@ -179,6 +220,32 @@ def derive(word, limit=MAX_PATTERNS):
 
     if not w:
         return {"patterns": [], "traps": []}
+
+    # --- hyphens ----------------------------------------------------------
+    # The letters either side of the join are the trap: 'coperate' for
+    # 'co-operate' drops a letter exactly there. Everything else is derived
+    # from each part on its own, so no rule fires on letters that only meet
+    # across the join.
+    form = word_form(word)
+    if "-" in form:
+        parts = form.split("-")
+        first, second = parts[0], parts[1]
+        joined = first[-1] + second[0]
+        if first in VOWEL_PREFIXES and second[0] in VOWELS:
+            add("hyphen-prefix", joined)
+        else:
+            add("hyphen-compound", joined)
+        for part in parts:
+            if len(part) >= 3:
+                d = derive(part, limit=99)
+                for p in d["patterns"]:
+                    if p != "unique":
+                        add(p)
+                for t in d["traps"]:
+                    if t not in traps:
+                        traps.append(t)
+        patterns.sort(key=lambda p: RANK.get(p, len(SPECIFICITY)))
+        return {"patterns": patterns[:limit], "traps": traps}
 
     # --- doubling ---------------------------------------------------------
     doubled = [d for d in DOUBLES if d in w]
@@ -305,7 +372,7 @@ def make_entry(word, source="weekly"):
     marks the entry so the dataset can always tell a school word from a
     statutory one, which matters for any later analysis.
     """
-    w = normalise(word)
+    w = word_form(word)
     d = derive(w)
     return {
         "word": w,

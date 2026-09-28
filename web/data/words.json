@@ -24,6 +24,10 @@
   "homophone-trap": "A real word sits next door and sounds the same.",
   "unique": "A one-off. Learn it as itself."
  },
+ "school_patterns": {
+  "hyphen-prefix": "When a prefix ends in a vowel and the word after it starts with one, a hyphen keeps them apart: co-operate, re-enter.",
+  "hyphen-compound": "Two words joined to make one describing word take a hyphen: a man-eating shark is not a man eating a shark."
+ },
  "probe_patterns": [
   "double-consonant",
   "schwa",

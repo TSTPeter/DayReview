@@ -197,6 +197,18 @@ repository for good. Editing one sentence adds about 15 KB. If that ever
 mattered, the route ProductionSite's Duet already took is to move media to Azure
 Blob storage.
 
+## Unreviewed sentences are not rendered
+
+`engine/sentences.py` `UNREVIEWED` lists sentences drafted but not yet read by an adult
+(empty since 28 September, when Peter reviewed the 42 drafted for the autumn
+term's lists). `tools/render_audio.py` skips them: a clip is how a
+sentence reaches her, and `docs/05` decision 2 keeps unreviewed content away from a
+child, and re-rendering after review edits would waste the credits anyway. Those items
+use the device voice until then. To review them by ear in Stephen's voice first, run
+the renderer with `--include-unreviewed`, knowing she will hear them too once deployed.
+When a sentence is approved, delete it from `UNREVIEWED` and render as normal;
+`tests/test_audio.py` then requires its clip.
+
 ## Still open
 
 - **Nobody has listened yet.** Start with `prophecy` and `prophesy`, then the

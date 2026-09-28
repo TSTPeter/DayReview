@@ -154,7 +154,72 @@ SENTENCES = {
     "practise": "You should practise the piano every day.",
     "prophecy": "The old prophecy came true at last.",
     "prophesy": "Nobody can prophesy what will happen next.",
+    # ------------------------------------------------------------------------
+    # The autumn 2026 school lists (engine/term.py). Drafted 28 September 2026
+    # and reviewed by Peter the same day. Written to the same
+    # rules as everything above, plus two of their own:
+    #
+    #   * No related word appears in the sentence. 'observation' would hand over
+    #     the -ant, and 'confidential' the -ent, which is the whole decision.
+    #   * An -ant word and its -ance or -ancy partner get sentences whose grammar
+    #     needs one word class: 'an observant girl', 'strict observance'.
+    #
+    # w/c 7 September
+    "hostile": "The cat gave the new puppy a hostile stare.",
+    "obstinate": "The obstinate donkey refused to move another step.",
+    "frantic": "There was a frantic search for the missing keys.",
+    "calamitous": "The storm had a calamitous effect on the harvest.",
+    "spectacular": "The fireworks made a spectacular display over the river.",
+    # w/c 28 September: -ant, -ance and -ancy ('relevant' is above)
+    "observant": "An observant girl spotted the tiny bird in the hedge.",
+    "observance": "Strict observance of the rules kept the game fair.",
+    "expectant": "The expectant crowd waited for the band to appear.",
+    "expectancy": "There was an air of expectancy as the curtain rose.",
+    "hesitant": "He was hesitant about jumping into the cold water.",
+    "hesitancy": "She answered the question without any hesitancy.",
+    "tolerant": "Our teacher is tolerant of honest mistakes.",
+    "tolerance": "The camel has a great tolerance for heat.",
+    "relevance": "The detective saw the relevance of the muddy footprint.",
+    # w/c 5 October: -ent, -ence and -ency ('excellent' and 'existence' are above)
+    "innocent": "The judge decided that the man was innocent.",
+    "innocence": "The puppy looked up at us with complete innocence.",
+    "decent": "He did the decent thing and gave the wallet back.",
+    "decency": "She had the decency to say sorry.",
+    "excellence": "The school won a prize for excellence in music.",
+    "confident": "She felt confident before her swimming test.",
+    "confidence": "Singing every day gave him the confidence to perform on stage.",
+    "existent": "This is the only existent copy of the old map.",
+    # w/c 12 October: a hyphen after co- and re- before a vowel
+    "co-operate": "The two teams had to co-operate to build the raft.",
+    "co-ordinate": "It is hard to co-ordinate your arms and legs at first.",
+    "co-own": "The two brothers co-own a small fishing boat.",
+    "co-author": "She will co-author the book with her best friend.",
+    "re-enter": "You may re-enter the hall after lunch.",
+    "re-educate": "The coach had to re-educate his players about the new rules.",
+    "re-examine": "The doctor decided to re-examine her sore ankle.",
+    "re-evaluate": "After the storm, we had to re-evaluate our plans.",
+    "re-energise": "A good night's sleep will re-energise you.",
+    "re-elect": "The town voted to re-elect its mayor.",
+    # w/c 19 October: a hyphen joining two words into one describing word
+    "man-eating": "The film was about a man-eating shark.",
+    "little-used": "We took a little-used path through the woods.",
+    "rock-bottom": "The shop sold everything at rock-bottom prices.",
+    "wide-eyed": "The wide-eyed children watched the magician.",
+    "pig-headed": "He was too pig-headed to ask for directions.",
+    "tight-fisted": "The tight-fisted king would not share his gold.",
+    "cold-hearted": "In the story, a cold-hearted giant guarded the bridge.",
+    "stone-faced": "The stone-faced guard did not even blink.",
+    "green-eyed": "The green-eyed cat watched us from the wall.",
+    "short-tempered": "Being tired made him short-tempered.",
 }
+
+# Sentences drafted but not yet read by an adult. tools/render_audio.py will not
+# render one of these, so until it is checked its item uses the device voice.
+# Add a word here with its new sentence; remove it once an adult has read it.
+#
+# Empty since 28 September 2026, when Peter reviewed the 42 drafted for the
+# autumn term's lists.
+UNREVIEWED = set()
 
 # British text-to-speech mispronounces some of these reliably enough to teach the wrong
 # model of the word, which is worse than no audio. docs/05 decision 3 says check all of
@@ -183,6 +248,17 @@ PRONUNCIATION_WATCHLIST = {
     # to this pair before any of the others.
     "prophecy": "PROF-uh-see",
     "prophesy": "PROF-uh-sigh",
+    # Autumn term additions. 'co-own' is the one to hear first: read as one word
+    # it comes out as 'coon', which is a different word and not a kind one.
+    "co-own": "koh-OHN",
+    "co-author": "koh-OR-thor",
+    "co-ordinate": "koh-OR-din-ate",
+    "re-energise": "ree-EN-er-jize",
+    "existent": "ig-ZIST-ent",
+    "obstinate": "OB-stin-ut",
+    "calamitous": "kuh-LAM-ih-tuss",
+    "hesitancy": "HEZ-ih-tun-see",
+    "expectancy": "ek-SPEK-tun-see",
 }
 
 

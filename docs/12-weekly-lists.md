@@ -229,6 +229,39 @@ re-proving the port for a feature that does not need it.
 
   That is honest rather than fixed. The proper fix is a reviewed sentence per
   homophone, and it is the next content job.
-- **One list at a time.** Saving a new list replaces the old one; the words
-  stay in the scheduler and keep their boxes, but the previous list's coverage
-  view is gone. Fine for one child, wrong the moment two lists overlap.
+- **One list at a time.** Saving a new list replaces the old one. The words
+  keep their boxes, and since 28 September they really do stay in the rotation
+  (see below); the previous list's coverage view is still gone.
+
+## 28 September 2026: the whole term, and what it broke
+
+The school sent the term's lists on one sheet, six weeks to 23 October. They are in
+`engine/term.py`, and each Monday's list now switches on by itself, tested that Friday.
+A list the adult saves during the week still wins for that week; an older one gives way
+on Monday (`weekly.choose_week`, held to its JavaScript twin day by day for 75 days).
+
+Loading them exposed three faults, all fixed:
+
+- **Hyphens were deleted.** Two of the six weeks are hyphen rules (*co-operate*,
+  *man-eating*). The parser turned *co-operate* into *cooperate*, and the marker removed
+  the hyphen from her answer too, so leaving it out was marked right. Words now keep
+  their hyphens (`derive.word_form`). A missing, misplaced or spaced hyphen is its own
+  error type, and the vowel lost at the join (*renter* for *re-enter*) is named as that.
+  Two derived rules with their own cards: `hyphen-prefix` and `hyphen-compound`.
+- **Practice crashed once an earlier list's word came due.** The claim above, that the
+  words "stay in the scheduler", was half true: their saved state stayed, but the app
+  only built entries for this week's words, so the session threw on the first old word
+  to come due. With a new list every Monday that would have happened every week. The
+  scheduler now gets an entry for every word it holds state for. The browser suite
+  checks it, and was shown to fail with the fix removed.
+- **The transfer measure counted school words as untaught.** A practised school word
+  was pooled with the deliberately untaught transfer words, which made the gap
+  meaningless once a list was practised. Only the off-list transfer set counts now.
+
+**The reveal card is back for this term's words.** "Words the app has never seen" above
+explains why a derived word hides its origin card: a guessed root is worse than none.
+The 52 term words without a curated entry now have a written-up one in
+`engine/games.py`, so the card shows. See `docs/15` for how they were checked.
+
+**42 new sentences, reviewed by Peter on 28 September.** Until they are rendered in
+Stephen's voice those items use the device voice (`docs/14`).

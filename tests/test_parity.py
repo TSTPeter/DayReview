@@ -30,6 +30,7 @@ sys.path.insert(0, str(ROOT / "engine"))
 
 import probe  # noqa: E402
 from classify import classify  # noqa: E402
+from derive import make_entry  # noqa: E402
 from words import WORDS  # noqa: E402
 
 RUNNER = ROOT / "tests" / "parity_runner.mjs"
@@ -51,7 +52,7 @@ def js_classify(cases):
 def py_classify(cases):
     out = []
     for c in cases:
-        d = classify(c["attempt"], ENTRIES[c["word"]])
+        d = classify(c["attempt"], c.get("entry") or ENTRIES[c["word"]])
         out.append({k: d[k] for k in COMPARED})
     return out
 
@@ -123,6 +124,25 @@ class TestParity(unittest.TestCase):
         cases = mutations()
         self.assertGreater(len(cases), 2000, "mutation set unexpectedly small")
         self.assertParity(cases, "mutation")
+
+    def test_hyphenated_school_words_agree(self):
+        # Two weeks of the autumn list are hyphen rules. Every way a child can
+        # get the hyphen wrong, and the vowel she drops at the join without it.
+        words = ["co-operate", "co-ordinate", "co-own", "co-author", "re-enter",
+                 "re-educate", "re-examine", "re-evaluate", "re-energise", "re-elect",
+                 "man-eating", "little-used", "rock-bottom", "wide-eyed", "pig-headed",
+                 "tight-fisted", "cold-hearted", "stone-faced", "green-eyed",
+                 "short-tempered"]
+        cases = []
+        for w in words:
+            entry = make_entry(w)
+            letters, h = w.replace("-", ""), w.index("-")
+            for attempt in [w, letters, w.replace("-", " "), w.replace("-", " - "),
+                            letters[:h - 1] + letters[h:], letters[:h] + letters[h + 1:],
+                            letters[:2] + "-" + letters[2:], w.upper(), w + "s",
+                            w.replace("-", "\u2011"), w.replace("-", "\u2014"), ""]:
+                cases.append({"word": w, "attempt": attempt, "entry": entry})
+        self.assertParity(cases, "hyphen")
 
     def test_empty_and_junk_input_agrees(self):
         cases = [{"word": "yacht", "attempt": a}

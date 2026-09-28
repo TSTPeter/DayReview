@@ -87,6 +87,8 @@ const HOMOPHONES = new Set([
 ]);
 
 export const SPECIFICITY = [
+  // When a word owns a hyphen, the hyphen is the lesson. See derive.py.
+  "hyphen-prefix", "hyphen-compound",
   "homophone-trap", "ough", "assimilated-prefix", "doubling-1-1-1",
   "greek-marker", "silent-letter", "sh-spelling", "french-ending",
   "suffix-ance-ence", "suffix-ant-ent", "suffix-able-ible", "suffix-ary-ery",
@@ -98,6 +100,28 @@ export const MAX_PATTERNS = 3;
 export function normalise(text) {
   return (text || "").toLowerCase().replace(/[^a-z]/g, "");
 }
+
+// The hyphen is the one piece of punctuation a spelling can own (co-operate,
+// man-eating). normalise() strips it for the aligner; wordForm() keeps it, and
+// is what a word is STORED as. See derive.py word_form().
+export const HYPHEN_VARIANTS = ["\u2010", "\u2011"];
+
+export function wordForm(text) {
+  let t = (text || "").toLowerCase();
+  for (const h of HYPHEN_VARIANTS) t = t.split(h).join("-");
+  t = t.replace(/[^a-z-]/g, "").replace(/-{2,}/g, "-");
+  return t.replace(/^-+|-+$/g, "");
+}
+
+// National Curriculum English Appendix 1, Years 5 and 6. See derive.py.
+export const VOWEL_PREFIXES = ["co", "re", "pre", "de", "anti", "semi", "multi", "pro"];
+
+export const SCHOOL_PATTERNS = {
+  "hyphen-prefix": "When a prefix ends in a vowel and the word after it starts "
+                   + "with one, a hyphen keeps them apart: co-operate, re-enter.",
+  "hyphen-compound": "Two words joined to make one describing word take a hyphen: "
+                     + "a man-eating shark is not a man eating a shark.",
+};
 
 function syllableGroups(word) {
   const out = [];
@@ -117,6 +141,27 @@ export function derive(word, limit = MAX_PATTERNS) {
   };
 
   if (!w) return { patterns: [], traps: [] };
+
+  // Hyphens first: the letters either side of the join are the trap, and every
+  // other rule is derived from each part on its own. See derive.py.
+  const form = wordForm(word);
+  if (form.includes("-")) {
+    const parts = form.split("-");
+    const [first, second] = parts;
+    const joined = first.slice(-1) + second[0];
+    if (VOWEL_PREFIXES.includes(first) && VOWELS.includes(second[0])) add("hyphen-prefix", joined);
+    else add("hyphen-compound", joined);
+    for (const part of parts) {
+      if (part.length < 3) continue;
+      const d = derive(part, 99);
+      for (const p of d.patterns) if (p !== "unique") add(p);
+      for (const t of d.traps) if (!traps.includes(t)) traps.push(t);
+    }
+    patterns.sort((a, b) =>
+      (RANK.has(a) ? RANK.get(a) : SPECIFICITY.length) -
+      (RANK.has(b) ? RANK.get(b) : SPECIFICITY.length));
+    return { patterns: patterns.slice(0, limit), traps };
+  }
 
   for (const d of DOUBLES) if (w.includes(d)) add("double-consonant", d);
 
@@ -176,7 +221,7 @@ export function derive(word, limit = MAX_PATTERNS) {
 
 /** An entry the rest of the engine accepts. Curated fields stay EMPTY. */
 export function makeEntry(word, source = "weekly") {
-  const w = normalise(word);
+  const w = wordForm(word);
   const d = derive(w);
   return {
     word: w,

@@ -66,6 +66,9 @@
 
 * { box-sizing: border-box; -webkit-tap-highlight-color: transparent; }
 
+/* hidden means hidden, even on an element whose class sets display: grid. */
+[hidden] { display: none !important; }
+
 html { -webkit-text-size-adjust: 100%; }
 
 body {
@@ -365,4 +368,144 @@ header.bar .where { font-weight: 800; letter-spacing: -.01em; }
 @media (max-width: 480px) {
   :root { --size: 18px; }
   main { padding: 0 1rem; }
+}
+
+/* ---------------------------------------------------------------- welcome */
+
+#home-hello { font-size: clamp(2rem, 5.5vw, 2.8rem); }
+.week-theme { font-weight: 800; font-size: 1.15rem; margin: 0 0 .5rem; }
+button.games-btn { background: var(--cut-mustard); color: #23201c; }
+.name-input {
+  font: inherit; min-height: 56px; padding: .6rem .9rem; flex: 1 1 12rem;
+  border: 2px solid color-mix(in srgb, var(--ink) 14%, transparent);
+  border-radius: 10px; background: var(--paper-1); color: var(--ink);
+}
+
+/* ---------------------------------------------------------------- games */
+/* The one area of the app with points and motion. Every part of a word has one
+ * colour everywhere, so the pattern is the same picture in every game: prefix
+ * teal, root coral, ending plum, hyphen mustard, a whole joined word sage. */
+
+.k-prefix { --piece: var(--cut-teal);    --piece-ink: #fff; }
+.k-root   { --piece: var(--cut-coral);   --piece-ink: #fff; }
+.k-suffix { --piece: var(--cut-plum);    --piece-ink: #fff; }
+.k-hyphen { --piece: var(--cut-mustard); --piece-ink: #23201c; }
+.k-word   { --piece: var(--cut-sage);    --piece-ink: #23201c; }
+.part { color: var(--piece); font-weight: 800; }
+
+.game-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(13rem, 1fr));
+             gap: 1rem; margin: 1rem 0 1.4rem; }
+.game-card {
+  display: flex; flex-direction: column; align-items: flex-start; gap: .25rem;
+  min-height: 150px; text-align: left; padding: 1.1rem 1.2rem;
+}
+.game-card b { font-size: 1.2rem; }
+.game-card:nth-child(1) { transform: rotate(-.6deg); }
+.game-card:nth-child(3) { transform: rotate(.5deg); }
+.game-icon { width: 52px; height: 40px; background-repeat: no-repeat; background-size: contain; }
+#game-jigsaw .game-icon { background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 52 40'%3E%3Cpath d='M2 4h20v10a4 4 0 1 1 0 8v14H2z' fill='%232f7d72'/%3E%3Cpath d='M24 4h24v32H24V22a4 4 0 1 0 0-8z' fill='%23e2725b'/%3E%3C/svg%3E"); }
+#game-match .game-icon { background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 52 40'%3E%3Crect x='1' y='4' width='14' height='10' rx='3' fill='%232f7d72'/%3E%3Crect x='37' y='26' width='14' height='10' rx='3' fill='%236b4c7a'/%3E%3Cpath d='M15 9C30 9 20 31 37 31' fill='none' stroke='%23e0a32e' stroke-width='3' stroke-linecap='round'/%3E%3C/svg%3E"); }
+#game-sort .game-icon { background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 52 40'%3E%3Cpath d='M2 16h20l-3 22H5z' fill='%236b4c7a'/%3E%3Cpath d='M30 16h20l-3 22H33z' fill='%238fa97f'/%3E%3Crect x='18' y='2' width='16' height='10' rx='3' fill='%23e2725b'/%3E%3C/svg%3E"); }
+
+.bonus-card .progress-track { height: 12px; }
+.bonus-bar { display: block; height: 12px; border-radius: 6px; background: var(--cut-plum);
+             width: 0; transition: width .4s ease; }
+.points-line { font-weight: 800; }
+.game-head { display: flex; align-items: center; justify-content: space-between; gap: 1rem; }
+.game-head h1 { margin: 0; }
+.points-chip { background: var(--cut-mustard); color: #23201c; font-weight: 800;
+               border-radius: 999px; padding: .3rem .9rem; box-shadow: var(--lift-1);
+               white-space: nowrap; }
+.points-chip:empty { display: none; }
+.clue-sheet { margin-top: 1rem; }
+.clue { font-size: 1.3rem; font-weight: 700; margin: 0; }
+.game-feedback { min-height: 2.4em; font-weight: 700; margin: .8rem 0; }
+.game-feedback.right { color: var(--right); }
+.game-feedback.wrong { color: var(--wrong); }
+
+/* The jigsaw. A piece is a button with its cut-paper shape drawn behind the
+ * text: a tab on the right, a notch on the left, so neighbours lock. */
+.jig-board, .jig-tray {
+  display: flex; flex-wrap: wrap; align-items: center; min-height: 92px;
+  padding: .9rem 1rem; border-radius: var(--radius); margin: 0 0 1rem;
+}
+.jig-board { background: var(--paper-1); box-shadow: inset 0 0 0 3px
+             color-mix(in srgb, var(--ink) 12%, transparent); gap: 0; }
+.jig-board:empty::before { content: "Tap the pieces in order"; color: var(--ink-2); }
+.jig-tray { gap: 1.1rem; background: var(--paper-2); }
+.piece {
+  position: relative; isolation: isolate; min-height: 64px;
+  padding: .55rem 1.6rem .55rem 1.25rem; background: none; box-shadow: none;
+  color: var(--piece-ink); font-size: 1.35rem; font-weight: 800; letter-spacing: .04em;
+  filter: drop-shadow(0 3px 3px rgba(35,32,28,.22));
+  touch-action: none;             /* a drag moves the piece, not the page */
+}
+.piece > svg { position: absolute; left: 0; top: 0; z-index: -1; overflow: visible; }
+.piece > svg path { fill: var(--piece); stroke: color-mix(in srgb, #000 18%, var(--piece));
+                    stroke-width: 1.5; }
+.piece:active { transform: translateY(2px); }
+.jig-board .piece + .piece { margin-left: -10px; }
+.piece.dragging { opacity: .35; }
+.piece-ghost { position: fixed; z-index: 50; pointer-events: none; }
+.jig-board.done .piece { filter: drop-shadow(0 4px 6px rgba(47,125,114,.45)); }
+
+/* Root match. Two columns and a layer of drawn lines between them. */
+.match-area { position: relative; display: grid; grid-template-columns: 1fr 1fr;
+              column-gap: clamp(4rem, 14vw, 9rem); row-gap: .8rem; margin: 1rem 0; }
+.match-col { display: flex; flex-direction: column; gap: .8rem; position: relative; z-index: 1; }
+.match-col button { text-align: left; min-height: 64px; padding: .6rem 1rem; }
+.match-col.right button { font-weight: 600; }
+.match-col button.picked { box-shadow: 0 0 0 4px var(--cut-mustard), var(--lift-2); }
+.match-col button.matched { background: color-mix(in srgb, var(--pair) 18%, var(--paper-1));
+                            box-shadow: 0 0 0 3px var(--pair), var(--lift-1); }
+.match-col .from { display: block; font-size: .8rem; font-weight: 600; color: var(--ink-2); }
+.match-lines { position: absolute; inset: 0; width: 100%; height: 100%; overflow: visible;
+               pointer-events: none; z-index: 0; }
+.match-lines path { fill: none; stroke-width: 4; stroke-linecap: round; }
+.match-lines path.miss { stroke: var(--ink-2); stroke-dasharray: 6 8; }
+
+/* Pattern sort. One card at a time; the decision is a gap in the word. */
+.sort-card {
+  background: var(--paper-1); border-radius: var(--radius); box-shadow: var(--lift-3);
+  padding: 1.6rem 1.4rem; margin: 1rem 0 1.4rem; font-size: clamp(1.4rem, 4vw, 1.9rem);
+  font-weight: 800; letter-spacing: .04em; text-align: center; transform: rotate(-.6deg);
+}
+.sort-card.sentence { font-size: 1.25rem; font-weight: 700; letter-spacing: .01em; }
+.sort-card .gap { display: inline-block; min-width: 1.4em; border-bottom: 5px solid var(--cut-mustard);
+                  margin: 0 .08em; }
+.sort-card .gap.filled { min-width: 0; border-bottom: 0; }
+.sort-bins { display: grid; grid-template-columns: 1fr 1fr; gap: 1rem; }
+.sort-bins button { min-height: 110px; display: flex; flex-direction: column; justify-content: center;
+                    gap: .2rem; font-size: 1.6rem; }
+.sort-bins button:nth-child(1) { background: var(--cut-teal); color: #fff; }
+.sort-bins button:nth-child(2) { background: var(--cut-plum); color: #fff; }
+.sort-bins button small { font-size: .85rem; font-weight: 600; opacity: .9; }
+.sort-result { display: grid; grid-template-columns: 1fr 1fr; gap: 1rem; margin: 1rem 0; }
+.sort-result ul { list-style: none; margin: .4rem 0 0; padding: 0; }
+.sort-result li { margin: .2rem 0; font-size: 1.1rem; }
+
+/* The bonus round. A game-show board: categories across, values down. */
+.bonus-board { display: grid; grid-template-columns: repeat(3, 1fr); gap: .7rem; margin: 1rem 0; }
+.bonus-board .cat { background: var(--cut-plum); color: #fff; border-radius: 10px;
+                    padding: .6rem .7rem; font-weight: 800; font-size: .9rem; text-align: center;
+                    display: grid; place-items: center; min-height: 72px; }
+.bonus-board button { min-height: 76px; font-size: 1.6rem; font-weight: 800;
+                      background: var(--paper-2); }
+.bonus-board button.done { font-size: 1rem; font-weight: 700; }
+.bonus-board button.done.right { background: color-mix(in srgb, var(--cut-teal) 20%, var(--paper-1)); }
+.bonus-board button.done.wrong { background: color-mix(in srgb, var(--cut-coral) 16%, var(--paper-1)); }
+
+@media (prefers-reduced-motion: no-preference) {
+  .shake { animation: shake .36s ease; }
+  @keyframes shake { 25% { transform: translateX(-7px); } 50% { transform: translateX(6px); }
+                     75% { transform: translateX(-4px); } }
+  .pop { animation: pop .3s cubic-bezier(.2,.9,.3,1.3); }
+  @keyframes pop { from { transform: scale(.85); } to { transform: scale(1); } }
+  .match-lines path { transition: stroke-dashoffset .6s ease; }
+}
+
+@media (max-width: 600px) {
+  .match-area { column-gap: 3rem; }
+  .bonus-board { gap: .4rem; }
+  .bonus-board .cat { font-size: .75rem; }
 }
