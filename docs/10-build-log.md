@@ -167,3 +167,28 @@ not exist is automatic scheduling of the delayed test sessions themselves. Half 
 **No experiment is running.** Every attempt row carries `arm: null` and
 `method_shown: null`. `docs/04` requires a pre-registration committed to `experiments/`
 before a single row is collected for a comparison, and none has been written.
+
+## 28 September 2026: the term, the welcome page and the games
+
+Built: the autumn term's six lists, loading by date (`docs/12`); hyphenated words end to
+end; a welcome page that greets her by name and says what is ready today; four learning
+games with points and a bonus round (`docs/15`). Two existing faults were found on the
+way and fixed: practice crashed once an earlier list's word came due, and the transfer
+measure counted school words as untaught.
+
+What to distrust, in the order to deal with it:
+
+- **Read `engine/games.py` and the 42 new sentences before she sees them.** All of it was
+  written in this build and none of it has been reviewed. Thirteen origins were checked
+  against a source and one was wrong (corrected); the rest were not checked one by one.
+  The sentences are held back from rendering until marked reviewed, but the games
+  content is not: it ships as soon as this is deployed.
+- **Hear `co-own` first.** Nine words were added to the pronunciation watchlist, and read
+  as one word *co-own* comes out as a different and unkind word.
+- **Nobody has played the games on an iPad.** Tapping is tested in Chromium at both iPad
+  sizes; dragging is written for touch but has only been tried with a mouse.
+- **The points economy is guessed.** 50 points to a bonus round, 5 to 15 an answer.
+  Watch the grown-up view's count of game rounds against dictation sessions: if games
+  crowd out dictation, `docs/11` predicted it, and the games should give way.
+- **After 23 October the term's last list stays live.** The next sheet goes in
+  `engine/term.py`.

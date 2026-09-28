@@ -73,6 +73,7 @@ Treat it as the domain core. The API wraps it; the front end never reimplements 
 | `docs/12-weekly-lists.md` | This week's school list: massed before the test, spaced after it |
 | `docs/13-hosting.md` | Served from TST's Azure Static Web App, and why that is not a DPIA trigger |
 | `docs/14-voice.md` | Pre-rendered dictation in one voice, and the exact-text contract |
+| `docs/15-games.md` | The welcome page and four learning games: what each rests on, and where points live |
 
 ## Working style
 

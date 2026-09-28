@@ -25,8 +25,13 @@ Evidence, briefly (docs/15-games.md has the full account):
 SOURCES. The -ant/-ent and hyphen rules are quoted from the DfE's English
 Appendix 1 (spelling), Years 5 and 6, pages 19 and 20; "man eating shark versus
 man-eating shark" is Appendix 2, Year 6. Origins follow the standard dictionary
-etymologies (checked against etymonline.com); where a history is disputed it is
-left out rather than simplified into something false.
+etymologies. Thirteen were checked against a source on 28 September 2026:
+frantic, obstinate, hesitate, device and devise, calamity, decent, prophecy,
+hostile, innocent, confident, evaluate and tolerate against etymonline.com, and
+green-eyed against the Folger text of Othello (3.3). All matched except the date
+for pig-headed ('stubborn' is from the 1780s; the 1610s sense was literal), now
+corrected. The rest have not been checked one by one. Where a history is
+disputed it is left out rather than simplified into something false.
 
 REVIEW. Like the sentences, these were written offline and are waiting for an
 adult to read them before a child does. docs/05 decision 2.
@@ -439,7 +444,7 @@ ROOTS = {
         ("respond", "answer", "Latin respondere", ["correspond"]),
     ],
     "week-2026-10-19": [
-        ("pig-headed", "stubborn", "English, 1620s", ["pig-headed"]),
+        ("pig-headed", "stubborn", "English, in this sense since the 1780s", ["pig-headed"]),
         ("tight-fisted", "mean with money", "English", ["tight-fisted"]),
         ("cold-hearted", "unkind, unfeeling", "English", ["cold-hearted"]),
         ("stone-faced", "showing no feeling", "English", ["stone-faced"]),
