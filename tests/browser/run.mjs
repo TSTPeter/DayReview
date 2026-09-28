@@ -620,11 +620,14 @@ console.log("\n— pre-rendered clips, on a device with NO speech voice —");
         row1.audio_source === "clip" && row1.prompt_mode === "audio_sentence",
         `${row1.prompt_mode} / ${row1.audio_source}`);
 
-  // Cancel in the middle of the first clip: nothing after it may play.
+  // Cancel in the middle of the first clip: nothing after it may play. Either cancel()
+  // or the word-on-screen guard is enough to pass this; the token alone is isolated below.
+  // Count from before the click. The naming clip is asked for as the screen is drawn,
+  // so a count taken once the screen shows can already include it, and then no word
+  // is found at all. That is a race, and it can go either way.
+  const before = hits.length;
   await w.click("#reveal-next");
   await w.waitForSelector("#screen-attempt.on");
-  const before = hits.length;
-  await w.waitForFunction((n) => window.__n = n, before);
   await w.waitForTimeout(250);          // the naming clip is now playing
   const second = Object.keys(dictation.sentences).find((wd) =>
     hits.slice(before).some((h) => h.path.endsWith(pathOf(namingLine(wd, hintFor(wd))))));
