@@ -282,5 +282,1313 @@
    ],
    "source": "term"
   }
+ ],
+ "entries": [
+  {
+   "word": "hostile",
+   "syll": "",
+   "lang": "Latin",
+   "root": "hostis",
+   "gloss": "an enemy, a stranger",
+   "morph": "host+ile",
+   "why": "From the Latin for an enemy. The ending is -ile, as in fragile.",
+   "family": [
+    "fragile",
+    "futile",
+    "agile"
+   ],
+   "errors": [],
+   "traps": [],
+   "patterns": [
+    "unique"
+   ],
+   "on_list": false,
+   "derived": true,
+   "source": "term",
+   "authored": true
+  },
+  {
+   "word": "obstinate",
+   "syll": "",
+   "lang": "Latin",
+   "root": "obstinare",
+   "gloss": "to stand firm, to persist",
+   "morph": "obstin+ate",
+   "why": "Someone who stands their ground. The ending says 'nut' but is spelt -ate.",
+   "family": [
+    "fortunate",
+    "desperate",
+    "delicate"
+   ],
+   "errors": [],
+   "traps": [],
+   "patterns": [
+    "unique"
+   ],
+   "on_list": false,
+   "derived": true,
+   "source": "term",
+   "authored": true
+  },
+  {
+   "word": "frantic",
+   "syll": "",
+   "lang": "Greek",
+   "root": "phren",
+   "gloss": "the mind",
+   "morph": "frant+ic",
+   "why": "From a Greek word for a mind in a frenzy, as in frenzy itself.",
+   "family": [
+    "hectic",
+    "panic",
+    "fantastic"
+   ],
+   "errors": [],
+   "traps": [],
+   "patterns": [
+    "unique"
+   ],
+   "on_list": false,
+   "derived": true,
+   "source": "term",
+   "authored": true
+  },
+  {
+   "word": "calamitous",
+   "syll": "",
+   "lang": "Latin",
+   "root": "calamitas",
+   "gloss": "damage, a disaster",
+   "morph": "calamit+ous",
+   "why": "Calamity plus -ous: the y changes to i before the ending.",
+   "family": [
+    "disastrous",
+    "glorious",
+    "furious"
+   ],
+   "errors": [],
+   "traps": [],
+   "patterns": [
+    "unique"
+   ],
+   "on_list": false,
+   "derived": true,
+   "source": "term",
+   "authored": true
+  },
+  {
+   "word": "spectacular",
+   "syll": "",
+   "lang": "Latin",
+   "root": "spectare",
+   "gloss": "to watch",
+   "morph": "spectacul+ar",
+   "why": "Something worth watching: spectacle, spectator, inspect.",
+   "family": [
+    "spectator",
+    "inspect",
+    "spectacle"
+   ],
+   "errors": [],
+   "traps": [],
+   "patterns": [
+    "unique"
+   ],
+   "on_list": false,
+   "derived": true,
+   "source": "term",
+   "authored": true
+  },
+  {
+   "word": "advice",
+   "syll": "",
+   "lang": "Latin",
+   "root": "ad + videre",
+   "gloss": "to see",
+   "morph": "ad+vice",
+   "why": "How someone sees it. The noun has a c, like ice.",
+   "family": [
+    "device",
+    "practice",
+    "licence"
+   ],
+   "errors": [],
+   "traps": [
+    "advice"
+   ],
+   "patterns": [
+    "homophone-trap"
+   ],
+   "on_list": false,
+   "derived": true,
+   "source": "term",
+   "authored": true
+  },
+  {
+   "word": "advise",
+   "syll": "",
+   "lang": "Latin",
+   "root": "ad + videre",
+   "gloss": "to see",
+   "morph": "ad+vise",
+   "why": "The verb, so it takes s: I advise you.",
+   "family": [
+    "devise",
+    "practise",
+    "license"
+   ],
+   "errors": [],
+   "traps": [
+    "advise"
+   ],
+   "patterns": [
+    "homophone-trap"
+   ],
+   "on_list": false,
+   "derived": true,
+   "source": "term",
+   "authored": true
+  },
+  {
+   "word": "device",
+   "syll": "",
+   "lang": "Latin",
+   "root": "dividere",
+   "gloss": "to divide",
+   "morph": "de+vice",
+   "why": "Once meant a plan worked out; now a gadget. The noun has a c.",
+   "family": [
+    "advice",
+    "practice",
+    "licence"
+   ],
+   "errors": [],
+   "traps": [
+    "device"
+   ],
+   "patterns": [
+    "homophone-trap"
+   ],
+   "on_list": false,
+   "derived": true,
+   "source": "term",
+   "authored": true
+  },
+  {
+   "word": "devise",
+   "syll": "",
+   "lang": "Latin",
+   "root": "dividere",
+   "gloss": "to divide",
+   "morph": "de+vise",
+   "why": "To work out a plan. The verb takes s.",
+   "family": [
+    "advise",
+    "practise",
+    "license"
+   ],
+   "errors": [],
+   "traps": [
+    "devise"
+   ],
+   "patterns": [
+    "homophone-trap"
+   ],
+   "on_list": false,
+   "derived": true,
+   "source": "term",
+   "authored": true
+  },
+  {
+   "word": "licence",
+   "syll": "",
+   "lang": "Latin",
+   "root": "licere",
+   "gloss": "to be allowed",
+   "morph": "lic+ence",
+   "why": "A permission you can hold. The noun has a c.",
+   "family": [
+    "advice",
+    "device",
+    "practice"
+   ],
+   "errors": [],
+   "traps": [
+    "ence",
+    "licence"
+   ],
+   "patterns": [
+    "homophone-trap",
+    "suffix-ance-ence"
+   ],
+   "on_list": false,
+   "derived": true,
+   "source": "term",
+   "authored": true
+  },
+  {
+   "word": "license",
+   "syll": "",
+   "lang": "Latin",
+   "root": "licere",
+   "gloss": "to be allowed",
+   "morph": "lic+ense",
+   "why": "To give permission. The verb takes s.",
+   "family": [
+    "advise",
+    "devise",
+    "practise"
+   ],
+   "errors": [],
+   "traps": [
+    "license"
+   ],
+   "patterns": [
+    "homophone-trap"
+   ],
+   "on_list": false,
+   "derived": true,
+   "source": "term",
+   "authored": true
+  },
+  {
+   "word": "practice",
+   "syll": "",
+   "lang": "Greek",
+   "root": "prassein",
+   "gloss": "to do",
+   "morph": "pract+ice",
+   "why": "Doing something again and again. The noun has a c.",
+   "family": [
+    "advice",
+    "device",
+    "licence"
+   ],
+   "errors": [],
+   "traps": [
+    "practice"
+   ],
+   "patterns": [
+    "homophone-trap"
+   ],
+   "on_list": false,
+   "derived": true,
+   "source": "term",
+   "authored": true
+  },
+  {
+   "word": "practise",
+   "syll": "",
+   "lang": "Greek",
+   "root": "prassein",
+   "gloss": "to do",
+   "morph": "pract+ise",
+   "why": "The verb, so it takes s: you practise the piano.",
+   "family": [
+    "advise",
+    "devise",
+    "license"
+   ],
+   "errors": [],
+   "traps": [
+    "practise"
+   ],
+   "patterns": [
+    "homophone-trap"
+   ],
+   "on_list": false,
+   "derived": true,
+   "source": "term",
+   "authored": true
+  },
+  {
+   "word": "prophecy",
+   "syll": "",
+   "lang": "Greek",
+   "root": "pro + phanai",
+   "gloss": "to speak before",
+   "morph": "pro+phe+cy",
+   "why": "Spoken before it happens. The noun ends -cy, said 'see'.",
+   "family": [
+    "advice",
+    "device",
+    "practice"
+   ],
+   "errors": [],
+   "traps": [
+    "ph",
+    "prophecy"
+   ],
+   "patterns": [
+    "homophone-trap",
+    "greek-marker"
+   ],
+   "on_list": false,
+   "derived": true,
+   "source": "term",
+   "authored": true
+  },
+  {
+   "word": "prophesy",
+   "syll": "",
+   "lang": "Greek",
+   "root": "pro + phanai",
+   "gloss": "to speak before",
+   "morph": "pro+phe+sy",
+   "why": "The verb ends -sy, said 'sigh'. Say it out loud to hear the difference.",
+   "family": [
+    "advise",
+    "devise",
+    "practise"
+   ],
+   "errors": [],
+   "traps": [
+    "ph",
+    "prophesy"
+   ],
+   "patterns": [
+    "homophone-trap",
+    "greek-marker"
+   ],
+   "on_list": false,
+   "derived": true,
+   "source": "term",
+   "authored": true
+  },
+  {
+   "word": "observant",
+   "syll": "",
+   "lang": "Latin",
+   "root": "observare",
+   "gloss": "to watch over",
+   "morph": "observ+ant",
+   "why": "Observation has -ation, so the ending is -ant.",
+   "family": [
+    "observance",
+    "observation",
+    "observe"
+   ],
+   "errors": [],
+   "traps": [
+    "ant"
+   ],
+   "patterns": [
+    "suffix-ant-ent"
+   ],
+   "on_list": false,
+   "derived": true,
+   "source": "term",
+   "authored": true
+  },
+  {
+   "word": "observance",
+   "syll": "",
+   "lang": "Latin",
+   "root": "observare",
+   "gloss": "to watch over",
+   "morph": "observ+ance",
+   "why": "Observation has -ation, so the ending is -ance.",
+   "family": [
+    "observant",
+    "observation",
+    "observe"
+   ],
+   "errors": [],
+   "traps": [
+    "ance"
+   ],
+   "patterns": [
+    "suffix-ance-ence"
+   ],
+   "on_list": false,
+   "derived": true,
+   "source": "term",
+   "authored": true
+  },
+  {
+   "word": "expectant",
+   "syll": "",
+   "lang": "Latin",
+   "root": "ex + spectare",
+   "gloss": "to look out for",
+   "morph": "expect+ant",
+   "why": "Expectation has -ation, so the ending is -ant.",
+   "family": [
+    "expectancy",
+    "expectation",
+    "expect"
+   ],
+   "errors": [],
+   "traps": [
+    "ant"
+   ],
+   "patterns": [
+    "suffix-ant-ent"
+   ],
+   "on_list": false,
+   "derived": true,
+   "source": "term",
+   "authored": true
+  },
+  {
+   "word": "expectancy",
+   "syll": "",
+   "lang": "Latin",
+   "root": "ex + spectare",
+   "gloss": "to look out for",
+   "morph": "expect+ancy",
+   "why": "Expectation has -ation, so the ending is -ancy.",
+   "family": [
+    "expectant",
+    "expectation",
+    "expect"
+   ],
+   "errors": [],
+   "traps": [
+    "ancy"
+   ],
+   "patterns": [
+    "suffix-ance-ence"
+   ],
+   "on_list": false,
+   "derived": true,
+   "source": "term",
+   "authored": true
+  },
+  {
+   "word": "hesitant",
+   "syll": "",
+   "lang": "Latin",
+   "root": "haesitare",
+   "gloss": "to stick, to hold back",
+   "morph": "hesit+ant",
+   "why": "Hesitation has -ation, so the ending is -ant.",
+   "family": [
+    "hesitancy",
+    "hesitation",
+    "hesitate"
+   ],
+   "errors": [],
+   "traps": [
+    "ant"
+   ],
+   "patterns": [
+    "suffix-ant-ent"
+   ],
+   "on_list": false,
+   "derived": true,
+   "source": "term",
+   "authored": true
+  },
+  {
+   "word": "hesitancy",
+   "syll": "",
+   "lang": "Latin",
+   "root": "haesitare",
+   "gloss": "to stick, to hold back",
+   "morph": "hesit+ancy",
+   "why": "Hesitation has -ation, so the ending is -ancy.",
+   "family": [
+    "hesitant",
+    "hesitation",
+    "hesitate"
+   ],
+   "errors": [],
+   "traps": [
+    "ancy"
+   ],
+   "patterns": [
+    "suffix-ance-ence"
+   ],
+   "on_list": false,
+   "derived": true,
+   "source": "term",
+   "authored": true
+  },
+  {
+   "word": "tolerant",
+   "syll": "",
+   "lang": "Latin",
+   "root": "tolerare",
+   "gloss": "to bear, to put up with",
+   "morph": "toler+ant",
+   "why": "Toleration has -ation, so the ending is -ant.",
+   "family": [
+    "tolerance",
+    "toleration",
+    "tolerate"
+   ],
+   "errors": [],
+   "traps": [
+    "ant"
+   ],
+   "patterns": [
+    "suffix-ant-ent"
+   ],
+   "on_list": false,
+   "derived": true,
+   "source": "term",
+   "authored": true
+  },
+  {
+   "word": "tolerance",
+   "syll": "",
+   "lang": "Latin",
+   "root": "tolerare",
+   "gloss": "to bear, to put up with",
+   "morph": "toler+ance",
+   "why": "Toleration has -ation, so the ending is -ance.",
+   "family": [
+    "tolerant",
+    "toleration",
+    "tolerate"
+   ],
+   "errors": [],
+   "traps": [
+    "ance"
+   ],
+   "patterns": [
+    "suffix-ance-ence"
+   ],
+   "on_list": false,
+   "derived": true,
+   "source": "term",
+   "authored": true
+  },
+  {
+   "word": "relevance",
+   "syll": "",
+   "lang": "Latin",
+   "root": "re + levare",
+   "gloss": "to lift up",
+   "morph": "relev+ance",
+   "why": "No related word gives the a away: relevance just has to be learnt.",
+   "family": [
+    "relevant",
+    "irrelevant"
+   ],
+   "errors": [],
+   "traps": [
+    "ance"
+   ],
+   "patterns": [
+    "suffix-ance-ence"
+   ],
+   "on_list": false,
+   "derived": true,
+   "source": "term",
+   "authored": true
+  },
+  {
+   "word": "innocent",
+   "syll": "",
+   "lang": "Latin",
+   "root": "in + nocere",
+   "gloss": "not harming",
+   "morph": "in+noc+ent",
+   "why": "The c says 's' before the ending, so it is -ent.",
+   "family": [
+    "innocence",
+    "decent",
+    "magnificent"
+   ],
+   "errors": [],
+   "traps": [
+    "nn",
+    "ent"
+   ],
+   "patterns": [
+    "suffix-ant-ent",
+    "double-consonant"
+   ],
+   "on_list": false,
+   "derived": true,
+   "source": "term",
+   "authored": true
+  },
+  {
+   "word": "innocence",
+   "syll": "",
+   "lang": "Latin",
+   "root": "in + nocere",
+   "gloss": "not harming",
+   "morph": "in+noc+ence",
+   "why": "The c says 's' before the ending, so it is -ence.",
+   "family": [
+    "innocent",
+    "decency",
+    "magnificence"
+   ],
+   "errors": [],
+   "traps": [
+    "nn",
+    "ence"
+   ],
+   "patterns": [
+    "suffix-ance-ence",
+    "double-consonant"
+   ],
+   "on_list": false,
+   "derived": true,
+   "source": "term",
+   "authored": true
+  },
+  {
+   "word": "decent",
+   "syll": "",
+   "lang": "Latin",
+   "root": "decere",
+   "gloss": "to be fitting",
+   "morph": "dec+ent",
+   "why": "The c says 's' before the ending, so it is -ent.",
+   "family": [
+    "decency",
+    "innocent",
+    "recent"
+   ],
+   "errors": [],
+   "traps": [
+    "ent"
+   ],
+   "patterns": [
+    "suffix-ant-ent"
+   ],
+   "on_list": false,
+   "derived": true,
+   "source": "term",
+   "authored": true
+  },
+  {
+   "word": "decency",
+   "syll": "",
+   "lang": "Latin",
+   "root": "decere",
+   "gloss": "to be fitting",
+   "morph": "dec+ency",
+   "why": "The c says 's' before the ending, so it is -ency.",
+   "family": [
+    "decent",
+    "innocence",
+    "urgency"
+   ],
+   "errors": [],
+   "traps": [
+    "ency"
+   ],
+   "patterns": [
+    "suffix-ance-ence"
+   ],
+   "on_list": false,
+   "derived": true,
+   "source": "term",
+   "authored": true
+  },
+  {
+   "word": "excellence",
+   "syll": "",
+   "lang": "Latin",
+   "root": "ex + cellere",
+   "gloss": "to rise above",
+   "morph": "ex+cell+ence",
+   "why": "No rule gives the e away: excellence just has to be learnt. Think excel.",
+   "family": [
+    "excellent",
+    "excel"
+   ],
+   "errors": [],
+   "traps": [
+    "ll",
+    "ence"
+   ],
+   "patterns": [
+    "suffix-ance-ence",
+    "double-consonant"
+   ],
+   "on_list": false,
+   "derived": true,
+   "source": "term",
+   "authored": true
+  },
+  {
+   "word": "confident",
+   "syll": "",
+   "lang": "Latin",
+   "root": "con + fidere",
+   "gloss": "to trust fully",
+   "morph": "con+fid+ent",
+   "why": "You can hear the e in confidential, so the ending is -ent.",
+   "family": [
+    "confidence",
+    "confidential",
+    "confide"
+   ],
+   "errors": [],
+   "traps": [
+    "ent"
+   ],
+   "patterns": [
+    "suffix-ant-ent"
+   ],
+   "on_list": false,
+   "derived": true,
+   "source": "term",
+   "authored": true
+  },
+  {
+   "word": "confidence",
+   "syll": "",
+   "lang": "Latin",
+   "root": "con + fidere",
+   "gloss": "to trust fully",
+   "morph": "con+fid+ence",
+   "why": "You can hear the e in confidential, so the ending is -ence.",
+   "family": [
+    "confident",
+    "confidential",
+    "confide"
+   ],
+   "errors": [],
+   "traps": [
+    "ence"
+   ],
+   "patterns": [
+    "suffix-ance-ence"
+   ],
+   "on_list": false,
+   "derived": true,
+   "source": "term",
+   "authored": true
+  },
+  {
+   "word": "existent",
+   "syll": "",
+   "lang": "Latin",
+   "root": "ex + sistere",
+   "gloss": "to stand out",
+   "morph": "ex+ist+ent",
+   "why": "You can hear the e in existential, so the ending is -ent.",
+   "family": [
+    "existence",
+    "exist",
+    "non-existent"
+   ],
+   "errors": [],
+   "traps": [
+    "ent",
+    "ste"
+   ],
+   "patterns": [
+    "silent-letter",
+    "suffix-ant-ent"
+   ],
+   "on_list": false,
+   "derived": true,
+   "source": "term",
+   "authored": true
+  },
+  {
+   "word": "co-operate",
+   "syll": "",
+   "lang": "Latin",
+   "root": "co + operari",
+   "gloss": "to work together",
+   "morph": "co+operate",
+   "why": "co ends in o and operate starts with o: the hyphen keeps them apart.",
+   "family": [
+    "co-ordinate",
+    "co-own",
+    "co-author"
+   ],
+   "errors": [],
+   "traps": [
+    "oo"
+   ],
+   "patterns": [
+    "hyphen-prefix"
+   ],
+   "on_list": false,
+   "derived": true,
+   "source": "term",
+   "authored": true
+  },
+  {
+   "word": "co-ordinate",
+   "syll": "",
+   "lang": "Latin",
+   "root": "co + ordinare",
+   "gloss": "to put in order together",
+   "morph": "co+ordinate",
+   "why": "co ends in o and ordinate starts with o, so a hyphen goes between.",
+   "family": [
+    "co-operate",
+    "co-own",
+    "co-author"
+   ],
+   "errors": [],
+   "traps": [
+    "oo"
+   ],
+   "patterns": [
+    "hyphen-prefix"
+   ],
+   "on_list": false,
+   "derived": true,
+   "source": "term",
+   "authored": true
+  },
+  {
+   "word": "co-own",
+   "syll": "",
+   "lang": "English",
+   "root": "co + own",
+   "gloss": "to have together",
+   "morph": "co+own",
+   "why": "Without the hyphen it would look like coown. The hyphen keeps co and own apart.",
+   "family": [
+    "co-operate",
+    "co-ordinate",
+    "co-author"
+   ],
+   "errors": [],
+   "traps": [
+    "oo"
+   ],
+   "patterns": [
+    "hyphen-prefix"
+   ],
+   "on_list": false,
+   "derived": true,
+   "source": "term",
+   "authored": true
+  },
+  {
+   "word": "co-author",
+   "syll": "",
+   "lang": "Latin",
+   "root": "co + auctor",
+   "gloss": "a maker, together",
+   "morph": "co+author",
+   "why": "co ends in a vowel and author starts with one, so a hyphen joins them.",
+   "family": [
+    "co-operate",
+    "co-ordinate",
+    "co-own"
+   ],
+   "errors": [],
+   "traps": [
+    "oa"
+   ],
+   "patterns": [
+    "hyphen-prefix"
+   ],
+   "on_list": false,
+   "derived": true,
+   "source": "term",
+   "authored": true
+  },
+  {
+   "word": "re-enter",
+   "syll": "",
+   "lang": "Latin",
+   "root": "re + intrare",
+   "gloss": "to go in again",
+   "morph": "re+enter",
+   "why": "re ends in e and enter starts with e: the hyphen keeps both.",
+   "family": [
+    "re-examine",
+    "re-educate",
+    "re-elect"
+   ],
+   "errors": [],
+   "traps": [
+    "ee"
+   ],
+   "patterns": [
+    "hyphen-prefix"
+   ],
+   "on_list": false,
+   "derived": true,
+   "source": "term",
+   "authored": true
+  },
+  {
+   "word": "re-educate",
+   "syll": "",
+   "lang": "Latin",
+   "root": "re + educare",
+   "gloss": "to bring up again",
+   "morph": "re+educate",
+   "why": "re ends in e and educate starts with e, so a hyphen goes between.",
+   "family": [
+    "re-enter",
+    "re-examine",
+    "re-evaluate"
+   ],
+   "errors": [],
+   "traps": [
+    "ee"
+   ],
+   "patterns": [
+    "hyphen-prefix"
+   ],
+   "on_list": false,
+   "derived": true,
+   "source": "term",
+   "authored": true
+  },
+  {
+   "word": "re-examine",
+   "syll": "",
+   "lang": "Latin",
+   "root": "re + examinare",
+   "gloss": "to weigh up again",
+   "morph": "re+examine",
+   "why": "re ends in e and examine starts with e: the hyphen keeps both.",
+   "family": [
+    "re-enter",
+    "re-educate",
+    "re-evaluate"
+   ],
+   "errors": [],
+   "traps": [
+    "ee"
+   ],
+   "patterns": [
+    "hyphen-prefix"
+   ],
+   "on_list": false,
+   "derived": true,
+   "source": "term",
+   "authored": true
+  },
+  {
+   "word": "re-evaluate",
+   "syll": "",
+   "lang": "French",
+   "root": "re + evaluer",
+   "gloss": "to judge the worth again",
+   "morph": "re+evaluate",
+   "why": "re ends in e and evaluate starts with e, so a hyphen goes between.",
+   "family": [
+    "re-examine",
+    "re-energise",
+    "re-elect"
+   ],
+   "errors": [],
+   "traps": [
+    "ee"
+   ],
+   "patterns": [
+    "hyphen-prefix"
+   ],
+   "on_list": false,
+   "derived": true,
+   "source": "term",
+   "authored": true
+  },
+  {
+   "word": "re-energise",
+   "syll": "",
+   "lang": "Greek",
+   "root": "re + energeia",
+   "gloss": "activity, once more",
+   "morph": "re+energise",
+   "why": "re ends in e and energise starts with e: the hyphen keeps both.",
+   "family": [
+    "re-enter",
+    "re-elect",
+    "re-evaluate"
+   ],
+   "errors": [],
+   "traps": [
+    "ee"
+   ],
+   "patterns": [
+    "hyphen-prefix"
+   ],
+   "on_list": false,
+   "derived": true,
+   "source": "term",
+   "authored": true
+  },
+  {
+   "word": "re-elect",
+   "syll": "",
+   "lang": "Latin",
+   "root": "re + eligere",
+   "gloss": "to pick out again",
+   "morph": "re+elect",
+   "why": "re ends in e and elect starts with e, so a hyphen goes between.",
+   "family": [
+    "re-enter",
+    "re-educate",
+    "re-energise"
+   ],
+   "errors": [],
+   "traps": [
+    "ee"
+   ],
+   "patterns": [
+    "hyphen-prefix"
+   ],
+   "on_list": false,
+   "derived": true,
+   "source": "term",
+   "authored": true
+  },
+  {
+   "word": "man-eating",
+   "syll": "",
+   "lang": "English",
+   "root": "man + eating",
+   "gloss": "that eats people",
+   "morph": "man+eating",
+   "why": "Man and eating team up to describe the shark, so they are joined.",
+   "family": [
+    "little-used",
+    "rock-bottom",
+    "wide-eyed"
+   ],
+   "errors": [],
+   "traps": [
+    "ne"
+   ],
+   "patterns": [
+    "hyphen-compound"
+   ],
+   "on_list": false,
+   "derived": true,
+   "source": "term",
+   "authored": true
+  },
+  {
+   "word": "little-used",
+   "syll": "",
+   "lang": "English",
+   "root": "little + used",
+   "gloss": "hardly ever used",
+   "morph": "little+used",
+   "why": "Joined, it means hardly used. A little used car is a small second-hand one.",
+   "family": [
+    "man-eating",
+    "rock-bottom",
+    "wide-eyed"
+   ],
+   "errors": [],
+   "traps": [
+    "eu",
+    "tt"
+   ],
+   "patterns": [
+    "hyphen-compound",
+    "double-consonant"
+   ],
+   "on_list": false,
+   "derived": true,
+   "source": "term",
+   "authored": true
+  },
+  {
+   "word": "rock-bottom",
+   "syll": "",
+   "lang": "English",
+   "root": "rock + bottom",
+   "gloss": "the very lowest",
+   "morph": "rock+bottom",
+   "why": "Two words working as one describing word before 'prices'.",
+   "family": [
+    "man-eating",
+    "little-used",
+    "wide-eyed"
+   ],
+   "errors": [],
+   "traps": [
+    "kb",
+    "tt"
+   ],
+   "patterns": [
+    "hyphen-compound",
+    "double-consonant"
+   ],
+   "on_list": false,
+   "derived": true,
+   "source": "term",
+   "authored": true
+  },
+  {
+   "word": "wide-eyed",
+   "syll": "",
+   "lang": "English",
+   "root": "wide + eyed",
+   "gloss": "with eyes wide open",
+   "morph": "wide+eyed",
+   "why": "One of a family: wide-eyed, green-eyed, pig-headed, cold-hearted.",
+   "family": [
+    "green-eyed",
+    "pig-headed",
+    "cold-hearted"
+   ],
+   "errors": [],
+   "traps": [
+    "ee"
+   ],
+   "patterns": [
+    "hyphen-compound"
+   ],
+   "on_list": false,
+   "derived": true,
+   "source": "term",
+   "authored": true
+  },
+  {
+   "word": "pig-headed",
+   "syll": "",
+   "lang": "English",
+   "root": "pig + headed",
+   "gloss": "stubborn",
+   "morph": "pig+headed",
+   "why": "Joined, it means stubborn. 'A pig headed for the mud' is a pig going somewhere.",
+   "family": [
+    "wide-eyed",
+    "cold-hearted",
+    "stone-faced"
+   ],
+   "errors": [],
+   "traps": [
+    "gh"
+   ],
+   "patterns": [
+    "hyphen-compound"
+   ],
+   "on_list": false,
+   "derived": true,
+   "source": "term",
+   "authored": true
+  },
+  {
+   "word": "tight-fisted",
+   "syll": "",
+   "lang": "English",
+   "root": "tight + fisted",
+   "gloss": "mean with money",
+   "morph": "tight+fisted",
+   "why": "A hand clenched round its money: two words making one describing word.",
+   "family": [
+    "cold-hearted",
+    "stone-faced",
+    "short-tempered"
+   ],
+   "errors": [],
+   "traps": [
+    "tf"
+   ],
+   "patterns": [
+    "hyphen-compound"
+   ],
+   "on_list": false,
+   "derived": true,
+   "source": "term",
+   "authored": true
+  },
+  {
+   "word": "cold-hearted",
+   "syll": "",
+   "lang": "English",
+   "root": "cold + hearted",
+   "gloss": "unkind, unfeeling",
+   "morph": "cold+hearted",
+   "why": "Cold and hearted team up to describe a person, so they are joined.",
+   "family": [
+    "wide-eyed",
+    "pig-headed",
+    "tight-fisted"
+   ],
+   "errors": [],
+   "traps": [
+    "dh"
+   ],
+   "patterns": [
+    "hyphen-compound"
+   ],
+   "on_list": false,
+   "derived": true,
+   "source": "term",
+   "authored": true
+  },
+  {
+   "word": "stone-faced",
+   "syll": "",
+   "lang": "English",
+   "root": "stone + faced",
+   "gloss": "showing no feeling",
+   "morph": "stone+faced",
+   "why": "A face as still as stone. Joined, because together they describe the guard.",
+   "family": [
+    "cold-hearted",
+    "pig-headed",
+    "wide-eyed"
+   ],
+   "errors": [],
+   "traps": [
+    "ef"
+   ],
+   "patterns": [
+    "hyphen-compound"
+   ],
+   "on_list": false,
+   "derived": true,
+   "source": "term",
+   "authored": true
+  },
+  {
+   "word": "green-eyed",
+   "syll": "",
+   "lang": "English",
+   "root": "green + eyed",
+   "gloss": "jealous",
+   "morph": "green+eyed",
+   "why": "Shakespeare called jealousy 'the green-eyed monster' in Othello.",
+   "family": [
+    "wide-eyed",
+    "pig-headed",
+    "cold-hearted"
+   ],
+   "errors": [],
+   "traps": [
+    "ne"
+   ],
+   "patterns": [
+    "hyphen-compound"
+   ],
+   "on_list": false,
+   "derived": true,
+   "source": "term",
+   "authored": true
+  },
+  {
+   "word": "short-tempered",
+   "syll": "",
+   "lang": "English",
+   "root": "short + tempered",
+   "gloss": "quick to get angry",
+   "morph": "short+tempered",
+   "why": "A temper with a short fuse. Two words joined into one describing word.",
+   "family": [
+    "tight-fisted",
+    "cold-hearted",
+    "stone-faced"
+   ],
+   "errors": [],
+   "traps": [
+    "tt"
+   ],
+   "patterns": [
+    "hyphen-compound"
+   ],
+   "on_list": false,
+   "derived": true,
+   "source": "term",
+   "authored": true
+  }
  ]
 }

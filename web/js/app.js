@@ -49,6 +49,7 @@ const STRATEGY_OPTIONS = [
 const app = {
   data: null, byWord: new Map(), sentences: {},
   curated: new Map(),        // statutory and off-list entries, as shipped
+  authored: new Map(),       // the term's school words, written up by hand
   term: [],                  // the school's lists for the term (engine/term.py)
   scheduler: null, session: null, queue: [], index: 0,
   marks: [], strategy: [], keys: new Keystrokes(),
@@ -80,6 +81,8 @@ async function boot() {
   app.sentences = sentences.sentences || {};
   app.term = term.weeks || [];
   for (const w of [...words.words, ...words.off_list]) app.curated.set(w.word, w);
+  // The term's school words, written up by hand: origin, parts, why, family.
+  app.authored = new Map((term.entries || []).map((e) => [e.word, e]));
   app.byWord = new Map(app.curated);
   assignArt(Object.keys(words.patterns));   // one distinct piece per rule
 
@@ -141,7 +144,9 @@ async function rebuildScheduler() {
   // second save in one sitting cannot drop words either.
   const wanted = [...new Set([...(app.week ? app.week.words : []),
                               ...Object.keys(state || {})])];
-  const extra = weekly.entriesFor(wanted, app.curated).filter((e) => !app.curated.has(e.word));
+  // A term word gets its authored entry; any other school word is derived.
+  const lookup = new Map([...app.curated, ...app.authored]);
+  const extra = weekly.entriesFor(wanted, lookup).filter((e) => !app.curated.has(e.word));
   app.byWord = new Map(app.curated);
   for (const e of extra) app.byWord.set(e.word, e);
   app.scheduler = new Scheduler([...app.data.words, ...extra], today(), state, patterns);
@@ -284,7 +289,8 @@ function paintParsed() {
   if (!words.length) { $("#week-parsed").textContent = ""; return; }
   // Say plainly which words the app knows properly and which it is reading
   // from the letters alone, so the thinner reveal is never a surprise.
-  const curated = words.filter((w) => app.byWord.has(w) && !app.byWord.get(w).derived);
+  const curated = words.filter((w) => app.authored.has(w)
+    || (app.byWord.has(w) && !app.byWord.get(w).derived));
   const parts = [`${words.length} word${words.length === 1 ? "" : "s"}`];
   // Show the tags back. If the school wrote '(N)' and the app did not read it,
   // that has to be visible here rather than discovered mid-dictation.
@@ -542,8 +548,9 @@ function showReveal(entry, d) {
   // A school word we only know from its letters has no origin, no morphemes
   // and no word family. Hiding that card is the honest answer: a guessed root
   // told to a child is worse than a missing one. She still gets the marking,
-  // the named error and the rule. See docs/12.
-  $("#reveal-about").hidden = !!entry.derived;
+  // the named error and the rule. See docs/12. The term's words are written up
+  // by hand (engine/games.py), so they show it.
+  $("#reveal-about").hidden = !entry.root;
 
   $("#reveal-morph").innerHTML = "";
   entry.morph.split("+").forEach((m, i, arr) => {

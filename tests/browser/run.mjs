@@ -806,11 +806,15 @@ console.log("\n— the school term —");
     test_on: iso(plus(setOn, 4)), done: false, theme, source: "term" });
   const lastWeek = week(plus(monday, -7), ["tomorrow", "business", "wednesday"], "Last week");
   const thisWeek = week(monday, ["co-operate", "re-enter", "man-eating"], "Hyphens");
+  // The real hand-written entries, so the reveal can be checked against them.
+  const shipped = await (await fetch(new URL("data/term.json", BASE))).json();
+  const entries = shipped.entries.filter((e) => thisWeek.words.includes(e.word));
   const termCtx = async (kv = {}) => {
     const c = await browser.newContext({ viewport: { width: 820, height: 1180 } });
     await noClips(c);
     await c.route("**/data/term.json", (r) => r.fulfill({
-      contentType: "application/json", body: JSON.stringify({ weeks: [lastWeek, thisWeek] }) }));
+      contentType: "application/json",
+      body: JSON.stringify({ weeks: [lastWeek, thisWeek], entries }) }));
     const w = await c.newPage();
     const errs = [];
     w.on("pageerror", (e) => errs.push(e.message));
@@ -887,6 +891,12 @@ console.log("\n— the school term —");
           `${missing.verdict} | ${missing.target}`);
     check("the marked answer shows where the hyphen goes", missing.marked === "co-operate",
           missing.marked);
+    const about = await w.locator("#reveal-about").isVisible();
+    const morph = await w.textContent("#reveal-morph");
+    const origin = await w.textContent("#reveal-origin");
+    check("a term word shows how it is built, from its written-up entry",
+          about && morph.includes("co") && morph.includes("operate") && /Latin/.test(origin),
+          `${morph} | ${origin}`);
     await c.close();
     // A fresh device, so the first word is co-operate again.
     const again = await termCtx();
