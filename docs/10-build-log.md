@@ -191,3 +191,28 @@ What to distrust, in the order to deal with it:
   crowd out dictation, `docs/11` predicted it, and the games should give way.
 - **After 23 October the term's last list stays live.** The next sheet goes in
   `engine/term.py`.
+
+## 30 September 2026: hangman and hidden words
+
+Built: two more games, hangman with a paper flower that loses a petal for each wrong
+letter, and a block of hidden words traced letter by letter (`docs/15`, section of this
+date). Both have a hint, and a hint halves the word's points. The blocks come from a
+new generator, `engine/wordblocks.py`, and ship in `web/data/games.json`: 36 blocks,
+about 29 KB. The export now writes lists of numbers on one line, which kept the file
+from doubling.
+
+What to distrust:
+
+- **Nobody has played either on an iPad.** Tapping and the keyboard are tested in
+  Chromium at both iPad sizes; sliding a finger through the letters has only been
+  tried with a mouse.
+- **The blocks may be too hard.** Bending paths were Peter's choice over straight
+  lines, and whether a ten-year-old finishes them without hints is unknown. The grown-up
+  view's game log records which words were hinted.
+- **A route that would strand the other words is accepted and moved.** That keeps a
+  right spelling from ever being marked wrong, but the colours landing on letters she
+  did not touch may puzzle her. Most blocks have a few such routes; the near-twin weeks
+  of 21 September and 5 October have up to 18 in a block.
+- **The rude-word screen is a list, and only straight lines are screened.**
+- **Hangman is still mostly letter guessing.** The typed answer is the part with
+  evidence behind it.

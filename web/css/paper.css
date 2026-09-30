@@ -495,6 +495,63 @@ button.games-btn { background: var(--cut-mustard); color: #23201c; }
 .bonus-board button.done.right { background: color-mix(in srgb, var(--cut-teal) 20%, var(--paper-1)); }
 .bonus-board button.done.wrong { background: color-mix(in srgb, var(--cut-coral) 16%, var(--paper-1)); }
 
+/* Hangman. A paper flower drops a petal for each wrong letter. The word is a row
+ * of slots; the keys are the alphabet and a hyphen, and the hyphen key is there
+ * every week, so its presence never gives a hyphen away. A wrong letter is only
+ * ever a crossed-out key: no misspelling of the word is shown. */
+#game-hangman .game-icon { background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 52 40'%3E%3Cpath d='M26 22v16' stroke='%238fa97f' stroke-width='3' fill='none' stroke-linecap='round'/%3E%3Cg fill='%23e2725b'%3E%3Ccircle cx='26' cy='5' r='5'/%3E%3Ccircle cx='34' cy='9.5' r='5'/%3E%3Ccircle cx='34' cy='18.5' r='5'/%3E%3Ccircle cx='18' cy='18.5' r='5'/%3E%3Ccircle cx='18' cy='9.5' r='5'/%3E%3C/g%3E%3Ccircle cx='43' cy='35' r='4' fill='%23e2725b' opacity='.6'/%3E%3Ccircle cx='26' cy='14' r='4.5' fill='%23e0a32e'/%3E%3C/svg%3E"); }
+#game-hunt .game-icon { background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 52 40'%3E%3Cpath d='M8 8L26 20L26 32L44 32' fill='none' stroke='%23e0a32e' stroke-width='5' stroke-linecap='round' stroke-linejoin='round'/%3E%3Ccircle cx='8' cy='8' r='5' fill='%23e2725b'/%3E%3Ccircle cx='26' cy='8' r='5' fill='%23cbbfa8'/%3E%3Ccircle cx='44' cy='8' r='5' fill='%23cbbfa8'/%3E%3Ccircle cx='8' cy='20' r='5' fill='%23cbbfa8'/%3E%3Ccircle cx='26' cy='20' r='5' fill='%23e2725b'/%3E%3Ccircle cx='44' cy='20' r='5' fill='%23cbbfa8'/%3E%3Ccircle cx='8' cy='32' r='5' fill='%23cbbfa8'/%3E%3Ccircle cx='26' cy='32' r='5' fill='%23e2725b'/%3E%3Ccircle cx='44' cy='32' r='5' fill='%23e2725b'/%3E%3C/svg%3E"); }
+.game-card:nth-child(5) { transform: rotate(-.4deg); }
+.hang-stage { display: grid; grid-template-columns: minmax(120px, 210px) 1fr; gap: 1.2rem;
+              align-items: center; margin: .4rem 0 .6rem; }
+.hang-flower { width: 100%; height: auto; overflow: visible; }
+.hang-flower .stem { fill: none; stroke: var(--cut-sage); stroke-width: 7; stroke-linecap: round; }
+.hang-flower .leaf, .hang-flower .petal, .hang-flower .centre {
+  stroke-width: 1.5; filter: drop-shadow(0 2px 2px rgba(35,32,28,.22)); }
+.hang-flower .leaf { fill: var(--cut-sage); stroke: color-mix(in srgb, #000 15%, var(--cut-sage)); }
+.hang-flower .petal { fill: var(--cut-coral); stroke: color-mix(in srgb, #000 18%, var(--cut-coral)); }
+.hang-flower .centre { fill: var(--cut-mustard); stroke: color-mix(in srgb, #000 18%, var(--cut-mustard)); }
+.hang-flower .fallen { opacity: 0; }
+.hang-left { font-weight: 800; font-size: 1.15rem; margin: 0 0 .6rem; }
+.hang-word { display: flex; flex-wrap: wrap; justify-content: center; gap: .3rem;
+             margin: .4rem 0 1rem; }
+.hang-word .slot { flex: 0 1 2.3rem; min-width: 1.5rem; height: 3rem; display: grid;
+                   place-items: center; font-size: 1.8rem; font-weight: 800;
+                   border-bottom: 5px solid var(--cut-mustard); }
+.hang-word .slot.shown { border-bottom-color: color-mix(in srgb, var(--ink) 22%, transparent); }
+.hang-word .slot.given { color: var(--cut-plum); }
+.hang-reveal { font-size: 1.1rem; }
+.hang-reveal .whole { font-size: 1.6rem; font-weight: 800; letter-spacing: .04em; margin: 0 0 .3rem; }
+.hang-keys { display: grid; grid-template-columns: repeat(9, 1fr); gap: .45rem; margin: 0 0 1rem; }
+.hang-keys button { min-height: 56px; padding: 0; font-size: 1.35rem; font-weight: 800; }
+.hang-keys button.hit { background: color-mix(in srgb, var(--cut-teal) 24%, var(--paper-1)); }
+.hang-keys button.miss { background: var(--paper-2); color: var(--ink-2); text-decoration: line-through; }
+.hang-keys button:disabled { opacity: .6; }
+.hang-solve { margin-bottom: .2rem; }
+.hang-solve input { flex: 1 1 14rem; font-size: 1.4rem; min-height: 60px; padding: .4rem .9rem; }
+
+/* Hidden words. Round paper letters with gaps between them. The line through a
+ * word's letters runs underneath, in the gaps, like a dot-to-dot, and a found
+ * word takes the colours of its parts, so a finished block shows the pattern. */
+.hunt-wrap { position: relative; margin: 1.2rem auto .4rem; width: min(100%, calc(var(--cols, 7) * 78px)); }
+.hunt-grid { position: relative; z-index: 1; display: grid; gap: clamp(6px, 1.5vw, 12px);
+             grid-template-columns: repeat(var(--cols, 7), 1fr);
+             touch-action: none; user-select: none; -webkit-user-select: none; }
+.hunt-cell { aspect-ratio: 1; min-height: 0; padding: 0; border-radius: 50%;
+             font-size: clamp(1.15rem, 3.6vw, 1.7rem); font-weight: 800;
+             background: var(--paper-1); box-shadow: var(--lift-1); touch-action: none; }
+/* The trace in progress is ink, a colour no word part uses, so it never looks found. */
+.hunt-cell.on { background: var(--ink); color: var(--paper-1); box-shadow: var(--lift-2); }
+.hunt-cell.found { background: var(--piece); color: var(--piece-ink); cursor: default; }
+.hunt-cell.hint { box-shadow: 0 0 0 4px var(--cut-plum), var(--lift-1); }
+.hunt-lines { position: absolute; inset: 0; width: 100%; height: 100%; z-index: 0;
+              pointer-events: none; overflow: visible; }
+.hunt-lines polyline { fill: none; stroke-linecap: round; stroke-linejoin: round; stroke-width: 12; }
+.hunt-lines .trace { stroke: var(--ink); }
+.hunt-lines .word { stroke: color-mix(in srgb, var(--ink) 28%, transparent); }
+.hunt-found { display: flex; flex-wrap: wrap; justify-content: center; gap: .4rem 1.1rem;
+              min-height: 2rem; font-size: 1.3rem; letter-spacing: .03em; margin: 0 0 .6rem; }
+
 @media (prefers-reduced-motion: no-preference) {
   .shake { animation: shake .36s ease; }
   @keyframes shake { 25% { transform: translateX(-7px); } 50% { transform: translateX(6px); }
@@ -502,10 +559,19 @@ button.games-btn { background: var(--cut-mustard); color: #23201c; }
   .pop { animation: pop .3s cubic-bezier(.2,.9,.3,1.3); }
   @keyframes pop { from { transform: scale(.85); } to { transform: scale(1); } }
   .match-lines path { transition: stroke-dashoffset .6s ease; }
+  /* A petal falls: the only motion hangman has, and it carries the news. */
+  .hang-flower .falling { animation: fall .9s ease-in forwards; transform-box: fill-box;
+                          transform-origin: 50% 50%; }
+  @keyframes fall { 0% { opacity: 1; transform: none; }
+                    100% { opacity: 0; transform: translate(18px, 130px) rotate(70deg); } }
+  .hunt-cell.found { transition: background-color .25s ease, color .25s ease; }
 }
 
 @media (max-width: 600px) {
   .match-area { column-gap: 3rem; }
+  .hang-stage { grid-template-columns: 110px 1fr; gap: .8rem; }
+  .hang-keys { gap: .3rem; grid-template-columns: repeat(7, 1fr); }
+  .hang-keys button { min-height: 48px; font-size: 1.1rem; }
   .bonus-board { gap: .4rem; }
   .bonus-board .cat { font-size: .75rem; }
 }

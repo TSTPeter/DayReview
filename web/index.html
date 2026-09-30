@@ -234,6 +234,16 @@
       <b>Pattern sort</b>
       <span class="small muted">Sort the words by their pattern</span>
     </button>
+    <button id="game-hangman" class="game-card">
+      <span class="game-icon" aria-hidden="true"></span>
+      <b>Hangman</b>
+      <span class="small muted">Guess the word before the flower loses its petals</span>
+    </button>
+    <button id="game-hunt" class="game-card">
+      <span class="game-icon" aria-hidden="true"></span>
+      <b>Hidden words</b>
+      <span class="small muted">Find this week&rsquo;s words in a block of letters</span>
+    </button>
   </div>
   <div class="sheet torn bonus-card" id="games-bonus">
     <span class="tab plum">Bonus round</span>
@@ -290,6 +300,55 @@
   <div class="row">
     <button id="sort-again" class="primary" hidden>Another round</button>
     <button id="sort-quit" class="link">Back to games</button>
+  </div>
+</section>
+
+<section id="screen-hangman" class="screen">
+  <div class="game-head"><h1>Hangman</h1><span class="points-chip" id="hang-points"></span></div>
+  <p id="hang-count" class="small muted"></p>
+  <div class="hang-stage">
+    <svg id="hang-flower" class="hang-flower" viewBox="0 0 200 230" aria-hidden="true">
+      <path class="stem" d="M100 118 C 96 160 104 190 100 228"/>
+      <path class="leaf" d="M101 178 C 124 160 146 164 152 170 C 138 186 118 188 101 178 Z"/>
+      <path class="leaf" d="M99 196 C 78 180 56 184 50 190 C 64 206 84 206 99 196 Z"/>
+      <g id="hang-petals"></g>
+      <circle class="centre" cx="100" cy="92" r="19"/>
+    </svg>
+    <div class="hang-side">
+      <p id="hang-left" class="hang-left" aria-live="polite"></p>
+      <div id="hang-reveal" class="hang-reveal" hidden></div>
+    </div>
+  </div>
+  <div id="hang-word" class="hang-word" role="img"></div>
+  <div id="hang-keys" class="hang-keys" aria-label="Letters"></div>
+  <div class="row hang-solve" id="hang-solve-row">
+    <input id="hang-input" class="spell" type="text" autocomplete="off"
+           autocapitalize="none" autocorrect="off" spellcheck="false"
+           enterkeyhint="done" aria-label="Type the whole word" placeholder="Know it? Type it">
+    <button id="hang-solve" disabled>That&rsquo;s it</button>
+  </div>
+  <p id="hang-feedback" class="game-feedback" aria-live="polite"></p>
+  <div class="row">
+    <button id="hang-hint">Hint</button>
+    <button id="hang-next" class="primary" hidden>Next word</button>
+    <button id="hang-quit" class="link">Back to games</button>
+  </div>
+</section>
+
+<section id="screen-hunt" class="screen">
+  <div class="game-head"><h1>Hidden words</h1><span class="points-chip" id="hunt-points"></span></div>
+  <p id="hunt-count" class="small muted"></p>
+  <div id="hunt-wrap" class="hunt-wrap">
+    <svg id="hunt-lines" class="hunt-lines" aria-hidden="true"></svg>
+    <div id="hunt-grid" class="hunt-grid" aria-label="The block of letters"></div>
+  </div>
+  <p id="hunt-feedback" class="game-feedback" aria-live="polite"></p>
+  <div id="hunt-found" class="hunt-found" aria-live="polite"></div>
+  <div class="row">
+    <button id="hunt-hint">Hint</button>
+    <button id="hunt-clear">Clear</button>
+    <button id="hunt-again" class="primary" hidden>Another block</button>
+    <button id="hunt-quit" class="link">Back to games</button>
   </div>
 </section>
 

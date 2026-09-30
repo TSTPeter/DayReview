@@ -1111,6 +1111,251 @@ if (!liveWeek) {
     await g.click("#sort-quit");
   }
 
+  // --- hangman: a hint, a miss, a wrong whole-word guess, letters by tap and by
+  // keyboard, a typed solve, and one word lost on purpose
+  await g.waitForSelector("#screen-games.on");
+  const readLog = () => g.evaluate(async () => {
+    const db = await new Promise((res) => { const r = indexedDB.open("spelling", 1); r.onsuccess = () => res(r.result); });
+    return await new Promise((res) => {
+      const t = db.transaction("kv", "readonly").objectStore("kv").get("game_log");
+      t.onsuccess = () => res(t.result ? t.result.value : []);
+    });
+  });
+  const beforeHang = await readPoints();
+  await g.click("#game-hangman");
+  await g.waitForSelector("#screen-hangman.on");
+  check("hangman has a hyphen key every week, so a hyphen is never given away",
+        (await g.locator('#hang-keys button[data-key="-"]').count()) === 1);
+  const slots = () => g.$$eval("#hang-word .slot", (ss) => ss.map((s) => s.textContent));
+  const guessedKeys = () => g.$$eval("#hang-keys button:disabled", (bs) => bs.map((b) => b.dataset.key));
+  // Which of this week's words fit what is showing: never read from the page's state.
+  const candidates = async () => {
+    const shown = await slots();
+    const guessed = await guessedKeys();
+    return liveWeek.words.filter((w) => w.length === shown.length
+      && [...w].every((ch, i) => (shown[i] ? shown[i] === ch : !guessed.includes(ch)))
+      && guessed.every((k) => shown.includes(k) || !w.includes(k)));
+  };
+  const fallen = () => g.locator("#hang-petals .fallen").count();
+  const press = async (k, keyboard) => {
+    if (keyboard) await g.keyboard.press(k === "-" ? "Minus" : k);
+    else await g.click(`#hang-keys button[data-key="${k}"]`);
+  };
+  const byLetters = async (keyboard = false) => {
+    for (let n = 0; n < 40 && !(await g.locator("#hang-next").isVisible()); n++) {
+      const cs = await candidates();
+      if (!cs.length) return false;
+      const guessed = await guessedKeys();
+      await press([...cs[0]].find((ch) => !guessed.includes(ch)), keyboard);
+    }
+    return /You got it/.test(await g.textContent("#hang-feedback"));
+  };
+  const hangWords = [];
+
+  // Word 1: the hint, a miss, then the whole word typed.
+  await g.click("#hang-hint");
+  const afterHint = await slots();
+  check("the hint fills in the first letter of the word, marked as given",
+        afterHint[0] !== "" && (await g.locator("#hang-word .slot.given").count()) >= 1
+        && await g.locator("#hang-hint").isDisabled(), afterHint.join("") || "(nothing shown)");
+  const safe = [..."qjzxkfwvmgdupbhylc"].filter((k) =>
+    !(liveWeek.words.filter((w) => w.length === afterHint.length)).some((w) => w.includes(k)));
+  if (safe.length) {
+    await press(safe[0]);
+    check("a wrong letter drops a petal and is crossed out on its key, nowhere else",
+          (await fallen()) === 1 && /7 petals left/.test(await g.textContent("#hang-left"))
+          && (await g.getAttribute(`#hang-keys button[data-key="${safe[0]}"]`, "class")).includes("miss")
+          && !(await slots()).includes(safe[0]));
+  }
+  // Type each word that still fits, in capitals: a wrong one costs a petal, and
+  // guessing letters to narrow it down could finish the word before it is typed
+  // (device and devise differ only in their last new letter).
+  let typed = null;
+  for (const guess of await candidates()) {
+    await g.fill("#hang-input", guess.toUpperCase());
+    await g.click("#hang-solve");
+    if (/You knew it/.test(await g.textContent("#hang-feedback"))) { typed = guess; break; }
+  }
+  hangWords.push(typed);
+  check("typing the whole word solves it", !!typed
+        && (await g.textContent("#hang-reveal .whole")) === typed, String(typed));
+  check("a word solved with a hint earns half", /\+5\b/.test(await g.textContent("#hang-feedback")),
+        await g.textContent("#hang-feedback"));
+  await g.click("#hang-next");
+
+  // Word 2: a wrong whole-word guess costs a petal and disappears, then letters.
+  await g.fill("#hang-input", "zzzz");
+  await g.press("#hang-input", "Enter");
+  check("a wrong whole-word guess costs a petal and never stays on screen",
+        (await fallen()) === 1 && (await g.inputValue("#hang-input")) === ""
+        && /not it/.test(await g.textContent("#hang-feedback")));
+  const solved2 = await byLetters();
+  hangWords.push((await slots()).join(""));
+  check("guessing letters by tap solves a word", solved2);
+  await g.click("#hang-next");
+
+  // Word 3: a keyboard, where there is one, guesses letters too.
+  await g.click("#hang-count");     // focus off the text box
+  const solved3 = await byLetters(true);
+  hangWords.push((await slots()).join(""));
+  check("guessing letters on a keyboard solves a word", solved3);
+  await g.click("#hang-next");
+
+  // Word 4: letters again.
+  const solved4 = await byLetters();
+  hangWords.push((await slots()).join(""));
+  await g.click("#hang-next");
+
+  // Word 5: lost on purpose, with letters no word of that length contains.
+  const len5 = (await slots()).length;
+  const none5 = [..."abcdefghijklmnopqrstuvwxyz-"].filter((k) =>
+    !liveWeek.words.filter((w) => w.length === len5).some((w) => w.includes(k)));
+  let lost = false;
+  if (none5.length >= 8) {
+    for (const k of none5.slice(0, 8)) await press(k);
+    const shown = await slots();
+    lost = /Out of petals/.test(await g.textContent("#hang-feedback"));
+    check("out of petals, the word is shown whole, in its parts, with its rule",
+          lost && shown.every((c) => c !== "") && (await g.textContent("#hang-reveal .whole")) === shown.join("")
+          && (await g.locator("#hang-reveal .muted").textContent()).length > 10, shown.join(""));
+    hangWords.push(shown.join(""));
+  } else {
+    console.log("  skip  no eight letters are missing from every word of that length");
+    await byLetters();
+    hangWords.push((await slots()).join(""));
+  }
+  await g.click("#hang-next");
+  const afterHang = await readPoints();
+  const hangExpected = 5 + (solved2 ? 10 : 0) + (solved3 ? 10 : 0) + (solved4 ? 10 : 0) + (lost ? 0 : 10);
+  check("hangman earns 10 a word solved, 5 with a hint, nothing for a lost one",
+        afterHang.earned - beforeHang.earned === hangExpected,
+        `+${afterHang.earned - beforeHang.earned}, expected +${hangExpected}`);
+  // The round is saved just after its last screen appears.
+  let hangLog = null;
+  for (let n = 0; n < 20 && !hangLog; n++) {
+    hangLog = (await readLog()).filter((r) => r.game === "hangman").pop();
+    if (!hangLog) await g.waitForTimeout(100);
+  }
+  check("a hangman round is logged, word by word",
+        hangLog && hangLog.items.length === 5 && hangLog.items[0].hint === true
+        && hangLog.items.map((i) => i.word).join() === hangWords.join(),
+        hangLog ? hangLog.items.map((i) => i.word).join() : "no entry");
+  check("the round ends with what was solved, and how",
+        /4 of 5 solved, 3 without a hint|5 of 5 solved, 4 without a hint/.test(await g.textContent("#hang-feedback")),
+        await g.textContent("#hang-feedback"));
+  await g.click("#hang-quit");
+
+  // --- hidden words: a hint, taps, a slide, and every word found
+  await g.waitForSelector("#screen-games.on");
+  const beforeHunt = await readPoints();
+  await g.click("#game-hunt");
+  await g.waitForSelector("#screen-hunt.on");
+  const letters = async () => (await g.$$eval("#hunt-grid .hunt-cell", (xs) => xs.map((x) => x.textContent))).join("");
+  const block = content.blocks[0];
+  check("the first block is the week's first, from engine/wordblocks.py", (await letters()) === block.letters);
+  const cell = (i) => g.locator("#hunt-grid .hunt-cell").nth(i);
+  const tap = async (cells) => { for (const c of cells) await cell(c).click(); };
+  const onCells = () => g.$$eval("#hunt-grid .hunt-cell.on", (xs) => xs.map((x) => Number(x.dataset.i)));
+  const own = (b, w, t = b.tilings[0]) => b.routes[w][t[w]];
+  await g.click("#hunt-hint");
+  const ring1 = await g.$$eval("#hunt-grid .hunt-cell.hint", (xs) => xs.map((x) => Number(x.dataset.i)));
+  await g.click("#hunt-hint");
+  const ring2 = await g.$$eval("#hunt-grid .hunt-cell.hint", (xs) => xs.map((x) => Number(x.dataset.i)));
+  check("a hint rings where a word starts, and asking again rings its next letter",
+        ring1.join() === String(own(block, 0)[0]) && ring2.join() === own(block, 0).slice(0, 2).join(),
+        `${ring1} then ${ring2}`);
+  const r1 = own(block, 1);
+  await tap(r1.slice(0, 2));
+  const two = await onCells();
+  await cell(r1[1]).click();
+  const one = await onCells();
+  await g.click("#hunt-clear");
+  const same = (a, b) => [...a].sort((x, y) => x - y).join() === [...b].sort((x, y) => x - y).join();
+  check("letters join a trace one after another, and tapping the last again takes it back",
+        same(two, r1.slice(0, 2)) && same(one, [r1[0]])
+        && (await onCells()).length === 0, `${two} then ${one}`);
+  await tap(own(block, 0));
+  const kinds0 = gameData.words[block.words[0]].parts.flatMap((p) => [...p.text].map(() => p.kind));
+  const classes0 = await Promise.all(own(block, 0).map((c) => cell(c).getAttribute("class")));
+  check("a found word takes the colours of its parts, letter by letter",
+        classes0.every((cl, k) => cl.includes("found") && cl.includes(`k-${kinds0[k]}`)),
+        `${block.words[0]}: ${kinds0.join(" ")}`);
+  check("a word found after a hint earns half",
+        /Found .*\+5\b/.test(await g.textContent("#hunt-feedback")), await g.textContent("#hunt-feedback"));
+  await cell(own(block, 0)[0]).click();
+  check("a found letter is spent: tapping it starts nothing", (await onCells()).length === 0);
+  // Word 2 by sliding a finger through it.
+  const centres = await g.$$eval("#hunt-grid .hunt-cell", (xs) => xs.map((x) => {
+    const r = x.getBoundingClientRect(); return [r.left + r.width / 2, r.top + r.height / 2];
+  }));
+  await g.mouse.move(...centres[r1[0]]);
+  await g.mouse.down();
+  for (const c of r1.slice(1)) await g.mouse.move(...centres[c], { steps: 5 });
+  await g.mouse.up();
+  check("sliding through the letters finds a word too",
+        (await g.textContent("#hunt-feedback")).startsWith(`Found ${block.words[1]}!`),
+        await g.textContent("#hunt-feedback"));
+  for (let w = 2; w < block.words.length; w++) await tap(own(block, w));
+  await g.waitForSelector("#hunt-again:not([hidden])", { timeout: 3000 }).catch(() => {});
+  check("finding every word finishes the block",
+        new RegExp(`All ${block.words.length} found, ${block.words.length - 1} without a hint`)
+          .test(await g.textContent("#hunt-feedback"))
+        && await g.locator("#hunt-again").isVisible()
+        && (await g.locator("#hunt-grid .hunt-cell.found").count()) === block.letters.length,
+        await g.textContent("#hunt-feedback"));
+  check("the found words are listed, in their colours",
+        (await g.textContent("#hunt-found")) === block.words.join("")
+        && (await g.locator("#hunt-found .part").count()) >= block.words.length);
+  const afterHunt = await readPoints();
+  check("hidden words earns 10 a word, 5 with a hint",
+        afterHunt.earned - beforeHunt.earned === 5 + 10 * (block.words.length - 1),
+        `+${afterHunt.earned - beforeHunt.earned}`);
+  const huntLines = await g.locator("#hunt-lines polyline.word").count();
+  check("every found word has its line, underneath the letters", huntLines === block.words.length,
+        `${huntLines} lines`);
+
+  // --- a route that spells the word but would strand the others still counts
+  const orphanAt = content.blocks.findIndex((b) => b.routes.some((rs, w) =>
+    rs.some((_, j) => !b.tilings.some((t) => t[w] === j))));
+  if (orphanAt < 0) {
+    console.log("  skip  no block this week has a route that would strand the others");
+  } else {
+    // The next block follows the number logged this week, so log enough to reach it.
+    const extra = (orphanAt - 1 + content.blocks.length) % content.blocks.length;
+    await g.evaluate(async ({ week, n }) => {
+      const db = await new Promise((res) => { const r = indexedDB.open("spelling", 1); r.onsuccess = () => res(r.result); });
+      const log = await new Promise((res) => {
+        const t = db.transaction("kv", "readonly").objectStore("kv").get("game_log");
+        t.onsuccess = () => res(t.result ? t.result.value : []);
+      });
+      for (let i = 0; i < n; i++) log.push({ at: new Date().toISOString(), game: "hunt", week, items: [], points: 0 });
+      await new Promise((res) => {
+        const t = db.transaction("kv", "readwrite");
+        t.objectStore("kv").put({ key: "game_log", value: log });
+        t.oncomplete = res;
+      });
+    }, { week: liveWeek.id, n: extra });
+    await g.click("#hunt-again");
+    const ob = content.blocks[orphanAt];
+    await g.waitForFunction((L) => [...document.querySelectorAll("#hunt-grid .hunt-cell")]
+      .map((x) => x.textContent).join("") === L, ob.letters, { timeout: 3000 }).catch(() => {});
+    check("another block is the next one in the week", (await letters()) === ob.letters);
+    const [w, j] = ob.routes.flatMap((rs, wi) => rs.map((_, ji) => [wi, ji]))
+      .find(([wi, ji]) => !ob.tilings.some((t) => t[wi] === ji));
+    await tap(ob.routes[w][j]);
+    const foundCells = await g.$$eval("#hunt-grid .hunt-cell.found", (xs) => xs.map((x) => Number(x.dataset.i)));
+    const k = ob.routes[w].findIndex((r) => [...r].sort((a, b) => a - b).join() === [...foundCells].sort((a, b) => a - b).join());
+    check("a right spelling along a route that would strand the rest still counts, moved to one that fits",
+          /In this block it fits here/.test(await g.textContent("#hunt-feedback"))
+          && k >= 0 && ob.tilings.some((t) => t[w] === k), `${ob.words[w]}: route ${j} became ${k}`);
+    const t = ob.tilings.find((x) => x[w] === k);
+    if (t) for (let v = 0; v < ob.words.length; v++) if (v !== w) await tap(ob.routes[v][t[v]]);
+    await g.waitForSelector("#hunt-again:not([hidden])", { timeout: 3000 }).catch(() => {});
+    check("and the block can still be finished",
+          /All \d+ found/.test(await g.textContent("#hunt-feedback")), await g.textContent("#hunt-feedback"));
+  }
+  await g.click("#hunt-quit");
+
   // --- the bonus round: open, answer every square, one wrong on purpose
   await g.waitForSelector("#screen-games.on");
   const beforeBonus = await readPoints();
@@ -1178,7 +1423,7 @@ if (!liveWeek) {
   // --- the new screens fit an iPad
   for (const [name, vw, vh] of [["iPad portrait", 820, 1180], ["iPad landscape", 1180, 820]]) {
     await g.setViewportSize({ width: vw, height: vh });
-    for (const s of ["games", "jigsaw", "match", "sort", "bonus"]) {
+    for (const s of ["games", "jigsaw", "match", "sort", "hangman", "hunt", "bonus"]) {
       const res = await g.evaluate((id) => {
         for (const x of document.querySelectorAll(".screen")) x.classList.toggle("on", x.id === `screen-${id}`);
         const over = document.documentElement.scrollWidth > document.documentElement.clientWidth + 1;

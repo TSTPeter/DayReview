@@ -15,6 +15,8 @@ WHAT IS HERE, AND WHAT IT RESTS ON.
             curriculum states it, and "learn it" where it says no rule helps.
   ROOTS     the root-match pairs, per week.
   SORTS     the pattern-sort decks, per week.
+  blocks    the hidden-words blocks, per week, are not written here: they are built
+            from the week's own words by engine/wordblocks.py.
 
 Evidence, briefly (docs/15-games.md has the full account):
   * Word parts (the jigsaw, the sort): morphological instruction benefits spelling,
@@ -655,6 +657,7 @@ def term_entries():
 
 
 def build(weeks, curated, sentences, noun_verb_pairs):
+    import wordblocks
     words = {}
     for week in weeks:
         for w in week["words"]:
@@ -675,6 +678,7 @@ def build(weeks, curated, sentences, noun_verb_pairs):
             "roots": [{"part": part, "means": means, "from": source, "words": ws}
                       for part, means, source, ws in ROOTS.get(week["id"], [])],
             "sort": sort_deck(week["id"], weeks, sentences, noun_verb_pairs),
+            "blocks": wordblocks.week_blocks(week["id"], week["words"]),
         }
     return {
         "generated_by": "engine/games.py",
