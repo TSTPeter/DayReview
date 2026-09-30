@@ -10,6 +10,9 @@ of words. Three of those asks cut across `docs/11`, so he was asked first, and c
 - **The daily quiz is the dictation, and it never locks. Points open a bonus round.**
 - **Build the jigsaw, the root match, the pattern sort and a game-show board.**
 
+On 30 September he asked for two more, hangman and a block of hidden words. See the
+section of that date below.
+
 ## What was asked, and what was built
 
 | Asked for | Built | Why the difference |
@@ -19,7 +22,7 @@ of words. Three of those asks cut across `docs/11`, so he was asked first, and c
 | Encourage her to come more regularly | **"What's ready today"** | "3 words are ready for another go, and 7 are new." A word is ready because its spacing interval has come round, which is exactly when practising it helps. Spacing is the largest effect this app rests on (`docs/01`) |
 | A syllable jigsaw | **A word-part jigsaw** | Syllables hide the decision these lists turn on. *ob-ser-vant* splits the *-ant*; *observ + ant* puts the choice on its own piece |
 | Etymology matching with swirly lines | **As asked: root match** | Rests on less than it looks (below). Built as a meaning game and labelled as one |
-| Hangman, Wheel of Fortune | **Not built** | Guessing a letter at a time practises guessing letters, not recalling spellings, and fills the screen with wrong letters. Judgement, not a finding |
+| Hangman, Wheel of Fortune | **Not built** on 28 September. Hangman **built on 30 September**, when Peter asked for it again | Guessing a letter at a time practises guessing letters, not recalling spellings. That was judgement, not a finding, so his second ask wins, and the design below meets the objection part way |
 | Jeopardy | **The bonus round** | Every square is a typed spelling, marked by the real classifier |
 | Coloured bits of words making a pattern | **The pattern sort**, and one colour code in every game | See below |
 | Points that unlock a daily quiz | **Points open the bonus round** | Locking the dictation behind games would mean a games-only day had no dictation at all, and dictation is the part with the strongest evidence behind it |
@@ -94,7 +97,11 @@ Older weeks are on the board on purpose: a round is spaced retrieval of the term
   (d = -0.28, against -0.40 for engagement-contingent; `docs/02`). Nothing is given
   for turning up, finishing, or time spent.
 - **Every 50 opens one bonus round.** A jigsaw word is 10, a match or a sort card 5,
-  a bonus square 5, 10 or 15. The number 50, about one game's worth, is a guess.
+  a bonus square 5, 10 or 15, a hangman or hidden word 10. The number 50, about one
+  game's worth, is a guess.
+- **Hangman and hidden words pay for the word, not the first go.** Misses are part of
+  hangman and searching is the whole of hidden words, so a word solved or found earns
+  10, and a hint halves it to 5. Still performance-contingent.
 - **Bonus-round points count too.** A good bonus round can earn the next one. The
   loop points at typed recall, the most useful practice after dictation. Judgement.
 - **Points never go down.** A wrong answer earns nothing and costs nothing.
@@ -107,11 +114,14 @@ made by Peter. See the note added there.
 ## Rules every game keeps
 
 - **No misspelling stays on screen.** A wrong jigsaw piece goes back; a sort card
-  shows a gap, never a wrong letter.
+  shows a gap, never a wrong letter; a wrong hangman letter is only a crossed-out key,
+  and a typed guess is cleared at once; a hidden-words block is made of nothing but
+  correct spellings.
 - **A miss is information.** It gets the rule and the "not yet" sound, never a buzzer
   (Shute 2008).
 - **One colour per word part, everywhere:** prefix teal, root coral, ending plum,
-  hyphen mustard, a whole joined word sage.
+  hyphen mustard, a whole joined word sage. A found hidden word takes them letter by
+  letter, and a trace in progress is ink, which no part uses.
 - **Nothing touches the scheduler or the attempt log.** The games are extra practice.
   The fixed sequence stays the default, which is `CLAUDE.md`'s rule.
 - **The games follow the term's calendar,** because their content is written per week.
@@ -155,3 +165,105 @@ into games. Worth doing if the games prove popular.
   games at eight weeks, not at one.
 - **After 23 October the games stay on the last week's list.** The next term's sheet
   goes in `engine/term.py`.
+- **Is a bending-path block too hard at ten?** Nobody knows yet. Watch how often she
+  needs a hint. Easier blocks, four words or smaller shapes, are a small change in
+  `engine/wordblocks.py`.
+- **Sliding through the letters** is written for touch and tested with a mouse.
+
+## 30 September 2026: hangman and hidden words
+
+Peter asked for "a hangman game using spelling words of the week", and for "four or
+five words ... hidden inside of a block", found by highlighting "the letters one after
+another", without being told what the words are. Both should have a hint that gives "a
+starting place for one of the letters". Asked, he chose:
+
+- **Bending paths** for the block, over straight lines.
+- **A flower that loses its petals** for hangman, over the gallows.
+- **A hint halves the word's points**, over hints being free or earning nothing.
+
+### Hangman
+
+Five of this week's words, one at a time. A paper flower has eight petals and each
+wrong letter drops one, so eight misses lose the word. The keys are the alphabet and a
+hyphen, and the hyphen key is there every week, including weeks with no hyphenated
+words, so its presence never gives a hyphen away. In the weeks of 12 and 19 October the
+hyphen is the decision the whole list is about, and here she has to make it.
+
+The objection on 28 September was that guessing a letter at a time practises guessing
+letters, not recalling spellings. That was judgement, not a finding, and the design
+meets it part way:
+
+- **She can type the whole word at any point**, and typing it is the way to finish
+  early. That is free recall, the practice `docs/01` supports. A wrong typed guess
+  costs a petal and is cleared at once, so her misspelling never stays on screen.
+- **A wrong letter is only a crossed-out key.** The word only ever shows right letters.
+- **Every word ends shown in its parts, with the line that explains it,** solved or
+  not. A lost word is information, not a buzzer (Shute 2008).
+- **The hint is the first hidden letter, never the hyphen,** and there is one a word.
+
+What hangman still is: mostly guessing letters. It is here because she will enjoy it,
+and the typed answer is the only part of it with evidence behind it.
+
+### Hidden words
+
+A block of letters, five to eight a side, holds four or five of this week's words. Each
+word bends through touching letters, across, down or diagonally, and every letter in
+the block belongs to one of them, so nothing on screen is anything but a correct
+spelling. She taps the letters one after another, or slides a finger through them;
+tapping the last letter again takes it back. A found word takes the colours of its
+parts, letter by letter, so a finished block shows the week's pattern: every *-ance*
+in plum.
+
+The blocks are built offline by `engine/wordblocks.py`, and `tests/test_wordblocks.py`
+checks every one that ships:
+
+- the words fill the block exactly, and the generator's own paths never cross on a
+  diagonal;
+- no hidden word is the start of another, or the game would find the short one first;
+- no other word on the week's list can be traced anywhere in it, so she can never
+  spell a list word correctly and be told it is not there;
+- no word on a screening list reads in a straight line, in any of the eight
+  directions. Bending paths are not screened. The question put to Peter said "nothing
+  rude can turn up by chance", which was too strong on its own; this screen is what
+  makes it nearly true.
+
+Six blocks a week cover all fifteen words, and she gets them in order.
+
+**A word can often be traced more than one way.** Some routes spell a hidden word
+correctly but would leave the other words unable to fit. Most blocks have a few; the
+weeks of near-twins (*advice, advise, device, devise*; *decent, decency*) have up to 18
+in a block. Turning such a route away would tell a
+child who spelled the word right that she was wrong, so any correct route counts: the
+word is accepted, and its colours move to the nearest route that fits, with "In this
+block it fits here." The export carries every route and every way the routes fill the
+block, so on the tablet this is a lookup, not a search. Whether the move puzzles her is
+not known; the alternative is to turn the route away with a reason.
+
+Rests on judgement. Tracing a word in order, letter by letter, is spelling it out; this
+build found no controlled evidence either way on word searches and spelling.
+
+### Hints
+
+Both give what Peter asked for, a starting place. In hangman the first letter still
+hidden fills in. In hidden words the first letter of a word she has not found is
+ringed, and asking again rings the next letter, which shows the way it goes, but never
+the whole word.
+
+A hint halves the word's points, 10 to 5. Learners often do not use on-demand help
+well, although using it well goes with learning more (Aleven, Stahl, Schworm, Fischer
+and Wallace 2003,
+[link](https://journals.sagepub.com/doi/10.3102/00346543073003277)). Half is a guess at
+a middle way: cheap enough that she asks rather than stays stuck, dear enough that she
+tries first. Judgement.
+
+### Points and what is logged
+
+| Game | A word | With a hint |
+|---|---|---|
+| Hangman | 10 if solved, nothing if the petals run out | 5 |
+| Hidden words | 10 | 5 |
+
+A perfect round of either is 50, one bonus round, the same as a perfect jigsaw round.
+Both log every round to `game_log`: for hangman each word, whether it was solved, the
+hint, the misses and whether it was typed; for hidden words each word and whether it
+was hinted. The grown-up view counts both beside the dictation sessions.

@@ -1,5 +1,6 @@
-// The learning games: word jigsaw, root match, pattern sort, and the bonus round.
-// docs/15-games.md says what each one rests on, and what it does not.
+// The learning games: word jigsaw, root match, pattern sort, hangman, hidden words,
+// and the bonus round. docs/15-games.md says what each one rests on, and what it
+// does not.
 //
 // Everything here sits OUTSIDE the practice loop, on purpose:
 //   * Points exist only on these screens. They are earned for a right answer at
@@ -8,18 +9,23 @@
 //   * Nothing here touches the scheduler or the attempt log. The dictation is the
 //     daily quiz and it never locks; the fixed sequence stays the default.
 //   * No wrong spelling is ever left on screen as something to look at. A wrong
-//     jigsaw piece goes straight back to the tray; a sort card shows a gap.
+//     jigsaw piece goes straight back to the tray; a sort card shows a gap; a
+//     wrong hangman letter is a crossed-out key; a hidden-words block is made
+//     of nothing but correct spellings.
 //
 // The content comes from engine/games.py via web/data/games.json.
 
 import { classify, feedback } from "./engine/classify.js";
+import { wordForm } from "./engine/derive.js";
 
 export const TICKET = 50;                      // points that open one bonus round
-const ROUND = { jigsaw: 5, match: 5, sort: 10 };
-const POINTS = { jigsaw: 10, match: 5, sort: 5 };
+const ROUND = { jigsaw: 5, match: 5, sort: 10, hangman: 5 };
+const POINTS = { jigsaw: 10, match: 5, sort: 5, hangman: 10, hunt: 10 };
 const BONUS_VALUES = [5, 10, 15];
 const PAIR_COLOURS = ["var(--cut-teal)", "var(--cut-coral)", "var(--cut-plum)",
                       "var(--cut-mustard)", "var(--cut-sage)"];
+
+const SVG = "http://www.w3.org/2000/svg";
 
 let ctx = null;          // wired by app.js: see init()
 let points = { earned: 0, rounds: 0 };
@@ -57,7 +63,7 @@ async function award(n) {
 }
 
 function paintPoints() {
-  for (const id of ["#jig-points", "#match-points", "#sort-points"]) {
+  for (const id of ["#jig-points", "#match-points", "#sort-points", "#hang-points", "#hunt-points"]) {
     const chip = $(id);
     if (chip) chip.textContent = `Points: ${points.earned}`;
   }
@@ -77,7 +83,10 @@ export async function openHub() {
   const week = ctx.week();
   const content = week && ctx.data().weeks[week.id];
   $("#games-empty").hidden = !!content;
-  for (const id of ["#game-jigsaw", "#game-match", "#game-sort"]) $(id).disabled = !content;
+  for (const id of ["#game-jigsaw", "#game-match", "#game-sort", "#game-hangman"]) {
+    $(id).disabled = !content;
+  }
+  $("#game-hunt").disabled = !(content && content.blocks && content.blocks.length);
   $("#games-week").textContent = week ? `This week: ${week.theme || week.words.join(", ")}` : "";
   $("#game-sort").disabled = !(content && content.sort);
   $("#games-points").textContent = `Your points: ${points.earned}`;
@@ -544,6 +553,453 @@ async function sortEnd() {
   $("#sort-again").hidden = false;
 }
 
+// ------------------------------------------------------------------ shared by the letter games
+
+// A hint halves what the word is worth: enough to make trying first worth it,
+// not so much that she stays stuck rather than ask. Judgement (docs/15).
+const hinted = (n) => Math.floor(n / 2);
+
+function say(sel, tone, text) {
+  const fb = $(sel);
+  fb.className = `game-feedback${tone ? ` ${tone}` : ""}`;
+  fb.textContent = text;
+}
+
+// The word in its parts, each in its colour: the same picture as every other game.
+const partSpans = (word) => ctx.data().words[word].parts.map((p) =>
+  ctx.el("span", { className: `part k-${p.kind}`, textContent: p.text }));
+
+// One part kind per letter, hyphens included, for colouring a word letter by letter.
+const letterKinds = (word) => ctx.data().words[word].parts.flatMap((p) => [...p.text].map(() => p.kind));
+
+const theme = (week) => (week.theme || "").replace(/-/g, "‑");
+
+// ------------------------------------------------------------------ hangman
+
+// Eight petals, so eight wrong letters. They fall in an order that keeps the
+// flower looking balanced for as long as it can.
+const PETALS = 8;
+const FALL_ORDER = [0, 4, 2, 6, 1, 5, 3, 7];
+const KEYS = [..."abcdefghijklmnopqrstuvwxyz", "-"];
+const PETAL_PATH = "M100 92 C 80 72 82 42 100 32 C 118 42 120 72 100 92 Z";
+const hang = { items: [], i: 0, word: "", guessed: new Set(), given: new Set(), misses: 0,
+               hinted: false, done: false, keys: new Map(), results: [], gained: 0 };
+
+export function startHangman() {
+  const week = ctx.week();
+  hang.items = shuffle(week.words.filter((w) => ctx.data().words[w])).slice(0, ROUND.hangman);
+  hang.i = 0; hang.results = []; hang.gained = 0;
+  $("#hang-next").onclick = hangNext;
+  paintPoints();
+  ctx.show("hangman");
+  hangItem();
+}
+
+function drawFlower() {
+  const petals = [];
+  for (let k = 0; k < PETALS; k++) {
+    const g = document.createElementNS(SVG, "g");
+    g.dataset.k = String(k);
+    const p = document.createElementNS(SVG, "path");
+    p.setAttribute("class", "petal");
+    p.setAttribute("d", PETAL_PATH);
+    p.setAttribute("transform", `rotate(${k * 45} 100 92)`);
+    g.append(p);
+    petals.push(g);
+  }
+  $("#hang-petals").replaceChildren(...petals);
+}
+
+function hangItem() {
+  hang.word = hang.items[hang.i];
+  hang.guessed = new Set(); hang.given = new Set();
+  hang.misses = 0; hang.hinted = false; hang.done = false;
+  $("#hang-count").textContent = `Word ${hang.i + 1} of ${hang.items.length}. `
+    + `This week: ${theme(ctx.week())}`;
+  drawFlower();
+  hang.keys = new Map(KEYS.map((k) => {
+    const b = ctx.el("button", { textContent: k, dataset: { key: k } });
+    b.setAttribute("aria-label", k === "-" ? "hyphen" : k);
+    b.onclick = () => hangGuess(k);
+    return [k, b];
+  }));
+  $("#hang-keys").replaceChildren(...hang.keys.values());
+  $("#hang-keys").hidden = false;
+  $("#hang-input").value = "";
+  $("#hang-solve").disabled = true;
+  $("#hang-solve-row").hidden = false;
+  $("#hang-hint").hidden = false;
+  $("#hang-hint").disabled = false;
+  $("#hang-next").hidden = true;
+  $("#hang-reveal").hidden = true;
+  say("#hang-feedback", "", "");
+  paintHang();
+}
+
+function paintHang() {
+  const word = [...hang.word];
+  const shown = (ch) => hang.done || hang.guessed.has(ch);
+  $("#hang-word").replaceChildren(...word.map((ch) => ctx.el("span", {
+    className: `slot${shown(ch) ? " shown" : ""}${hang.given.has(ch) ? " given" : ""}`,
+    textContent: shown(ch) ? ch : "" })));
+  // Read out what is showing, never what is hidden.
+  $("#hang-word").setAttribute("aria-label", `The word: ${word.map((ch) =>
+    (shown(ch) ? (ch === "-" ? "hyphen" : ch) : "blank")).join(", ")}`);
+  const left = PETALS - hang.misses;
+  $("#hang-left").textContent = hang.done ? "" : `${plural(left, "petal")} left`;
+}
+
+async function hangGuess(k, hint = false) {
+  if (hang.done || hang.guessed.has(k)) return;
+  hang.guessed.add(k);
+  if (hint) hang.given.add(k);
+  const key = hang.keys.get(k);
+  key.disabled = true;
+  if (hang.word.includes(k)) {
+    key.classList.add("hit");
+    say("#hang-feedback", "", hint ? `A place to start: ${k}.` : "");
+    paintHang();
+    if ([...hang.word].every((ch) => hang.guessed.has(ch))) await hangEnd(true);
+    return;
+  }
+  key.classList.add("miss");
+  await hangMiss(k === "-" ? "No hyphen in this word." : `No ${k} in this word.`);
+}
+
+async function hangMiss(message) {
+  hang.misses += 1;
+  $(`#hang-petals [data-k="${FALL_ORDER[hang.misses - 1]}"]`).classList.add("falling", "fallen");
+  paintHang();
+  if (hang.misses >= PETALS) { await hangEnd(false); return; }
+  ctx.sfx.play("notyet");
+  say("#hang-feedback", "wrong", message);
+}
+
+// A starting place: the first letter still hidden, reading from the left. Never
+// the hyphen, which in the hyphen weeks is the very decision she is there to make.
+async function hangHint() {
+  if (hang.done || hang.hinted) return;
+  const ch = [...hang.word].find((c) => c !== "-" && !hang.guessed.has(c));
+  if (!ch) return;
+  hang.hinted = true;
+  $("#hang-hint").disabled = true;
+  await hangGuess(ch, true);
+}
+
+// Typing the whole word is the way to finish early, and the one move here that
+// is free recall. A wrong guess costs a petal, and it never stays on screen.
+async function hangSolve() {
+  if (hang.done) return;
+  const typed = wordForm($("#hang-input").value);
+  $("#hang-input").value = "";
+  $("#hang-solve").disabled = true;
+  if (!typed) return;
+  if (typed === hang.word) { await hangEnd(true, true); return; }
+  await hangMiss("That is not it. Keep guessing.");
+}
+
+async function hangEnd(solved, typed = false) {
+  hang.done = true;
+  if (!solved) for (const ch of hang.word) if (!hang.guessed.has(ch)) hang.given.add(ch);
+  const gained = !solved ? 0 : hang.hinted ? hinted(POINTS.hangman) : POINTS.hangman;
+  hang.results.push({ word: hang.word, solved, hint: hang.hinted, misses: hang.misses, typed });
+  hang.gained += gained;
+  paintHang();
+  $("#hang-keys").hidden = true;
+  $("#hang-solve-row").hidden = true;
+  $("#hang-hint").hidden = true;
+  // A miss is information: the word in its parts, and its rule.
+  $("#hang-reveal").replaceChildren(
+    ctx.el("p", { className: "whole" }, partSpans(hang.word)),
+    ctx.el("p", { className: "muted", textContent: ctx.data().words[hang.word].why }));
+  $("#hang-reveal").hidden = false;
+  say("#hang-feedback", solved ? "right" : "wrong", solved
+    ? `${typed ? "You knew it!" : "You got it!"}${gained ? `  +${gained}` : ""}`
+    : "Out of petals this time. Here is the word.");
+  ctx.sfx.play(solved ? "correct" : "notyet");
+  $("#hang-next").hidden = false;
+  $("#hang-next").textContent = hang.i + 1 < hang.items.length ? "Next word" : "Finish";
+  $("#hang-next").focus();
+  await award(gained);
+}
+
+async function hangNext() {
+  hang.i += 1;
+  if (hang.i < hang.items.length) { hangItem(); return; }
+  ctx.sfx.play("complete");
+  const solved = hang.results.filter((r) => r.solved);
+  $("#hang-count").textContent = "Round finished";
+  $("#hang-reveal").hidden = true;
+  $("#hang-word").replaceChildren();
+  $("#hang-left").textContent = "";
+  say("#hang-feedback", "right", `${solved.length} of ${hang.results.length} solved, `
+    + `${solved.filter((r) => !r.hint).length} without a hint.`
+    + (hang.gained ? ` +${hang.gained} points this round.` : ""));
+  $("#hang-next").textContent = "Another round";
+  $("#hang-next").onclick = startHangman;
+  await logRound("hangman", hang.results, hang.gained);
+}
+
+// ------------------------------------------------------------------ hidden words
+
+// A block from engine/wordblocks.py: four or five of the week's words fill it,
+// each a path through touching letters. She traces a word by tapping its letters
+// one after another, or by sliding through them. Any route that spells a hidden
+// word counts. The block carries every route and every way they fit together, so
+// checking her route is a lookup, never a search.
+const hunt = { block: null, found: new Map(), trace: [], hint: null, hinted: new Set(),
+               gained: 0, done: false, saving: null };
+
+export async function startHunt() {
+  await hunt.saving;
+  const week = ctx.week();
+  const blocks = ctx.data().weeks[week.id].blocks;
+  // The next block in the week's order: a finished block is logged, so the log
+  // says how many she has done this week.
+  const log = await ctx.store.getKV("game_log", []);
+  const done = log.filter((r) => r.game === "hunt" && r.week === week.id).length;
+  const b = hunt.block = blocks[done % blocks.length];
+  hunt.found = new Map(); hunt.trace = []; hunt.hint = null; hunt.hinted = new Set();
+  hunt.gained = 0; hunt.done = false;
+  $("#hunt-wrap").style.setProperty("--cols", String(b.cols));
+  $("#hunt-grid").replaceChildren(...[...b.letters].map((ch, i) => {
+    const cell = ctx.el("button", { className: "hunt-cell", textContent: ch,
+                                    dataset: { i: String(i) } });
+    if (ch === "-") cell.setAttribute("aria-label", "hyphen");
+    return cell;
+  }));
+  $("#hunt-found").replaceChildren();
+  $("#hunt-again").hidden = true;
+  $("#hunt-hint").hidden = false;
+  $("#hunt-clear").hidden = false;
+  say("#hunt-feedback", "", "");
+  paintPoints();
+  huntCount();
+  ctx.show("hunt");
+  requestAnimationFrame(huntDraw);
+}
+
+const huntCell = (i) => $("#hunt-grid").children[i];
+
+function adjacent(a, b) {
+  const cols = hunt.block.cols;
+  return a !== b && Math.abs(Math.floor(a / cols) - Math.floor(b / cols)) <= 1
+    && Math.abs((a % cols) - (b % cols)) <= 1;
+}
+
+const spent = () => new Set([...hunt.found].flatMap(([w, r]) => hunt.block.routes[w][r]));
+
+// The ways the whole block can still be finished, given what she has found.
+const stillFits = () => hunt.block.tilings.filter((t) =>
+  [...hunt.found].every(([w, r]) => t[w] === r));
+
+function huntCount() {
+  const b = hunt.block;
+  $("#hunt-count").textContent = `${plural(b.words.length, "word")} from this week `
+    + `(${theme(ctx.week())}) are hiding here. Found: ${hunt.found.size}.`;
+}
+
+// Tap the next letter to add it, the last letter again to take it back, an
+// earlier one to go back to there, or any other letter to start again from it.
+function huntTap(i) {
+  if (hunt.done || spent().has(i)) return;
+  const t = hunt.trace;
+  const at = t.indexOf(i);
+  if (at >= 0 && at === t.length - 1) t.pop();
+  else if (at >= 0) t.length = at + 1;
+  else if (t.length && adjacent(t[t.length - 1], i)) t.push(i);
+  else hunt.trace = [i];
+  huntChanged();
+}
+
+// Sliding a finger through the letters does the same. Only the middle of a letter
+// counts as touching it, so a diagonal slide does not clip the letters it passes.
+function wireHunt() {
+  const grid = $("#hunt-grid");
+  let drag = null;
+  const cellAt = (x, y) => {
+    const cell = document.elementFromPoint(x, y)?.closest(".hunt-cell");
+    if (!cell || !grid.contains(cell)) return null;
+    const r = cell.getBoundingClientRect();
+    const off = Math.hypot(x - (r.left + r.width / 2), y - (r.top + r.height / 2));
+    return off <= r.width * 0.42 ? Number(cell.dataset.i) : null;
+  };
+  grid.addEventListener("pointerdown", (e) => {
+    const cell = e.target.closest(".hunt-cell");
+    if (!cell || hunt.done) return;
+    const i = Number(cell.dataset.i);
+    drag = { id: e.pointerId, start: i, last: i, moved: false };
+    grid.setPointerCapture(e.pointerId);
+  });
+  grid.addEventListener("pointermove", (e) => {
+    if (!drag || e.pointerId !== drag.id) return;
+    const i = cellAt(e.clientX, e.clientY);
+    if (i === null || i === drag.last) return;
+    if (!drag.moved) {
+      drag.moved = true;
+      // A slide carries on from the end of the trace, or starts a new one.
+      if (hunt.trace[hunt.trace.length - 1] !== drag.start) {
+        hunt.trace = spent().has(drag.start) ? [] : [drag.start];
+      }
+    }
+    drag.last = i;
+    const t = hunt.trace;
+    if (t.length >= 2 && t[t.length - 2] === i) { t.pop(); huntChanged(); return; }
+    if (!t.length || spent().has(i) || t.includes(i) || !adjacent(t[t.length - 1], i)) return;
+    t.push(i);
+    huntChanged();
+  });
+  grid.addEventListener("pointerup", (e) => {
+    if (!drag || e.pointerId !== drag.id) return;
+    const { start, moved } = drag;
+    drag = null;
+    if (!moved) huntTap(start);
+  });
+  grid.addEventListener("pointercancel", () => { drag = null; });
+  // Keyboard: Enter or Space on a focused letter taps it.
+  grid.addEventListener("click", (e) => {
+    const cell = e.target.closest(".hunt-cell");
+    if (cell && e.detail === 0) huntTap(Number(cell.dataset.i));
+  });
+  window.addEventListener("resize", () => {
+    if ($("#screen-hunt").classList.contains("on")) huntDraw();
+  });
+}
+
+async function huntChanged() {
+  paintTrace();
+  const b = hunt.block;
+  const t = hunt.trace;
+  const w = b.words.indexOf(t.map((i) => b.letters[i]).join(""));
+  if (w < 0) return;
+  if (hunt.found.has(w)) {
+    say("#hunt-feedback", "", `You have found ${b.words[w]} already.`);
+    hunt.trace = [];
+    paintTrace();
+    return;
+  }
+  const r = b.routes[w].findIndex((route) =>
+    route.length === t.length && route.every((c, k) => c === t[k]));
+  const fits = stillFits();
+  if (r >= 0 && fits.some((f) => f[w] === r)) { await huntFound(w, r, false); return; }
+  // Spelled right, along a route that would leave the rest unable to fit. It still
+  // counts: the word moves to the nearest route that fits, starting where she did
+  // if it can.
+  const score = (k) => {
+    const route = b.routes[w][k];
+    return (route[0] === t[0] ? 100 : 0) + route.filter((c) => t.includes(c)).length;
+  };
+  const best = fits.map((f) => f[w]).sort((x, y) => score(y) - score(x))[0];
+  await huntFound(w, best, true);
+}
+
+function paintTrace() {
+  const on = new Set(hunt.trace);
+  for (const cell of $("#hunt-grid").children) {
+    cell.classList.toggle("on", on.has(Number(cell.dataset.i)));
+  }
+  huntDraw();
+}
+
+// The lines run underneath the letters, in the gaps between them.
+function huntDraw() {
+  const b = hunt.block;
+  if (!b) return;
+  const box = $("#hunt-wrap").getBoundingClientRect();
+  const centre = (i) => {
+    const r = huntCell(i).getBoundingClientRect();
+    return `${r.left - box.left + r.width / 2},${r.top - box.top + r.height / 2}`;
+  };
+  const line = (cells, cls) => {
+    const p = document.createElementNS(SVG, "polyline");
+    p.setAttribute("class", cls);
+    p.setAttribute("points", cells.map(centre).join(" "));
+    return p;
+  };
+  $("#hunt-lines").replaceChildren(
+    ...[...hunt.found].map(([w, r]) => line(b.routes[w][r], "word")),
+    ...(hunt.trace.length > 1 ? [line(hunt.trace, "trace")] : []));
+}
+
+async function huntFound(w, r, moved) {
+  const b = hunt.block;
+  const word = b.words[w];
+  hunt.found.set(w, r);
+  hunt.trace = [];
+  const kinds = letterKinds(word);
+  b.routes[w][r].forEach((c, k) => huntCell(c).classList.add("found", `k-${kinds[k]}`));
+  if (hunt.hint && hunt.hint.w === w) hunt.hint = null;
+  paintHint();
+  paintTrace();
+  const gained = hunt.hinted.has(word) ? hinted(POINTS.hunt) : POINTS.hunt;
+  hunt.gained += gained;
+  $("#hunt-found").append(ctx.el("span", {}, partSpans(word)));
+  say("#hunt-feedback", "right", `Found ${word}!${moved ? " In this block it fits here." : ""}`
+    + `  +${gained}`);
+  huntCount();
+  // The screen answers at once; saving follows.
+  const last = hunt.found.size === b.words.length;
+  if (last) huntEnd(word);
+  else ctx.sfx.play("correct");
+  await award(gained);
+  if (last) await hunt.saving;
+}
+
+// A starting place: the first letter of a word she has not found yet is ringed.
+// Asking again rings the next letter of the same word, which shows the way it
+// goes. It never rings a whole word.
+function huntHint() {
+  if (hunt.done) return;
+  const b = hunt.block;
+  if (!hunt.hint) {
+    const w = b.words.findIndex((_, k) => !hunt.found.has(k));
+    if (w < 0) return;
+    hunt.hint = { w, lit: 0, route: null };
+  }
+  const h = hunt.hint;
+  hunt.hinted.add(b.words[h.w]);
+  const route = hintRoute();
+  h.lit = Math.min(h.lit + 1, route.length - 1);
+  paintHint();
+  say("#hunt-feedback", "", h.lit === 1 ? "A word starts at the ringed letter."
+    : "The ringed letters are the start of a word, in order.");
+}
+
+// The hinted word's route in a layout that can still be finished, keeping the
+// letters already ringed where they are.
+function hintRoute() {
+  const b = hunt.block, h = hunt.hint;
+  const fits = stillFits();
+  const lit = h.route ? h.route.slice(0, h.lit) : [];
+  h.route = fits.map((f) => b.routes[h.w][f[h.w]]).find((r) => lit.every((c, k) => r[k] === c))
+    || b.routes[h.w][fits[0][h.w]];
+  return h.route;
+}
+
+function paintHint() {
+  if (hunt.hint) hintRoute();
+  const ringed = new Set(hunt.hint ? hunt.hint.route.slice(0, hunt.hint.lit) : []);
+  for (const cell of $("#hunt-grid").children) {
+    cell.classList.toggle("hint", ringed.has(Number(cell.dataset.i)));
+  }
+}
+
+function huntEnd(word) {
+  hunt.done = true;
+  const b = hunt.block;
+  const items = b.words.map((w) => ({ word: w, hint: hunt.hinted.has(w) }));
+  ctx.sfx.play("complete");
+  say("#hunt-feedback", "right", `Found ${word}! All ${b.words.length} found, `
+    + `${items.filter((x) => !x.hint).length} without a hint.`
+    + (hunt.gained ? ` +${hunt.gained} points this block.` : ""));
+  $("#hunt-hint").hidden = true;
+  $("#hunt-clear").hidden = true;
+  $("#hunt-again").hidden = false;
+  $("#hunt-again").focus();
+  // "Another block" waits for this: the log is how it knows which block is next.
+  hunt.saving = logRound("hunt", items, hunt.gained);
+}
+
 // ------------------------------------------------------------------ bonus round
 
 const bonus = { tiles: [], open: null, score: 0 };
@@ -664,6 +1120,27 @@ export function wire() {
   $("#game-match").onclick = startMatch;
   $("#game-sort").onclick = startSort;
   $("#game-bonus").onclick = startBonus;
+  $("#game-hangman").onclick = startHangman;
+  $("#game-hunt").onclick = startHunt;
+  $("#hang-hint").onclick = hangHint;
+  $("#hang-solve").onclick = hangSolve;
+  $("#hang-input").addEventListener("input", (e) => {
+    $("#hang-solve").disabled = !e.target.value.trim();
+  });
+  $("#hang-input").addEventListener("keydown", (e) => {
+    if (e.key === "Enter") { e.preventDefault(); hangSolve(); }
+  });
+  // A keyboard, where there is one, guesses letters too.
+  document.addEventListener("keydown", (e) => {
+    if (!$("#screen-hangman").classList.contains("on") || e.target === $("#hang-input")) return;
+    if (e.metaKey || e.ctrlKey || e.altKey) return;
+    const k = e.key.toLowerCase();
+    if (/^[a-z]$/.test(k) || k === "-") { e.preventDefault(); hangGuess(k); }
+  });
+  $("#hunt-hint").onclick = huntHint;
+  $("#hunt-clear").onclick = () => { hunt.trace = []; paintTrace(); say("#hunt-feedback", "", ""); };
+  $("#hunt-again").onclick = startHunt;
+  wireHunt();
   $("#jig-check").onclick = jigCheck;
   $("#jig-clear").onclick = () => { for (const p of [...$("#jig-board").children]) movePiece(p, $("#jig-tray")); };
   $("#jig-next").onclick = jigNext;
@@ -677,5 +1154,6 @@ export function wire() {
   });
   $("#bonus-check").onclick = bonusCheck;
   $("#bonus-back").onclick = bonusBack;
-  for (const id of ["#jig-quit", "#match-quit", "#sort-quit", "#bonus-quit"]) $(id).onclick = openHub;
+  for (const id of ["#jig-quit", "#match-quit", "#sort-quit", "#bonus-quit", "#hang-quit",
+                    "#hunt-quit"]) $(id).onclick = openHub;
 }

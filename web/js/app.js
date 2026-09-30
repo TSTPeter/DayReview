@@ -976,7 +976,8 @@ async function paintGamesSummary() {
   const words = new Set(recent.flatMap((r) => r.items.map((i) => i.word)).filter(Boolean));
   $("#gu-games-summary").textContent = log.length
     ? `Last 7 days: ${count("jigsaw")} jigsaw, ${count("match")} root match, `
-      + `${count("sort")} pattern sort and ${count("bonus")} bonus rounds, `
+      + `${count("sort")} pattern sort, ${count("hangman")} hangman, `
+      + `${count("hunt")} hidden words and ${count("bonus")} bonus rounds, `
       + `touching ${words.size} words; ${sessions} dictation sessions. `
       + `${pts.earned || 0} points earned in all.`
     : "No games played yet.";

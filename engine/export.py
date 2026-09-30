@@ -13,6 +13,7 @@ Writes web/data/words.json. Run it after any change to words.py or probe.py.
 
 import json
 import pathlib
+import re
 
 import games
 import probe
@@ -64,6 +65,16 @@ def build_sentences():
             "pronunciation_watchlist": sentences.PRONUNCIATION_WATCHLIST}
 
 
+def _one_line_numbers(text):
+    """indent=1, except that a list of numbers stays on one line.
+
+    The word blocks' routes are hundreds of short lists of cell numbers; one number
+    to a line doubled the size of games.json for nothing.
+    """
+    return re.sub(r"\[\s*(-?\d+(?:,\s*-?\d+)*)\s*\]",
+                  lambda m: "[" + ",".join(x.strip() for x in m.group(1).split(",")) + "]", text)
+
+
 if __name__ == "__main__":
     OUT.parent.mkdir(parents=True, exist_ok=True)
     payload = build()
@@ -90,8 +101,9 @@ if __name__ == "__main__":
 
     curated = {w["word"]: w for w in payload["words"] + payload["off_list"]}
     content = games.build(weeks, curated, sentences.SENTENCES, list(NOUN_VERB_PAIRS))
-    OUT_GAMES.write_text(json.dumps(content, indent=1) + "\n")
+    OUT_GAMES.write_text(_one_line_numbers(json.dumps(content, indent=1)) + "\n")
     print(f"wrote {OUT_GAMES.relative_to(ROOT)}  {len(content['words'])} words, "
+          f"{sum(len(w['blocks']) for w in content['weeks'].values())} word blocks, "
           f"{sum(len(w['roots']) for w in content['weeks'].values())} root pairs, "
           f"{sum(len(w['sort']['cards']) for w in content['weeks'].values() if w['sort'])} sort cards")
 
