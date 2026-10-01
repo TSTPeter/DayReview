@@ -8,5 +8,9 @@ words.csv
 engine/words.json
 engine/words.csv
 
-# Real Firebase config: never commit. See web/data/firebase.example.json
+# A Firebase config: never commit, never serve. The app takes it pasted on the
+# tablet (docs/13), and tools/deploy_to_site.py refuses to ship one.
 web/data/firebase.json
+
+# Downloaded corpora for tools/find_quotes.py: never committed
+.cache/

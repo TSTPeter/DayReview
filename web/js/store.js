@@ -134,6 +134,11 @@ export async function exportAll() {
     pattern_state: await getKV("pattern_state"),
     game_points: await getKV("game_points"),
     game_log: await getKV("game_log"),
+    // experiments/2026-10-support-types.md: the seed, every assignment and every
+    // showing, so the registered analysis can be run on the export.
+    experiment_seed: await getKV("experiment_seed"),
+    support_arms: await getKV("support_arms"),
+    support_log: await getKV("support_log"),
     // Deliberately absent: learner_name. docs/06 standard 8 keeps a name out of
     // the learner record, and an export is the record leaving the device.
   };

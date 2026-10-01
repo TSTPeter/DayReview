@@ -95,3 +95,15 @@ feature is wanted, mark, store and analyse it locally.
 3. Ship export and hard-delete alongside the first multi-user release.
 4. Re-check the Children's code before any launch. Post Data (Use and Access) Act revisions
    to ICO codes were anticipated and could not be confirmed as of September 2026.
+
+## 1 October 2026: the line, approached
+
+Three features arrived together: a Share button, Firebase sync, and a microphone. The
+first takes the app beyond the family, which is the line this document draws, so
+the DPIA is now written, in draft, as `docs/16-dpia.md`, before the button ships.
+
+Peter asked for friends to see each other's daily progress, including friends of
+friends. He chose the narrower option, sharing the address only, after weighing
+ICO standards 5, 9 and 13. A social layer would need its own DPIA and parental
+consent, since under 13 "an adult with parental responsibility must provide
+consent".

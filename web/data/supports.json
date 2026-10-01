@@ -1,0 +1,3671 @@
+{
+ "generated_by": "engine/supports.py",
+ "reviewed": false,
+ "arms": [
+  "etymology",
+  "story",
+  "say",
+  "blend"
+ ],
+ "registration": "experiments/2026-10-support-types.md",
+ "words": {
+  "accommodate": {
+   "etymology": {
+    "text": "From the Latin ad + com + modus, meaning \u2018measure, fit\u2019.",
+    "family": [
+     "accompany",
+     "accord",
+     "commodity"
+    ]
+   },
+   "story": {
+    "kind": "quote",
+    "text": "They preferred taking it out of doors, under the trees, and I set a little table to accommodate them.",
+    "source": "Emily Bront\u00eb, Wuthering Heights, 1847",
+    "ebook": 768
+   },
+   "say": {
+    "chunks": [
+     "ac",
+     "com",
+     "mod",
+     "ate"
+    ],
+    "stress": [3]
+   }
+  },
+  "accompany": {
+   "etymology": {
+    "text": "From the Latin ad + com + panis, meaning \u2018with bread\u2019.",
+    "family": [
+     "accommodate",
+     "company",
+     "companion"
+    ]
+   },
+   "story": {
+    "kind": "quote",
+    "text": "I answered by inviting him to accompany me on a general inspection of the result of my labours.",
+    "source": "Charlotte Bront\u00eb, Jane Eyre, 1847",
+    "ebook": 1260
+   },
+   "say": {
+    "chunks": [
+     "ac",
+     "com",
+     "pan",
+     "y"
+    ],
+    "stress": [3]
+   }
+  },
+  "according": {
+   "etymology": {
+    "text": "From the Latin ad + cor, cordis, meaning \u2018heart\u2019.",
+    "family": [
+     "accord",
+     "cordial",
+     "record"
+    ]
+   },
+   "story": {
+    "kind": "quote",
+    "text": "The Jungle People are very busy in the spring, and Mowgli could hear them grunting and screaming and whistling according to their kind.",
+    "source": "Rudyard Kipling, The Second Jungle Book, 1895",
+    "ebook": 1937
+   },
+   "say": {
+    "chunks": [
+     "ac",
+     "cord",
+     "ing"
+    ],
+    "stress": [2]
+   }
+  },
+  "achieve": {
+   "etymology": {
+    "text": "From the French a chief, meaning \u2018to a head\u2019.",
+    "family": [
+     "chief",
+     "mischief",
+     "believe"
+    ]
+   },
+   "story": {
+    "kind": "quote",
+    "text": "I honour endurance, perseverance, industry, talent; because these are the means by which men achieve great ends and mount to lofty eminence.",
+    "source": "Charlotte Bront\u00eb, Jane Eyre, 1847",
+    "ebook": 1260
+   },
+   "say": {
+    "chunks": [
+     "a",
+     "chieve"
+    ],
+    "stress": [1]
+   }
+  },
+  "advice": {
+   "etymology": {
+    "text": "From the Latin ad + videre, meaning \u2018to see\u2019.",
+    "family": [
+     "device",
+     "practice",
+     "licence"
+    ]
+   },
+   "story": {
+    "kind": "quote",
+    "text": "\u201cI never ask advice about growing,\u201d Alice said indignantly.",
+    "source": "Lewis Carroll, Through the Looking-Glass, 1871",
+    "ebook": 12
+   },
+   "say": {
+    "chunks": [
+     "ad",
+     "vice"
+    ],
+    "stress": [1]
+   }
+  },
+  "advise": {
+   "etymology": {
+    "text": "From the Latin ad + videre, meaning \u2018to see\u2019.",
+    "family": [
+     "devise",
+     "practise",
+     "license"
+    ]
+   },
+   "story": {
+    "kind": "quote",
+    "text": "\u201cYou can\u2019t possibly do that,\u201d said the Rose: \u201cI should advise you to walk the other way.\u201d",
+    "source": "Lewis Carroll, Through the Looking-Glass, 1871",
+    "ebook": 12
+   },
+   "say": {
+    "chunks": [
+     "ad",
+     "vise"
+    ],
+    "stress": [1]
+   }
+  },
+  "aggressive": {
+   "etymology": {
+    "text": "From the Latin ad + gradi, gressus, meaning \u2018to step\u2019.",
+    "family": [
+     "progress",
+     "congress",
+     "digress"
+    ]
+   },
+   "story": {
+    "kind": "quote",
+    "text": "And Bill struggles out, a muddy, trampled wreck, and in an unnecessarily aggressive mood...",
+    "source": "Jerome K. Jerome, Three Men in a Boat, 1889",
+    "ebook": 308
+   },
+   "say": {
+    "chunks": [
+     "ag",
+     "gress",
+     "ive"
+    ],
+    "stress": [2]
+   }
+  },
+  "amateur": {
+   "etymology": {
+    "text": "From the French amator, amare, meaning \u2018to love\u2019.",
+    "family": [
+     "amorous",
+     "entrepreneur",
+     "chauffeur"
+    ]
+   },
+   "story": {
+    "kind": "quote",
+    "text": "There is, it must be confessed, something very sad about the early efforts of an amateur in bagpipes.",
+    "source": "Jerome K. Jerome, Three Men in a Boat, 1889",
+    "ebook": 308
+   },
+   "say": {
+    "chunks": [
+     "amat",
+     "eur"
+    ],
+    "stress": [1]
+   }
+  },
+  "ancient": {
+   "etymology": {
+    "text": "From the French ante, meaning \u2018before\u2019.",
+    "family": [
+     "sufficient",
+     "efficient",
+     "conscience"
+    ]
+   },
+   "story": {
+    "kind": "quote",
+    "text": "When he got it home it was a Sunday puzzle about ancient Nineveh!",
+    "source": "E. Nesbit, Five Children and It, 1902",
+    "ebook": 778
+   },
+   "say": {
+    "chunks": [
+     "anci",
+     "ent"
+    ],
+    "stress": [1]
+   }
+  },
+  "apparent": {
+   "etymology": {
+    "text": "From the Latin ad + parere, meaning \u2018to appear\u2019.",
+    "family": [
+     "appear",
+     "apparition",
+     "transparent"
+    ]
+   },
+   "story": {
+    "kind": "quote",
+    "text": "Mary said nothing at all, and Mrs. Medlock looked rather discomfited by her apparent indifference, but, after taking a breath, she went on.",
+    "source": "Frances Hodgson Burnett, The Secret Garden, 1911",
+    "ebook": 113
+   },
+   "say": {
+    "chunks": [
+     "ap",
+     "par",
+     "ent"
+    ],
+    "stress": [2]
+   }
+  },
+  "appreciate": {
+   "etymology": {
+    "text": "From the Latin ad + pretium, meaning \u2018price\u2019.",
+    "family": [
+     "price",
+     "precious",
+     "appraise"
+    ]
+   },
+   "story": {
+    "kind": "quote",
+    "text": "\u201cWell done for a yearling!\u201d said the Sea Lion, who could appreciate good swimming.",
+    "source": "Rudyard Kipling, The Jungle Book, 1894",
+    "ebook": 236
+   },
+   "say": {
+    "chunks": [
+     "ap",
+     "preci",
+     "ate"
+    ],
+    "stress": [2]
+   }
+  },
+  "attached": {
+   "etymology": {
+    "text": "From the French atachier, meaning \u2018to fasten\u2019.",
+    "family": [
+     "attach",
+     "attack",
+     "detach"
+    ]
+   },
+   "story": {
+    "kind": "quote",
+    "text": "Everyone disagreed with him at the time, and no one attached any importance to the incident.",
+    "source": "E. Nesbit, Five Children and It, 1902",
+    "ebook": 778
+   },
+   "say": {
+    "chunks": [
+     "at",
+     "tach",
+     "ed"
+    ],
+    "stress": [2]
+   }
+  },
+  "available": {
+   "etymology": {
+    "text": "From the Latin ad + valere, meaning \u2018to be strong, worth\u2019.",
+    "family": [
+     "value",
+     "valid",
+     "prevail"
+    ]
+   },
+   "story": {
+    "kind": "quote",
+    "text": "A cast of your skull, sir, until the original is available, would be an ornament to any anthropological museum.",
+    "source": "Arthur Conan Doyle, The Hound of the Baskervilles, 1902",
+    "ebook": 2852
+   },
+   "say": {
+    "chunks": [
+     "a",
+     "vail",
+     "able"
+    ],
+    "stress": [2]
+   }
+  },
+  "average": {
+   "etymology": {
+    "text": "From the Arabic awar, meaning \u2018damage to cargo\u2019.",
+    "family": [
+     "courage",
+     "damage",
+     "village"
+    ]
+   },
+   "story": {
+    "kind": "quote",
+    "text": "And another, \u201cHow long would it take a school-inspector of average activity to tumble head over heels from London to York?\u201d",
+    "source": "Charles Kingsley, The Water-Babies, 1863",
+    "ebook": 1018
+   },
+   "say": {
+    "chunks": [
+     "aver",
+     "age"
+    ],
+    "stress": [1]
+   }
+  },
+  "awkward": {
+   "etymology": {
+    "text": "From the Old Norse afugr + -ward, meaning \u2018turned the wrong way\u2019.",
+    "family": [
+     "backward",
+     "forward",
+     "toward"
+    ]
+   },
+   "story": {
+    "kind": "quote",
+    "text": "That seemed to be everything, and an awkward pause followed.",
+    "source": "J. M. Barrie, Peter Pan, 1911",
+    "ebook": 16
+   },
+   "say": {
+    "chunks": [
+     "awk",
+     "ward"
+    ],
+    "stress": [1]
+   }
+  },
+  "bargain": {
+   "etymology": {
+    "text": "From the French bargaignier, meaning \u2018to haggle\u2019.",
+    "family": [
+     "captain",
+     "mountain",
+     "villain"
+    ]
+   },
+   "story": {
+    "kind": "quote",
+    "text": "Then the Man said, \u2018Yes, but he has not made a bargain with me or with all proper Men after me.\u2019",
+    "source": "Rudyard Kipling, Just So Stories, 1902",
+    "ebook": 2781
+   },
+   "say": {
+    "chunks": [
+     "bar",
+     "gain"
+    ],
+    "stress": [1]
+   }
+  },
+  "bruise": {
+   "etymology": {
+    "text": "From the Old English brysan, meaning \u2018to crush\u2019.",
+    "family": [
+     "cruise",
+     "juice",
+     "fruit"
+    ]
+   },
+   "story": {
+    "kind": "quote",
+    "text": "Robert tore down a stocking and showed a purple bruise touched up with red.",
+    "source": "E. Nesbit, Five Children and It, 1902",
+    "ebook": 778
+   },
+   "say": {
+    "chunks": [
+     "bruise"
+    ],
+    "stress": [0]
+   }
+  },
+  "calamitous": {
+   "etymology": {
+    "text": "From the Latin calamitas, meaning \u2018damage, a disaster\u2019.",
+    "family": [
+     "disastrous",
+     "glorious",
+     "furious"
+    ]
+   },
+   "story": {
+    "kind": "quote",
+    "text": "Mrs. Bulstrode is anxious for her niece, and I myself should grieve at a calamitous change in your position.",
+    "source": "George Eliot, Middlemarch, 1871",
+    "ebook": 145
+   },
+   "say": {
+    "chunks": [
+     "calamit",
+     "ous"
+    ],
+    "stress": [1]
+   }
+  },
+  "category": {
+   "etymology": {
+    "text": "From the Greek kategoria, meaning \u2018a statement, an accusation\u2019.",
+    "family": [
+     "categorise",
+     "allegory",
+     "memory"
+    ]
+   },
+   "story": {
+    "kind": "quote",
+    "text": "Well, I have no doubt that this small matter will fall into the same innocent category.",
+    "source": "Arthur Conan Doyle, The Adventures of Sherlock Holmes, 1892",
+    "ebook": 1661
+   },
+   "say": {
+    "chunks": [
+     "categor",
+     "y"
+    ],
+    "stress": [1]
+   }
+  },
+  "cemetery": {
+   "etymology": {
+    "text": "From the Greek koimeterion, meaning \u2018sleeping place\u2019.",
+    "family": [
+     "monastery",
+     "mystery",
+     "stationery"
+    ]
+   },
+   "story": {
+    "kind": "written",
+    "text": "The old cemetery behind the church was full of mossy stones with names you could barely read.",
+    "source": "Written for you"
+   },
+   "say": {
+    "chunks": [
+     "cemeter",
+     "y"
+    ],
+    "stress": [1]
+   }
+  },
+  "co-author": {
+   "etymology": {
+    "text": "From the Latin co + auctor, meaning \u2018a maker, together\u2019.",
+    "family": [
+     "co-operate",
+     "co-ordinate",
+     "co-own"
+    ]
+   },
+   "story": {
+    "kind": "written",
+    "text": "Mum and her friend were each a co-author of the cookbook, so both their names went on the cover.",
+    "source": "Written for you"
+   },
+   "say": {
+    "chunks": [
+     "co",
+     "hyphen",
+     "author"
+    ],
+    "stress": [1]
+   }
+  },
+  "co-operate": {
+   "etymology": {
+    "text": "From the Latin co + operari, meaning \u2018to work together\u2019.",
+    "family": [
+     "co-ordinate",
+     "co-own",
+     "co-author"
+    ]
+   },
+   "story": {
+    "kind": "written",
+    "text": "The two teams had to co-operate to get the raft across the river.",
+    "source": "Written for you"
+   },
+   "say": {
+    "chunks": [
+     "co",
+     "hyphen",
+     "operate"
+    ],
+    "stress": [1]
+   }
+  },
+  "co-ordinate": {
+   "etymology": {
+    "text": "From the Latin co + ordinare, meaning \u2018to put in order together\u2019.",
+    "family": [
+     "co-operate",
+     "co-own",
+     "co-author"
+    ]
+   },
+   "story": {
+    "kind": "written",
+    "text": "We had to co-ordinate our steps, or the three-legged race would end in a heap.",
+    "source": "Written for you"
+   },
+   "say": {
+    "chunks": [
+     "co",
+     "hyphen",
+     "ordinate"
+    ],
+    "stress": [1]
+   }
+  },
+  "co-own": {
+   "etymology": {
+    "text": "Made in English from co + own: to have together.",
+    "family": [
+     "co-operate",
+     "co-ordinate",
+     "co-author"
+    ]
+   },
+   "story": {
+    "kind": "written",
+    "text": "My brother and I co-own the old bike, so we take turns to ride it.",
+    "source": "Written for you"
+   },
+   "say": {
+    "chunks": [
+     "co",
+     "hyphen",
+     "own"
+    ],
+    "stress": [1]
+   }
+  },
+  "cold-hearted": {
+   "etymology": {
+    "text": "Made in English from cold + hearted: unkind, unfeeling.",
+    "family": [
+     "wide-eyed",
+     "pig-headed",
+     "tight-fisted"
+    ]
+   },
+   "story": {
+    "kind": "quote",
+    "text": "Extravagance and vanity had made him cold-hearted and selfish.",
+    "source": "Jane Austen, Sense and Sensibility, 1811",
+    "ebook": 161
+   },
+   "say": {
+    "chunks": [
+     "cold",
+     "hyphen",
+     "hearted"
+    ],
+    "stress": [1]
+   }
+  },
+  "committee": {
+   "etymology": {
+    "text": "From the Latin com + mittere, meaning \u2018to send with\u2019.",
+    "family": [
+     "commit",
+     "submit",
+     "transmit"
+    ]
+   },
+   "story": {
+    "kind": "quote",
+    "text": "Sir Leicester, in the library, has fallen asleep for the good of the country over the report of a Parliamentary committee.",
+    "source": "Charles Dickens, Bleak House, 1853",
+    "ebook": 1023
+   },
+   "say": {
+    "chunks": [
+     "com",
+     "mitt",
+     "ee"
+    ],
+    "stress": [2]
+   }
+  },
+  "communicate": {
+   "etymology": {
+    "text": "From the Latin communis, meaning \u2018common, shared\u2019.",
+    "family": [
+     "community",
+     "common",
+     "communion"
+    ]
+   },
+   "story": {
+    "kind": "quote",
+    "text": "Having made this discovery she naturally thought it of enough interest to communicate to Colin.",
+    "source": "Frances Hodgson Burnett, The Secret Garden, 1911",
+    "ebook": 113
+   },
+   "say": {
+    "chunks": [
+     "commun",
+     "ic",
+     "ate"
+    ],
+    "stress": [2]
+   }
+  },
+  "community": {
+   "etymology": {
+    "text": "From the Latin communis, meaning \u2018common, shared\u2019.",
+    "family": [
+     "communicate",
+     "common",
+     "commune"
+    ]
+   },
+   "story": {
+    "kind": "quote",
+    "text": "Angry as he was at the whole breed and community of Man, something jumped up in his throat and made him catch his breath when he looked at the village roofs.",
+    "source": "Rudyard Kipling, The Second Jungle Book, 1895",
+    "ebook": 1937
+   },
+   "say": {
+    "chunks": [
+     "commun",
+     "ity"
+    ],
+    "stress": [1]
+   }
+  },
+  "competition": {
+   "etymology": {
+    "text": "From the Latin com + petere, meaning \u2018to seek together\u2019.",
+    "family": [
+     "compete",
+     "petition",
+     "appetite"
+    ]
+   },
+   "story": {
+    "kind": "quote",
+    "text": "Little Dorrit thought of the competition that was to be entered upon, and assented very softly.",
+    "source": "Charles Dickens, Little Dorrit, 1857",
+    "ebook": 963
+   },
+   "say": {
+    "chunks": [
+     "com",
+     "pet",
+     "ition"
+    ],
+    "stress": [2]
+   }
+  },
+  "confidence": {
+   "etymology": {
+    "text": "From the Latin con + fidere, meaning \u2018to trust fully\u2019.",
+    "family": [
+     "confident",
+     "confidential",
+     "confide"
+    ]
+   },
+   "story": {
+    "kind": "quote",
+    "text": "It gave him confidence in himself, and when Teddy came running down the path, Rikki-tikki was ready to be petted.",
+    "source": "Rudyard Kipling, The Jungle Book, 1894",
+    "ebook": 236
+   },
+   "say": {
+    "chunks": [
+     "con",
+     "fid",
+     "ence"
+    ],
+    "stress": [2]
+   }
+  },
+  "confident": {
+   "etymology": {
+    "text": "From the Latin con + fidere, meaning \u2018to trust fully\u2019.",
+    "family": [
+     "confidence",
+     "confidential",
+     "confide"
+    ]
+   },
+   "story": {
+    "kind": "quote",
+    "text": "They talked of Cinderella, and Tootles was confident that his mother must have been very like her.",
+    "source": "J. M. Barrie, Peter Pan, 1911",
+    "ebook": 16
+   },
+   "say": {
+    "chunks": [
+     "con",
+     "fid",
+     "ent"
+    ],
+    "stress": [2]
+   }
+  },
+  "conscience": {
+   "etymology": {
+    "text": "From the Latin com + scire, meaning \u2018to know with\u2019.",
+    "family": [
+     "science",
+     "conscious",
+     "omniscient"
+    ]
+   },
+   "story": {
+    "kind": "quote",
+    "text": "He had the good conscience that comes from paying debts; all the Jungle was his friend, and just a little afraid of him.",
+    "source": "Rudyard Kipling, The Second Jungle Book, 1895",
+    "ebook": 1937
+   },
+   "say": {
+    "chunks": [
+     "con",
+     "sci",
+     "ence"
+    ],
+    "stress": [2]
+   }
+  },
+  "conscious": {
+   "etymology": {
+    "text": "From the Latin com + scire, meaning \u2018to know with\u2019.",
+    "family": [
+     "conscience",
+     "science",
+     "subconscious"
+    ]
+   },
+   "story": {
+    "kind": "quote",
+    "text": "But as he rode home, he began to be more conscious of being ill, than of being melancholy.",
+    "source": "George Eliot, Middlemarch, 1871",
+    "ebook": 145
+   },
+   "say": {
+    "chunks": [
+     "con",
+     "sci",
+     "ous"
+    ],
+    "stress": [2]
+   }
+  },
+  "controversy": {
+   "etymology": {
+    "text": "From the Latin contra + vertere, meaning \u2018to turn against\u2019.",
+    "family": [
+     "convert",
+     "reverse",
+     "adverse"
+    ]
+   },
+   "story": {
+    "kind": "quote",
+    "text": "Many hundred large volumes have been published upon this controversy...",
+    "source": "Jonathan Swift, Gulliver's Travels, 1726",
+    "ebook": 829
+   },
+   "say": {
+    "chunks": [
+     "contro",
+     "vers",
+     "y"
+    ],
+    "stress": [2]
+   }
+  },
+  "convenience": {
+   "etymology": {
+    "text": "From the Latin com + venire, meaning \u2018to come together\u2019.",
+    "family": [
+     "convene",
+     "intervene",
+     "avenue"
+    ]
+   },
+   "story": {
+    "kind": "quote",
+    "text": "What is my pleasure or convenience compared with that of others!",
+    "source": "Kenneth Grahame, The Wind in the Willows, 1908",
+    "ebook": 289
+   },
+   "say": {
+    "chunks": [
+     "con",
+     "veni",
+     "ence"
+    ],
+    "stress": [2]
+   }
+  },
+  "correspond": {
+   "etymology": {
+    "text": "From the Latin com + respondere, meaning \u2018to answer together\u2019.",
+    "family": [
+     "respond",
+     "response",
+     "sponsor"
+    ]
+   },
+   "story": {
+    "kind": "quote",
+    "text": "The diagnosis seems in every case to correspond exactly with all the sensations that I have ever felt.",
+    "source": "Jerome K. Jerome, Three Men in a Boat, 1889",
+    "ebook": 308
+   },
+   "say": {
+    "chunks": [
+     "cor",
+     "respond"
+    ],
+    "stress": []
+   }
+  },
+  "criticise": {
+   "etymology": {
+    "text": "From the Greek kritikos, meaning \u2018able to judge\u2019.",
+    "family": [
+     "critic",
+     "crisis",
+     "criterion"
+    ]
+   },
+   "story": {
+    "kind": "quote",
+    "text": "The Mole was a good listener, and Toad, with no one to check his statements or to criticise in an unfriendly spirit, rather let himself go.",
+    "source": "Kenneth Grahame, The Wind in the Willows, 1908",
+    "ebook": 289
+   },
+   "say": {
+    "chunks": [
+     "critic",
+     "ise"
+    ],
+    "stress": [1]
+   }
+  },
+  "curiosity": {
+   "etymology": {
+    "text": "From the Latin cura, meaning \u2018care\u2019.",
+    "family": [
+     "curious",
+     "cure",
+     "accurate"
+    ]
+   },
+   "story": {
+    "kind": "quote",
+    "text": "He had been looking at Alice for some time with great curiosity, and this was his first speech.",
+    "source": "Lewis Carroll, Alice's Adventures in Wonderland, 1865",
+    "ebook": 11
+   },
+   "say": {
+    "chunks": [
+     "curi",
+     "os",
+     "ity"
+    ],
+    "stress": [2]
+   }
+  },
+  "decency": {
+   "etymology": {
+    "text": "From the Latin decere, meaning \u2018to be fitting\u2019.",
+    "family": [
+     "decent",
+     "innocence",
+     "urgency"
+    ]
+   },
+   "story": {
+    "kind": "quote",
+    "text": "I was glad to notice that they had sufficient decency left in them to look very foolish.",
+    "source": "Jerome K. Jerome, Three Men in a Boat, 1889",
+    "ebook": 308
+   },
+   "say": {
+    "chunks": [
+     "dec",
+     "ency"
+    ],
+    "stress": [1]
+   }
+  },
+  "decent": {
+   "etymology": {
+    "text": "From the Latin decere, meaning \u2018to be fitting\u2019.",
+    "family": [
+     "decency",
+     "innocent",
+     "recent"
+    ]
+   },
+   "story": {
+    "kind": "quote",
+    "text": "If he\u2019d only employ a decent, steady, well-trained animal, pay him good wages, and leave everything to him, he\u2019d get on all right.",
+    "source": "Kenneth Grahame, The Wind in the Willows, 1908",
+    "ebook": 289
+   },
+   "say": {
+    "chunks": [
+     "dec",
+     "ent"
+    ],
+    "stress": [1]
+   }
+  },
+  "definite": {
+   "etymology": {
+    "text": "From the Latin de + finis, meaning \u2018boundary, end\u2019.",
+    "family": [
+     "finish",
+     "final",
+     "infinite"
+    ]
+   },
+   "story": {
+    "kind": "quote",
+    "text": "Once or twice I had a feeling of intense fear for which I could perceive no definite reason.",
+    "source": "H. G. Wells, The Time Machine, 1895",
+    "ebook": 35
+   },
+   "say": {
+    "chunks": [
+     "de",
+     "fin",
+     "ite"
+    ],
+    "stress": [2]
+   }
+  },
+  "desperate": {
+   "etymology": {
+    "text": "From the Latin de + sperare, meaning \u2018to hope\u2019.",
+    "family": [
+     "despair",
+     "prosper",
+     "desperation"
+    ]
+   },
+   "story": {
+    "kind": "quote",
+    "text": "Hatta made a desperate effort, and swallowed a large piece of bread-and-butter.",
+    "source": "Lewis Carroll, Through the Looking-Glass, 1871",
+    "ebook": 12
+   },
+   "say": {
+    "chunks": [
+     "de",
+     "sper",
+     "ate"
+    ],
+    "stress": [2]
+   }
+  },
+  "determined": {
+   "etymology": {
+    "text": "From the Latin de + terminus, meaning \u2018limit, boundary\u2019.",
+    "family": [
+     "terminate",
+     "term",
+     "exterminate"
+    ]
+   },
+   "story": {
+    "kind": "quote",
+    "text": "She knew it would be rude to smile, and she was very determined not to be rude.",
+    "source": "Frances Hodgson Burnett, A Little Princess, 1905",
+    "ebook": 146
+   },
+   "say": {
+    "chunks": [
+     "de",
+     "termin",
+     "ed"
+    ],
+    "stress": [2]
+   }
+  },
+  "develop": {
+   "etymology": {
+    "text": "From the French desveloper, meaning \u2018to unwrap\u2019.",
+    "family": [
+     "envelope",
+     "envelop",
+     "development"
+    ]
+   },
+   "story": {
+    "kind": "quote",
+    "text": "Robins are not like human beings; their muscles are always exercised from the first and so they develop themselves in a natural manner.",
+    "source": "Frances Hodgson Burnett, The Secret Garden, 1911",
+    "ebook": 113
+   },
+   "say": {
+    "chunks": [
+     "de",
+     "vel",
+     "op"
+    ],
+    "stress": [2]
+   }
+  },
+  "device": {
+   "etymology": {
+    "text": "From the Latin dividere, meaning \u2018to divide\u2019.",
+    "family": [
+     "advice",
+     "practice",
+     "licence"
+    ]
+   },
+   "story": {
+    "kind": "quote",
+    "text": "This was a device, I suppose, to sport with my curiosity, and exercise my talent of guessing.",
+    "source": "Jane Austen, Emma, 1815",
+    "ebook": 158
+   },
+   "say": {
+    "chunks": [
+     "de",
+     "vice"
+    ],
+    "stress": [1]
+   }
+  },
+  "devise": {
+   "etymology": {
+    "text": "From the Latin dividere, meaning \u2018to divide\u2019.",
+    "family": [
+     "advise",
+     "practise",
+     "license"
+    ]
+   },
+   "story": {
+    "kind": "quote",
+    "text": "A ride of two hundred and odd miles in severe weather, is one of the best softeners of a hard bed that ingenuity can devise.",
+    "source": "Charles Dickens, Nicholas Nickleby, 1839",
+    "ebook": 967
+   },
+   "say": {
+    "chunks": [
+     "de",
+     "vise"
+    ],
+    "stress": [1]
+   }
+  },
+  "dictionary": {
+   "etymology": {
+    "text": "From the Latin dicere, meaning \u2018to say\u2019.",
+    "family": [
+     "dictate",
+     "predict",
+     "verdict"
+    ]
+   },
+   "story": {
+    "kind": "quote",
+    "text": "And they could not find it in the dictionary either, though they looked.",
+    "source": "E. Nesbit, Five Children and It, 1902",
+    "ebook": 778
+   },
+   "say": {
+    "chunks": [
+     "dic",
+     "tion",
+     "ar",
+     "y"
+    ],
+    "stress": [1]
+   }
+  },
+  "disastrous": {
+   "etymology": {
+    "text": "From the Latin dis + astrum, meaning \u2018bad star\u2019.",
+    "family": [
+     "disaster",
+     "astronomy",
+     "asterisk"
+    ]
+   },
+   "story": {
+    "kind": "quote",
+    "text": "We felt that to give in to the weather in a climate such as ours would be a most disastrous precedent.",
+    "source": "Jerome K. Jerome, Three Men in a Boat, 1889",
+    "ebook": 308
+   },
+   "say": {
+    "chunks": [
+     "dis",
+     "astr",
+     "ous"
+    ],
+    "stress": [2]
+   }
+  },
+  "embarrass": {
+   "etymology": {
+    "text": "From the French embarrasser, meaning \u2018to block, to bar\u2019.",
+    "family": [
+     "harass",
+     "bar",
+     "barrier"
+    ]
+   },
+   "story": {
+    "kind": "quote",
+    "text": "Situated as we are with Lady Dalrymple, cousins, we ought to be very careful not to embarrass her with acquaintance she might not approve.",
+    "source": "Jane Austen, Persuasion, 1817",
+    "ebook": 105
+   },
+   "say": {
+    "chunks": [
+     "em",
+     "bar",
+     "rass"
+    ],
+    "stress": [1,2]
+   }
+  },
+  "environment": {
+   "etymology": {
+    "text": "From the French environ, meaning \u2018around\u2019.",
+    "family": [
+     "environs",
+     "government",
+     "environmental"
+    ]
+   },
+   "story": {
+    "kind": "quote",
+    "text": "An animal perfectly in harmony with its environment is a perfect mechanism.",
+    "source": "H. G. Wells, The Time Machine, 1895",
+    "ebook": 35
+   },
+   "say": {
+    "chunks": [
+     "en",
+     "vi",
+     "ron",
+     "ment"
+    ],
+    "stress": [2,3]
+   }
+  },
+  "equipment": {
+   "etymology": {
+    "text": "From the French equiper, meaning \u2018to fit out a ship\u2019.",
+    "family": [
+     "equip",
+     "equipped",
+     "shipment"
+    ]
+   },
+   "story": {
+    "kind": "quote",
+    "text": "By the time I came back Alan must have told his story; for it seemed understood that I was to fly with him, and they were all busy upon our equipment.",
+    "source": "Robert Louis Stevenson, Kidnapped, 1886",
+    "ebook": 421
+   },
+   "say": {
+    "chunks": [
+     "e",
+     "quip",
+     "ment"
+    ],
+    "stress": [1]
+   }
+  },
+  "equipped": {
+   "etymology": {
+    "text": "From the French equiper, meaning \u2018to fit out a ship\u2019.",
+    "family": [
+     "equip",
+     "equipment",
+     "shipped"
+    ]
+   },
+   "story": {
+    "kind": "quote",
+    "text": "In the meantime the boys were gazing very forlornly at Wendy, now equipped with John and Michael for the journey.",
+    "source": "J. M. Barrie, Peter Pan, 1911",
+    "ebook": 16
+   },
+   "say": {
+    "chunks": [
+     "e",
+     "quipped"
+    ],
+    "stress": [1]
+   }
+  },
+  "especially": {
+   "etymology": {
+    "text": "From the Latin specialis, meaning \u2018of a kind\u2019.",
+    "family": [
+     "special",
+     "species",
+     "specific"
+    ]
+   },
+   "story": {
+    "kind": "quote",
+    "text": "An elephant\u2019s trumpeting is always nasty, especially on a dark night.",
+    "source": "Rudyard Kipling, The Jungle Book, 1894",
+    "ebook": 236
+   },
+   "say": {
+    "chunks": [
+     "es",
+     "pe",
+     "cial",
+     "ly"
+    ],
+    "stress": [2,3]
+   }
+  },
+  "exaggerate": {
+   "etymology": {
+    "text": "From the Latin ex + agger, meaning \u2018a heap\u2019.",
+    "family": [
+     "aggregate",
+     "exaggeration",
+     "gesture"
+    ]
+   },
+   "story": {
+    "kind": "quote",
+    "text": "In her need for some manifestation of feeling she was ready to exaggerate her own fault.",
+    "source": "George Eliot, Middlemarch, 1871",
+    "ebook": 145
+   },
+   "say": {
+    "chunks": [
+     "ex",
+     "ag",
+     "ger",
+     "ate"
+    ],
+    "stress": [1,2]
+   }
+  },
+  "excellence": {
+   "etymology": {
+    "text": "From the Latin ex + cellere, meaning \u2018to rise above\u2019.",
+    "family": [
+     "excellent",
+     "excel"
+    ]
+   },
+   "story": {
+    "kind": "quote",
+    "text": "I often tell young ladies, that no excellence in music is to be acquired without constant practice.",
+    "source": "Jane Austen, Pride and Prejudice, 1813",
+    "ebook": 1342
+   },
+   "say": {
+    "chunks": [
+     "ex",
+     "cell",
+     "ence"
+    ],
+    "stress": [2]
+   }
+  },
+  "excellent": {
+   "etymology": {
+    "text": "From the Latin ex + cellere, meaning \u2018to rise above\u2019.",
+    "family": [
+     "excel",
+     "excellence",
+     "cellar"
+    ]
+   },
+   "story": {
+    "kind": "quote",
+    "text": "\u201cExcellent and deserving animal!\u201d said the Badger, his mouth full of chicken and trifle.",
+    "source": "Kenneth Grahame, The Wind in the Willows, 1908",
+    "ebook": 289
+   },
+   "say": {
+    "chunks": [
+     "ex",
+     "cell",
+     "ent"
+    ],
+    "stress": [2]
+   }
+  },
+  "existence": {
+   "etymology": {
+    "text": "From the Latin ex + sistere, meaning \u2018to stand out\u2019.",
+    "family": [
+     "exist",
+     "insist",
+     "resist"
+    ]
+   },
+   "story": {
+    "kind": "quote",
+    "text": "One of the most curious things in her new existence was her changed position among the pupils.",
+    "source": "Frances Hodgson Burnett, A Little Princess, 1905",
+    "ebook": 146
+   },
+   "say": {
+    "chunks": [
+     "ex",
+     "ist",
+     "ence"
+    ],
+    "stress": [2]
+   }
+  },
+  "existent": {
+   "etymology": {
+    "text": "From the Latin ex + sistere, meaning \u2018to stand out\u2019.",
+    "family": [
+     "existence",
+     "exist",
+     "non-existent"
+    ]
+   },
+   "story": {
+    "kind": "written",
+    "text": "The scientists were delighted to find the beetle still existent, long after they thought it had vanished.",
+    "source": "Written for you"
+   },
+   "say": {
+    "chunks": [
+     "ex",
+     "ist",
+     "ent"
+    ],
+    "stress": [2]
+   }
+  },
+  "expectancy": {
+   "etymology": {
+    "text": "From the Latin ex + spectare, meaning \u2018to look out for\u2019.",
+    "family": [
+     "expectant",
+     "expectation",
+     "expect"
+    ]
+   },
+   "story": {
+    "kind": "quote",
+    "text": "Hushed in expectancy, she kept her wary gaze upon the stairs...",
+    "source": "Charles Dickens, Hard Times, 1854",
+    "ebook": 786
+   },
+   "say": {
+    "chunks": [
+     "expect",
+     "ancy"
+    ],
+    "stress": [1]
+   }
+  },
+  "expectant": {
+   "etymology": {
+    "text": "From the Latin ex + spectare, meaning \u2018to look out for\u2019.",
+    "family": [
+     "expectancy",
+     "expectation",
+     "expect"
+    ]
+   },
+   "story": {
+    "kind": "quote",
+    "text": "She had the vague, confused, expectant feeling that comes to one's heart in dreams.",
+    "source": "E. Nesbit, The Railway Children, 1906",
+    "ebook": 1874
+   },
+   "say": {
+    "chunks": [
+     "expect",
+     "ant"
+    ],
+    "stress": [1]
+   }
+  },
+  "explanation": {
+   "etymology": {
+    "text": "From the Latin ex + planus, meaning \u2018flat, clear\u2019.",
+    "family": [
+     "explain",
+     "plain",
+     "plane"
+    ]
+   },
+   "story": {
+    "kind": "quote",
+    "text": "This explanation, of course, was thoroughly understood by every one present.",
+    "source": "Kenneth Grahame, The Wind in the Willows, 1908",
+    "ebook": 289
+   },
+   "say": {
+    "chunks": [
+     "ex",
+     "pla",
+     "na",
+     "tion"
+    ],
+    "stress": [1,2]
+   }
+  },
+  "familiar": {
+   "etymology": {
+    "text": "From the Latin familia, meaning \u2018household\u2019.",
+    "family": [
+     "family",
+     "familiarity",
+     "familial"
+    ]
+   },
+   "story": {
+    "kind": "quote",
+    "text": "As the familiar sound broke forth, the old passion seized on Toad and completely mastered him, body and soul.",
+    "source": "Kenneth Grahame, The Wind in the Willows, 1908",
+    "ebook": 289
+   },
+   "say": {
+    "chunks": [
+     "fa",
+     "mil",
+     "iar"
+    ],
+    "stress": [2]
+   }
+  },
+  "foreign": {
+   "etymology": {
+    "text": "From the French foris, meaning \u2018outside, out of doors\u2019.",
+    "family": [
+     "sovereign",
+     "reign",
+     "forest"
+    ]
+   },
+   "story": {
+    "kind": "quote",
+    "text": "'Is that the Ninevite language?' asked Anthea, who had learned no foreign language at school except French.",
+    "source": "E. Nesbit, Five Children and It, 1902",
+    "ebook": 778
+   },
+   "say": {
+    "chunks": [
+     "for",
+     "eign"
+    ],
+    "stress": [1]
+   }
+  },
+  "forty": {
+   "etymology": {
+    "text": "From the Old English feowertig, meaning \u2018four tens\u2019.",
+    "family": [
+     "four",
+     "fourteen",
+     "fourth"
+    ]
+   },
+   "story": {
+    "kind": "quote",
+    "text": "\u201cFor forty years, father and son, we have tended elephants, and we have never heard such moonshine about dances.\u201d",
+    "source": "Rudyard Kipling, The Jungle Book, 1894",
+    "ebook": 236
+   },
+   "say": {
+    "chunks": [
+     "for",
+     "ty"
+    ],
+    "stress": [0]
+   }
+  },
+  "frantic": {
+   "etymology": {
+    "text": "From the Greek phren, meaning \u2018the mind\u2019.",
+    "family": [
+     "hectic",
+     "panic",
+     "fantastic"
+    ]
+   },
+   "story": {
+    "kind": "quote",
+    "text": "Little mishaps, that you would hardly notice on dry land, drive you nearly frantic with rage, when they occur on the water.",
+    "source": "Jerome K. Jerome, Three Men in a Boat, 1889",
+    "ebook": 308
+   },
+   "say": {
+    "chunks": [
+     "frant",
+     "ic"
+    ],
+    "stress": [1]
+   }
+  },
+  "frequently": {
+   "etymology": {
+    "text": "From the Latin frequens, meaning \u2018crowded, repeated\u2019.",
+    "family": [
+     "frequent",
+     "frequency",
+     "sequence"
+    ]
+   },
+   "story": {
+    "kind": "quote",
+    "text": "Sometimes we had rather rough play, for they would frequently bite and kick as well as gallop.",
+    "source": "Anna Sewell, Black Beauty, 1877",
+    "ebook": 271
+   },
+   "say": {
+    "chunks": [
+     "fre",
+     "quent",
+     "ly"
+    ],
+    "stress": [1]
+   }
+  },
+  "government": {
+   "etymology": {
+    "text": "From the French gubernare, meaning \u2018to steer a ship\u2019.",
+    "family": [
+     "govern",
+     "governor",
+     "environment"
+    ]
+   },
+   "story": {
+    "kind": "quote",
+    "text": "This running up and down among the hills is not the best Government service.",
+    "source": "Rudyard Kipling, The Jungle Book, 1894",
+    "ebook": 236
+   },
+   "say": {
+    "chunks": [
+     "gov",
+     "ern",
+     "ment"
+    ],
+    "stress": [1,2]
+   }
+  },
+  "green-eyed": {
+   "etymology": {
+    "text": "Made in English from green + eyed: jealous.",
+    "family": [
+     "wide-eyed",
+     "pig-headed",
+     "cold-hearted"
+    ]
+   },
+   "story": {
+    "kind": "quote",
+    "text": "The welcome light soon shines upon the wall, as Krook comes slowly up with his green-eyed cat following at his heels.",
+    "source": "Charles Dickens, Bleak House, 1853",
+    "ebook": 1023
+   },
+   "say": {
+    "chunks": [
+     "green",
+     "hyphen",
+     "eyed"
+    ],
+    "stress": [1]
+   }
+  },
+  "guarantee": {
+   "etymology": {
+    "text": "From the French garant, meaning \u2018a warrant\u2019.",
+    "family": [
+     "guard",
+     "guardian",
+     "warranty"
+    ]
+   },
+   "story": {
+    "kind": "quote",
+    "text": "The story has nothing to do with a picture; the housekeeper can guarantee that.",
+    "source": "Charles Dickens, Bleak House, 1853",
+    "ebook": 1023
+   },
+   "say": {
+    "chunks": [
+     "guar",
+     "an",
+     "tee"
+    ],
+    "stress": [0]
+   }
+  },
+  "harass": {
+   "etymology": {
+    "text": "From the French harasser, meaning \u2018to set a dog on\u2019.",
+    "family": [
+     "embarrass",
+     "harassment",
+     "harried"
+    ]
+   },
+   "story": {
+    "kind": "quote",
+    "text": "Why should he go to India, except to harass me?",
+    "source": "Charles Dickens, David Copperfield, 1850",
+    "ebook": 766
+   },
+   "say": {
+    "chunks": [
+     "ha",
+     "rass"
+    ],
+    "stress": [1]
+   }
+  },
+  "hesitancy": {
+   "etymology": {
+    "text": "From the Latin haesitare, meaning \u2018to stick, to hold back\u2019.",
+    "family": [
+     "hesitant",
+     "hesitation",
+     "hesitate"
+    ]
+   },
+   "story": {
+    "kind": "written",
+    "text": "There was a hesitancy in her voice, as if she was not sure she should say it.",
+    "source": "Written for you"
+   },
+   "say": {
+    "chunks": [
+     "hesit",
+     "ancy"
+    ],
+    "stress": [1]
+   }
+  },
+  "hesitant": {
+   "etymology": {
+    "text": "From the Latin haesitare, meaning \u2018to stick, to hold back\u2019.",
+    "family": [
+     "hesitancy",
+     "hesitation",
+     "hesitate"
+    ]
+   },
+   "story": {
+    "kind": "written",
+    "text": "Sam was hesitant at the edge of the pool, and then he jumped in.",
+    "source": "Written for you"
+   },
+   "say": {
+    "chunks": [
+     "hesit",
+     "ant"
+    ],
+    "stress": [1]
+   }
+  },
+  "hindrance": {
+   "etymology": {
+    "text": "From the Old English hindrian, meaning \u2018to hold back\u2019.",
+    "family": [
+     "hinder",
+     "remembrance",
+     "entrance"
+    ]
+   },
+   "story": {
+    "kind": "quote",
+    "text": "We both did what we had to do without any hindrance, and when we met again at one o\u2019clock reported it done.",
+    "source": "Charles Dickens, Great Expectations, 1861",
+    "ebook": 1400
+   },
+   "say": {
+    "chunks": [
+     "hin",
+     "drance"
+    ],
+    "stress": [1]
+   }
+  },
+  "hostile": {
+   "etymology": {
+    "text": "From the Latin hostis, meaning \u2018an enemy, a stranger\u2019.",
+    "family": [
+     "fragile",
+     "futile",
+     "agile"
+    ]
+   },
+   "story": {
+    "kind": "quote",
+    "text": "Nothing horrid was visible in the air, yet their progress had become slow and laboured, exactly as if they were pushing their way through hostile forces.",
+    "source": "J. M. Barrie, Peter Pan, 1911",
+    "ebook": 16
+   },
+   "say": {
+    "chunks": [
+     "host",
+     "ile"
+    ],
+    "stress": [1]
+   }
+  },
+  "identity": {
+   "etymology": {
+    "text": "From the Latin idem, meaning \u2018the same\u2019.",
+    "family": [
+     "identical",
+     "identify",
+     "idem"
+    ]
+   },
+   "story": {
+    "kind": "quote",
+    "text": "\u201cHave you any papers proving your identity?\u201d asked Mr. Rankeillor.",
+    "source": "Robert Louis Stevenson, Kidnapped, 1886",
+    "ebook": 421
+   },
+   "say": {
+    "chunks": [
+     "i",
+     "den",
+     "ti",
+     "ty"
+    ],
+    "stress": [2]
+   }
+  },
+  "immediate": {
+   "etymology": {
+    "text": "From the Latin in + medius, meaning \u2018middle\u2019.",
+    "family": [
+     "immediately",
+     "mediate",
+     "medium"
+    ]
+   },
+   "story": {
+    "kind": "quote",
+    "text": "As long as they went deeper there was, Curdie judged, no immediate danger.",
+    "source": "George MacDonald, The Princess and the Goblin, 1872",
+    "ebook": 708
+   },
+   "say": {
+    "chunks": [
+     "im",
+     "me",
+     "di",
+     "ate"
+    ],
+    "stress": [0,1]
+   }
+  },
+  "immediately": {
+   "etymology": {
+    "text": "From the Latin in + medius, meaning \u2018middle\u2019.",
+    "family": [
+     "immediate",
+     "definitely",
+     "sincerely"
+    ]
+   },
+   "story": {
+    "kind": "quote",
+    "text": "Here one of the guinea-pigs cheered, and was immediately suppressed by the officers of the court.",
+    "source": "Lewis Carroll, Alice's Adventures in Wonderland, 1865",
+    "ebook": 11
+   },
+   "say": {
+    "chunks": [
+     "im",
+     "me",
+     "di",
+     "ate",
+     "ly"
+    ],
+    "stress": [0,1]
+   }
+  },
+  "individual": {
+   "etymology": {
+    "text": "From the Latin in + dividere, meaning \u2018not dividable\u2019.",
+    "family": [
+     "divide",
+     "division",
+     "individually"
+    ]
+   },
+   "story": {
+    "kind": "quote",
+    "text": "I have fully made up my mind that the individual present has not treated me like a gentleman.",
+    "source": "Charles Dickens, Little Dorrit, 1857",
+    "ebook": 963
+   },
+   "say": {
+    "chunks": [
+     "in",
+     "di",
+     "vid",
+     "u",
+     "al"
+    ],
+    "stress": [3,4]
+   }
+  },
+  "innocence": {
+   "etymology": {
+    "text": "From the Latin in + nocere, meaning \u2018not harming\u2019.",
+    "family": [
+     "innocent",
+     "decency",
+     "magnificence"
+    ]
+   },
+   "story": {
+    "kind": "quote",
+    "text": "I had been waiting for him to see me that I might try to assure him of my innocence.",
+    "source": "Charles Dickens, Great Expectations, 1861",
+    "ebook": 1400
+   },
+   "say": {
+    "chunks": [
+     "in",
+     "noc",
+     "ence"
+    ],
+    "stress": [2]
+   }
+  },
+  "innocent": {
+   "etymology": {
+    "text": "From the Latin in + nocere, meaning \u2018not harming\u2019.",
+    "family": [
+     "innocence",
+     "decent",
+     "magnificent"
+    ]
+   },
+   "story": {
+    "kind": "quote",
+    "text": "\u201cIt\u2019s about your rowing, I suppose,\u201d said the Rat, with an innocent air.",
+    "source": "Kenneth Grahame, The Wind in the Willows, 1908",
+    "ebook": 289
+   },
+   "say": {
+    "chunks": [
+     "in",
+     "noc",
+     "ent"
+    ],
+    "stress": [2]
+   }
+  },
+  "interfere": {
+   "etymology": {
+    "text": "From the French inter + ferire, meaning \u2018to strike between\u2019.",
+    "family": [
+     "interference",
+     "interrupt",
+     "interval"
+    ]
+   },
+   "story": {
+    "kind": "quote",
+    "text": "Many folks would have ridden by and said it was not their business to interfere.",
+    "source": "Anna Sewell, Black Beauty, 1877",
+    "ebook": 271
+   },
+   "say": {
+    "chunks": [
+     "in",
+     "ter",
+     "fere"
+    ],
+    "stress": [2]
+   }
+  },
+  "interrupt": {
+   "etymology": {
+    "text": "From the Latin inter + rumpere, meaning \u2018to break between\u2019.",
+    "family": [
+     "rupture",
+     "erupt",
+     "corrupt"
+    ]
+   },
+   "story": {
+    "kind": "quote",
+    "text": "\u201cNow don\u2019t interrupt,\u201d he would beg of her.",
+    "source": "J. M. Barrie, Peter Pan, 1911",
+    "ebook": 16
+   },
+   "say": {
+    "chunks": [
+     "in",
+     "ter",
+     "rupt"
+    ],
+    "stress": [1,2]
+   }
+  },
+  "language": {
+   "etymology": {
+    "text": "From the French lingua, meaning \u2018tongue\u2019.",
+    "family": [
+     "linguist",
+     "bilingual",
+     "tongue"
+    ]
+   },
+   "story": {
+    "kind": "quote",
+    "text": "He could speak robin (which is a quite distinct language not to be mistaken for any other).",
+    "source": "Frances Hodgson Burnett, The Secret Garden, 1911",
+    "ebook": 113
+   },
+   "say": {
+    "chunks": [
+     "lan",
+     "guage"
+    ],
+    "stress": [1]
+   }
+  },
+  "leisure": {
+   "etymology": {
+    "text": "From the French licere, meaning \u2018to be allowed\u2019.",
+    "family": [
+     "seizure",
+     "pleasure",
+     "measure"
+    ]
+   },
+   "story": {
+    "kind": "quote",
+    "text": "\u2018We paid two shillings for the sample and instructions, and it says you can make two pounds a week easily in your leisure time.\u2019",
+    "source": "E. Nesbit, The Story of the Treasure Seekers, 1899",
+    "ebook": 770
+   },
+   "say": {
+    "chunks": [
+     "lei",
+     "sure"
+    ],
+    "stress": [0]
+   }
+  },
+  "licence": {
+   "etymology": {
+    "text": "From the Latin licere, meaning \u2018to be allowed\u2019.",
+    "family": [
+     "advice",
+     "device",
+     "practice"
+    ]
+   },
+   "story": {
+    "kind": "quote",
+    "text": "\u2018I shall take the usual licence, Mr. Browdie,\u2019 said Nicholas, as he placed a chair for the bride.",
+    "source": "Charles Dickens, Nicholas Nickleby, 1839",
+    "ebook": 967
+   },
+   "say": {
+    "chunks": [
+     "lic",
+     "ence"
+    ],
+    "stress": [1]
+   }
+  },
+  "license": {
+   "etymology": {
+    "text": "From the Latin licere, meaning \u2018to be allowed\u2019.",
+    "family": [
+     "advise",
+     "devise",
+     "practise"
+    ]
+   },
+   "story": {
+    "kind": "quote",
+    "text": "Society had said \u2018Let us license them; let us know them.\u2019",
+    "source": "Charles Dickens, Little Dorrit, 1857",
+    "ebook": 963
+   },
+   "say": {
+    "chunks": [
+     "lic",
+     "ense"
+    ],
+    "stress": [1]
+   }
+  },
+  "lightning": {
+   "etymology": {
+    "text": "From the Old English lihtan, meaning \u2018to make light\u2019.",
+    "family": [
+     "light",
+     "lighten",
+     "frighten"
+    ]
+   },
+   "story": {
+    "kind": "quote",
+    "text": "The lightning was breaking out of the mountain, too, and flashing up into the cloud.",
+    "source": "George MacDonald, The Princess and the Goblin, 1872",
+    "ebook": 708
+   },
+   "say": {
+    "chunks": [
+     "light",
+     "ning"
+    ],
+    "stress": [0,1]
+   }
+  },
+  "little-used": {
+   "etymology": {
+    "text": "Made in English from little + used: hardly ever used.",
+    "family": [
+     "man-eating",
+     "rock-bottom",
+     "wide-eyed"
+    ]
+   },
+   "story": {
+    "kind": "written",
+    "text": "We took a little-used path through the woods, full of brambles and quiet.",
+    "source": "Written for you"
+   },
+   "say": {
+    "chunks": [
+     "little",
+     "hyphen",
+     "used"
+    ],
+    "stress": [1]
+   }
+  },
+  "man-eating": {
+   "etymology": {
+    "text": "Made in English from man + eating: that eats people.",
+    "family": [
+     "little-used",
+     "rock-bottom",
+     "wide-eyed"
+    ]
+   },
+   "story": {
+    "kind": "written",
+    "text": "The film was about a man-eating shark, but the real sharks we saw were small and shy.",
+    "source": "Written for you"
+   },
+   "say": {
+    "chunks": [
+     "man",
+     "hyphen",
+     "eating"
+    ],
+    "stress": [1]
+   }
+  },
+  "marvellous": {
+   "etymology": {
+    "text": "From the French mirabilia, meaning \u2018wonderful things\u2019.",
+    "family": [
+     "marvel",
+     "miracle",
+     "admire"
+    ]
+   },
+   "story": {
+    "kind": "quote",
+    "text": "It was a marvellous imitation.",
+    "source": "J. M. Barrie, Peter Pan, 1911",
+    "ebook": 16
+   },
+   "say": {
+    "chunks": [
+     "marvel",
+     "lous"
+    ],
+    "stress": [1]
+   }
+  },
+  "mischievous": {
+   "etymology": {
+    "text": "From the French meschief, meaning \u2018bad outcome\u2019.",
+    "family": [
+     "mischief",
+     "chief",
+     "achieve"
+    ]
+   },
+   "story": {
+    "kind": "quote",
+    "text": "And you\u2019d have deserved it, you little mischievous darling!",
+    "source": "Lewis Carroll, Through the Looking-Glass, 1871",
+    "ebook": 12
+   },
+   "say": {
+    "chunks": [
+     "mis",
+     "chie",
+     "vous"
+    ],
+    "stress": [1]
+   }
+  },
+  "muscle": {
+   "etymology": {
+    "text": "From the Latin musculus, meaning \u2018little mouse\u2019.",
+    "family": [
+     "muscular",
+     "mussel",
+     "mouse"
+    ]
+   },
+   "story": {
+    "kind": "quote",
+    "text": "Dickon stood up on the grass and slowly went through a carefully practical but simple series of muscle exercises.",
+    "source": "Frances Hodgson Burnett, The Secret Garden, 1911",
+    "ebook": 113
+   },
+   "say": {
+    "chunks": [
+     "mus",
+     "cle"
+    ],
+    "stress": [0,1]
+   }
+  },
+  "necessary": {
+   "etymology": {
+    "text": "From the Latin necesse, meaning \u2018unavoidable\u2019.",
+    "family": [
+     "necessity",
+     "necessarily",
+     "accessory"
+    ]
+   },
+   "story": {
+    "kind": "quote",
+    "text": "If it was necessary to go to her attic for anything, Sara was obliged to light a candle.",
+    "source": "Frances Hodgson Burnett, A Little Princess, 1905",
+    "ebook": 146
+   },
+   "say": {
+    "chunks": [
+     "nec",
+     "es",
+     "sar",
+     "y"
+    ],
+    "stress": [0]
+   }
+  },
+  "neighbour": {
+   "etymology": {
+    "text": "From the Old English neah + gebur, meaning \u2018near dweller\u2019.",
+    "family": [
+     "eight",
+     "weigh",
+     "weight"
+    ]
+   },
+   "story": {
+    "kind": "quote",
+    "text": "Mr. Pickwick was perfectly aware that a tree is a very dangerous neighbour in a thunderstorm.",
+    "source": "Charles Dickens, The Pickwick Papers, 1837",
+    "ebook": 580
+   },
+   "say": {
+    "chunks": [
+     "neigh",
+     "bour"
+    ],
+    "stress": [0]
+   }
+  },
+  "nuisance": {
+   "etymology": {
+    "text": "From the French nocere, meaning \u2018to harm\u2019.",
+    "family": [
+     "innocent",
+     "noxious",
+     "annoyance"
+    ]
+   },
+   "story": {
+    "kind": "quote",
+    "text": "You kids must learn not to make yourselves a nuisance.",
+    "source": "E. Nesbit, Five Children and It, 1902",
+    "ebook": 778
+   },
+   "say": {
+    "chunks": [
+     "nui",
+     "sance"
+    ],
+    "stress": [0]
+   }
+  },
+  "observance": {
+   "etymology": {
+    "text": "From the Latin observare, meaning \u2018to watch over\u2019.",
+    "family": [
+     "observant",
+     "observation",
+     "observe"
+    ]
+   },
+   "story": {
+    "kind": "quote",
+    "text": "Of course I felt my good faith involved in the observance of his request.",
+    "source": "Charles Dickens, Great Expectations, 1861",
+    "ebook": 1400
+   },
+   "say": {
+    "chunks": [
+     "observ",
+     "ance"
+    ],
+    "stress": [1]
+   }
+  },
+  "observant": {
+   "etymology": {
+    "text": "From the Latin observare, meaning \u2018to watch over\u2019.",
+    "family": [
+     "observance",
+     "observation",
+     "observe"
+    ]
+   },
+   "story": {
+    "kind": "quote",
+    "text": "He had replaced his neckerchief loosely, and had stood, keenly observant of me, biting a long end of it.",
+    "source": "Charles Dickens, Great Expectations, 1861",
+    "ebook": 1400
+   },
+   "say": {
+    "chunks": [
+     "observ",
+     "ant"
+    ],
+    "stress": [1]
+   }
+  },
+  "obstinate": {
+   "etymology": {
+    "text": "From the Latin obstinare, meaning \u2018to stand firm, to persist\u2019.",
+    "family": [
+     "fortunate",
+     "desperate",
+     "delicate"
+    ]
+   },
+   "story": {
+    "kind": "quote",
+    "text": "She knew she felt contrary again, and obstinate, and she did not care at all.",
+    "source": "Frances Hodgson Burnett, The Secret Garden, 1911",
+    "ebook": 113
+   },
+   "say": {
+    "chunks": [
+     "obstin",
+     "ate"
+    ],
+    "stress": [1]
+   }
+  },
+  "occupy": {
+   "etymology": {
+    "text": "From the Latin ob + capere, meaning \u2018to seize\u2019.",
+    "family": [
+     "occur",
+     "occasion",
+     "capture"
+    ]
+   },
+   "story": {
+    "kind": "quote",
+    "text": "I then proposed to occupy myself till dinner-time in drawing some little sketches for her use.",
+    "source": "Charlotte Bront\u00eb, Jane Eyre, 1847",
+    "ebook": 1260
+   },
+   "say": {
+    "chunks": [
+     "oc",
+     "cu",
+     "py"
+    ],
+    "stress": [0,1]
+   }
+  },
+  "occur": {
+   "etymology": {
+    "text": "From the Latin ob + currere, meaning \u2018to run towards\u2019.",
+    "family": [
+     "occurred",
+     "current",
+     "recur"
+    ]
+   },
+   "story": {
+    "kind": "quote",
+    "text": "It did not occur to her to feel cross at finding her pet chair occupied by the small, dingy figure.",
+    "source": "Frances Hodgson Burnett, A Little Princess, 1905",
+    "ebook": 146
+   },
+   "say": {
+    "chunks": [
+     "oc",
+     "cur"
+    ],
+    "stress": [0,1]
+   }
+  },
+  "opportunity": {
+   "etymology": {
+    "text": "From the Latin ob + portus, meaning \u2018towards the harbour\u2019.",
+    "family": [
+     "port",
+     "import",
+     "portable"
+    ]
+   },
+   "story": {
+    "kind": "quote",
+    "text": "\u201cThen you\u2019d better not fight to-day,\u201d said Alice, thinking it a good opportunity to make peace.",
+    "source": "Lewis Carroll, Through the Looking-Glass, 1871",
+    "ebook": 12
+   },
+   "say": {
+    "chunks": [
+     "op",
+     "por",
+     "tu",
+     "ni",
+     "ty"
+    ],
+    "stress": [0,1]
+   }
+  },
+  "parliament": {
+   "etymology": {
+    "text": "From the French parler, meaning \u2018to speak\u2019.",
+    "family": [
+     "parley",
+     "parlour",
+     "parole"
+    ]
+   },
+   "story": {
+    "kind": "quote",
+    "text": "First we had to decide what sort of illness we should like to cure, and a \u2018heated discussion ensued\u2019, like in Parliament.",
+    "source": "E. Nesbit, The Story of the Treasure Seekers, 1899",
+    "ebook": 770
+   },
+   "say": {
+    "chunks": [
+     "par",
+     "lia",
+     "ment"
+    ],
+    "stress": [1]
+   }
+  },
+  "persuade": {
+   "etymology": {
+    "text": "From the Latin per + suadere, meaning \u2018to urge thoroughly\u2019.",
+    "family": [
+     "persuasion",
+     "dissuade",
+     "suave"
+    ]
+   },
+   "story": {
+    "kind": "quote",
+    "text": "The next day Albert\u2019s uncle took Noel away, before Oswald had time to persuade Alice that we ought to tell him about the sixpence.",
+    "source": "E. Nesbit, The Story of the Treasure Seekers, 1899",
+    "ebook": 770
+   },
+   "say": {
+    "chunks": [
+     "per",
+     "suade"
+    ],
+    "stress": [1]
+   }
+  },
+  "physical": {
+   "etymology": {
+    "text": "From the Greek physis, meaning \u2018nature\u2019.",
+    "family": [
+     "physics",
+     "physician",
+     "physiology"
+    ]
+   },
+   "story": {
+    "kind": "quote",
+    "text": "There was certainly no physical injury of any kind.",
+    "source": "Arthur Conan Doyle, The Hound of the Baskervilles, 1902",
+    "ebook": 2852
+   },
+   "say": {
+    "chunks": [
+     "phys",
+     "i",
+     "cal"
+    ],
+    "stress": [0]
+   }
+  },
+  "pig-headed": {
+   "etymology": {
+    "text": "Made in English from pig + headed: stubborn.",
+    "family": [
+     "wide-eyed",
+     "cold-hearted",
+     "stone-faced"
+    ]
+   },
+   "story": {
+    "kind": "quote",
+    "text": "But Noel is a bit pig-headed; it\u2019s his worst fault.",
+    "source": "E. Nesbit, The Story of the Treasure Seekers, 1899",
+    "ebook": 770
+   },
+   "say": {
+    "chunks": [
+     "pig",
+     "hyphen",
+     "headed"
+    ],
+    "stress": [1]
+   }
+  },
+  "practice": {
+   "etymology": {
+    "text": "From the Greek prassein, meaning \u2018to do\u2019.",
+    "family": [
+     "advice",
+     "device",
+     "licence"
+    ]
+   },
+   "story": {
+    "kind": "quote",
+    "text": "Of course in this, as in doing Latin proses or getting into mischief, practice makes perfect.",
+    "source": "E. Nesbit, Five Children and It, 1902",
+    "ebook": 778
+   },
+   "say": {
+    "chunks": [
+     "pract",
+     "ice"
+    ],
+    "stress": [1]
+   }
+  },
+  "practise": {
+   "etymology": {
+    "text": "From the Greek prassein, meaning \u2018to do\u2019.",
+    "family": [
+     "advise",
+     "devise",
+     "license"
+    ]
+   },
+   "story": {
+    "kind": "quote",
+    "text": "My friend used to get up early in the morning to practise, but he had to give that plan up, because of his sister.",
+    "source": "Jerome K. Jerome, Three Men in a Boat, 1889",
+    "ebook": 308
+   },
+   "say": {
+    "chunks": [
+     "pract",
+     "ise"
+    ],
+    "stress": [1]
+   }
+  },
+  "prejudice": {
+   "etymology": {
+    "text": "From the Latin prae + judicium, meaning \u2018judgement before\u2019.",
+    "family": [
+     "judge",
+     "judicial",
+     "prejudge"
+    ]
+   },
+   "story": {
+    "kind": "quote",
+    "text": "But I am afraid she has a childish prejudice against it.",
+    "source": "Frances Hodgson Burnett, A Little Princess, 1905",
+    "ebook": 146
+   },
+   "say": {
+    "chunks": [
+     "prej",
+     "u",
+     "dice"
+    ],
+    "stress": [0]
+   }
+  },
+  "privilege": {
+   "etymology": {
+    "text": "From the Latin privus + lex, meaning \u2018private law\u2019.",
+    "family": [
+     "legal",
+     "legislate",
+     "private"
+    ]
+   },
+   "story": {
+    "kind": "quote",
+    "text": "\u201cSixpence for the privilege of passing by the private road!\u201d",
+    "source": "Kenneth Grahame, The Wind in the Willows, 1908",
+    "ebook": 289
+   },
+   "say": {
+    "chunks": [
+     "priv",
+     "i",
+     "lege"
+    ],
+    "stress": [2]
+   }
+  },
+  "profession": {
+   "etymology": {
+    "text": "From the Latin pro + fateri, meaning \u2018to declare publicly\u2019.",
+    "family": [
+     "professor",
+     "confess",
+     "profess"
+    ]
+   },
+   "story": {
+    "kind": "quote",
+    "text": "I had never been brought up to any profession, and at first I was at a loss what to do for myself.",
+    "source": "Charles Dickens, David Copperfield, 1850",
+    "ebook": 766
+   },
+   "say": {
+    "chunks": [
+     "pro",
+     "fes",
+     "sion"
+    ],
+    "stress": [1,2]
+   }
+  },
+  "programme": {
+   "etymology": {
+    "text": "From the Greek pro + gramma, meaning \u2018written before\u2019.",
+    "family": [
+     "grammar",
+     "diagram",
+     "telegram"
+    ]
+   },
+   "story": {
+    "kind": "quote",
+    "text": "I observe that there is a good deal of German music on the programme, which is rather more to my taste than Italian or French.",
+    "source": "Arthur Conan Doyle, The Adventures of Sherlock Holmes, 1892",
+    "ebook": 1661
+   },
+   "say": {
+    "chunks": [
+     "pro",
+     "gramme"
+    ],
+    "stress": [1]
+   }
+  },
+  "pronunciation": {
+   "etymology": {
+    "text": "From the Latin pro + nuntiare, meaning \u2018to announce\u2019.",
+    "family": [
+     "pronounce",
+     "announce",
+     "denounce"
+    ]
+   },
+   "story": {
+    "kind": "quote",
+    "text": "\u201cThese things belong only to pronunciation, which is the least part of grammar,\u201d said Mrs. Garth.",
+    "source": "George Eliot, Middlemarch, 1871",
+    "ebook": 145
+   },
+   "say": {
+    "chunks": [
+     "pro",
+     "nun",
+     "ci",
+     "a",
+     "tion"
+    ],
+    "stress": [1,2]
+   }
+  },
+  "prophecy": {
+   "etymology": {
+    "text": "From the Greek pro + phanai, meaning \u2018to speak before\u2019.",
+    "family": [
+     "advice",
+     "device",
+     "practice"
+    ]
+   },
+   "story": {
+    "kind": "quote",
+    "text": "To this prophecy, so agreeable to his ears, Arthur returned no answer than a cackle of great delight.",
+    "source": "Charles Dickens, Nicholas Nickleby, 1839",
+    "ebook": 967
+   },
+   "say": {
+    "chunks": [
+     "pro",
+     "phe",
+     "cy"
+    ],
+    "stress": [2]
+   }
+  },
+  "prophesy": {
+   "etymology": {
+    "text": "From the Greek pro + phanai, meaning \u2018to speak before\u2019.",
+    "family": [
+     "advise",
+     "devise",
+     "practise"
+    ]
+   },
+   "story": {
+    "kind": "quote",
+    "text": "It tried its best, but the instrument was built so that it couldn\u2019t prophesy fine weather any harder than it did without breaking itself.",
+    "source": "Jerome K. Jerome, Three Men in a Boat, 1889",
+    "ebook": 308
+   },
+   "say": {
+    "chunks": [
+     "pro",
+     "phe",
+     "sy"
+    ],
+    "stress": [2]
+   }
+  },
+  "queue": {
+   "etymology": {
+    "text": "From the French cauda, meaning \u2018tail\u2019.",
+    "family": [
+     "cue",
+     "barbecue",
+     "tail"
+    ]
+   },
+   "story": {
+    "kind": "written",
+    "text": "We stood in a long queue for ice cream on the hottest day of the year.",
+    "source": "Written for you"
+   },
+   "say": {
+    "chunks": [
+     "queue"
+    ],
+    "stress": [0]
+   }
+  },
+  "re-educate": {
+   "etymology": {
+    "text": "From the Latin re + educare, meaning \u2018to bring up again\u2019.",
+    "family": [
+     "re-enter",
+     "re-examine",
+     "re-evaluate"
+    ]
+   },
+   "story": {
+    "kind": "written",
+    "text": "The rescue centre helped re-educate the young owl so that it could hunt for itself again.",
+    "source": "Written for you"
+   },
+   "say": {
+    "chunks": [
+     "re",
+     "hyphen",
+     "educate"
+    ],
+    "stress": [1]
+   }
+  },
+  "re-elect": {
+   "etymology": {
+    "text": "From the Latin re + eligere, meaning \u2018to pick out again\u2019.",
+    "family": [
+     "re-enter",
+     "re-educate",
+     "re-energise"
+    ]
+   },
+   "story": {
+    "kind": "written",
+    "text": "The class voted to re-elect Mia as their school council rep.",
+    "source": "Written for you"
+   },
+   "say": {
+    "chunks": [
+     "re",
+     "hyphen",
+     "elect"
+    ],
+    "stress": [1]
+   }
+  },
+  "re-energise": {
+   "etymology": {
+    "text": "From the Greek re + energeia, meaning \u2018activity, once more\u2019.",
+    "family": [
+     "re-enter",
+     "re-elect",
+     "re-evaluate"
+    ]
+   },
+   "story": {
+    "kind": "written",
+    "text": "A drink of water and a short rest helped re-energise the tired runners.",
+    "source": "Written for you"
+   },
+   "say": {
+    "chunks": [
+     "re",
+     "hyphen",
+     "energise"
+    ],
+    "stress": [1]
+   }
+  },
+  "re-enter": {
+   "etymology": {
+    "text": "From the Latin re + intrare, meaning \u2018to go in again\u2019.",
+    "family": [
+     "re-examine",
+     "re-educate",
+     "re-elect"
+    ]
+   },
+   "story": {
+    "kind": "quote",
+    "text": "I did not hear him re-enter, and in the morning I found he was still away.",
+    "source": "Emily Bront\u00eb, Wuthering Heights, 1847",
+    "ebook": 768
+   },
+   "say": {
+    "chunks": [
+     "re",
+     "hyphen",
+     "enter"
+    ],
+    "stress": [1]
+   }
+  },
+  "re-evaluate": {
+   "etymology": {
+    "text": "From the French re + evaluer, meaning \u2018to judge the worth again\u2019.",
+    "family": [
+     "re-examine",
+     "re-energise",
+     "re-elect"
+    ]
+   },
+   "story": {
+    "kind": "written",
+    "text": "After the first lap, the team stopped to re-evaluate their plan.",
+    "source": "Written for you"
+   },
+   "say": {
+    "chunks": [
+     "re",
+     "hyphen",
+     "evaluate"
+    ],
+    "stress": [1]
+   }
+  },
+  "re-examine": {
+   "etymology": {
+    "text": "From the Latin re + examinare, meaning \u2018to weigh up again\u2019.",
+    "family": [
+     "re-enter",
+     "re-educate",
+     "re-evaluate"
+    ]
+   },
+   "story": {
+    "kind": "written",
+    "text": "The detective decided to re-examine the footprints in the mud.",
+    "source": "Written for you"
+   },
+   "say": {
+    "chunks": [
+     "re",
+     "hyphen",
+     "examine"
+    ],
+    "stress": [1]
+   }
+  },
+  "recognise": {
+   "etymology": {
+    "text": "From the Latin re + cognoscere, meaning \u2018to know again\u2019.",
+    "family": [
+     "cognition",
+     "incognito",
+     "recognition"
+    ]
+   },
+   "story": {
+    "kind": "quote",
+    "text": "They did not recognise the sound of the boots, but everyone was certain that they had heard the voice before.",
+    "source": "E. Nesbit, The Railway Children, 1906",
+    "ebook": 1874
+   },
+   "say": {
+    "chunks": [
+     "rec",
+     "og",
+     "nise"
+    ],
+    "stress": [1]
+   }
+  },
+  "recommend": {
+   "etymology": {
+    "text": "From the Latin re + com + mandare, meaning \u2018to entrust again\u2019.",
+    "family": [
+     "commend",
+     "command",
+     "mandate"
+    ]
+   },
+   "story": {
+    "kind": "quote",
+    "text": "\u201cIf you can cough any trifle on it up, Pip, I\u2019d recommend you to do it,\u201d said Joe, all aghast.",
+    "source": "Charles Dickens, Great Expectations, 1861",
+    "ebook": 1400
+   },
+   "say": {
+    "chunks": [
+     "rec",
+     "om",
+     "mend"
+    ],
+    "stress": [0]
+   }
+  },
+  "relevance": {
+   "etymology": {
+    "text": "From the Latin re + levare, meaning \u2018to lift up\u2019.",
+    "family": [
+     "relevant",
+     "irrelevant"
+    ]
+   },
+   "story": {
+    "kind": "written",
+    "text": "Our teacher asked us to explain the relevance of each picture to the story.",
+    "source": "Written for you"
+   },
+   "say": {
+    "chunks": [
+     "relev",
+     "ance"
+    ],
+    "stress": [1]
+   }
+  },
+  "relevant": {
+   "etymology": {
+    "text": "From the Latin re + levare, meaning \u2018to lift up\u2019.",
+    "family": [
+     "relieve",
+     "elevate",
+     "lever"
+    ]
+   },
+   "story": {
+    "kind": "quote",
+    "text": "\u201cI am glad of all details,\u201d remarked my friend, \u201cwhether they seem to you to be relevant or not.\u201d",
+    "source": "Arthur Conan Doyle, The Adventures of Sherlock Holmes, 1892",
+    "ebook": 1661
+   },
+   "say": {
+    "chunks": [
+     "relev",
+     "ant"
+    ],
+    "stress": [1]
+   }
+  },
+  "restaurant": {
+   "etymology": {
+    "text": "From the French restaurer, meaning \u2018to restore\u2019.",
+    "family": [
+     "restore",
+     "restaurateur",
+     "restoration"
+    ]
+   },
+   "story": {
+    "kind": "quote",
+    "text": "We adjourned soon after the first ballet, and wended our way back to the restaurant, where supper was already awaiting us.",
+    "source": "Jerome K. Jerome, Three Men in a Boat, 1889",
+    "ebook": 308
+   },
+   "say": {
+    "chunks": [
+     "res",
+     "tau",
+     "rant"
+    ],
+    "stress": [1]
+   }
+  },
+  "rhyme": {
+   "etymology": {
+    "text": "From the Greek rhythmos, meaning \u2018measured flow\u2019.",
+    "family": [
+     "rhythm",
+     "rhetoric",
+     "rhinoceros"
+    ]
+   },
+   "story": {
+    "kind": "quote",
+    "text": "So, one day, when they sat down to lessons, each of them found a little rhyme at its place.",
+    "source": "E. Nesbit, The Railway Children, 1906",
+    "ebook": 1874
+   },
+   "say": {
+    "chunks": [
+     "rhyme"
+    ],
+    "stress": [0]
+   }
+  },
+  "rhythm": {
+   "etymology": {
+    "text": "From the Greek rhythmos, meaning \u2018flow\u2019.",
+    "family": [
+     "rhyme",
+     "myth",
+     "gym"
+    ]
+   },
+   "story": {
+    "kind": "quote",
+    "text": "Then as it grew it took a regular rhythm, and he knew it for nothing else but the pat-pat-pat of little feet still a very long way off.",
+    "source": "Kenneth Grahame, The Wind in the Willows, 1908",
+    "ebook": 289
+   },
+   "say": {
+    "chunks": [
+     "rhy",
+     "thm"
+    ],
+    "stress": [0]
+   }
+  },
+  "rock-bottom": {
+   "etymology": {
+    "text": "Made in English from rock + bottom: the very lowest.",
+    "family": [
+     "man-eating",
+     "little-used",
+     "wide-eyed"
+    ]
+   },
+   "story": {
+    "kind": "written",
+    "text": "The shop sold last year's toys at rock-bottom prices.",
+    "source": "Written for you"
+   },
+   "say": {
+    "chunks": [
+     "rock",
+     "hyphen",
+     "bottom"
+    ],
+    "stress": [1]
+   }
+  },
+  "sacrifice": {
+   "etymology": {
+    "text": "From the Latin sacer + facere, meaning \u2018to make holy\u2019.",
+    "family": [
+     "sacred",
+     "sacrament",
+     "office"
+    ]
+   },
+   "story": {
+    "kind": "quote",
+    "text": "He leaves Northamptonshire so soon, that even this slight sacrifice cannot be often demanded.",
+    "source": "Jane Austen, Mansfield Park, 1814",
+    "ebook": 141
+   },
+   "say": {
+    "chunks": [
+     "sac",
+     "ri",
+     "fice"
+    ],
+    "stress": [1]
+   }
+  },
+  "secretary": {
+   "etymology": {
+    "text": "From the Latin secretum, meaning \u2018a secret\u2019.",
+    "family": [
+     "secret",
+     "secrecy",
+     "secretive"
+    ]
+   },
+   "story": {
+    "kind": "quote",
+    "text": "\u2018A secretary\u2019s duties are rather difficult to define, perhaps,\u2019 said Nicholas, considering.",
+    "source": "Charles Dickens, Nicholas Nickleby, 1839",
+    "ebook": 967
+   },
+   "say": {
+    "chunks": [
+     "sec",
+     "re",
+     "tar",
+     "y"
+    ],
+    "stress": [0]
+   }
+  },
+  "short-tempered": {
+   "etymology": {
+    "text": "Made in English from short + tempered: quick to get angry.",
+    "family": [
+     "tight-fisted",
+     "cold-hearted",
+     "stone-faced"
+    ]
+   },
+   "story": {
+    "kind": "written",
+    "text": "The giant was short-tempered in the mornings, so the children tiptoed past his door.",
+    "source": "Written for you"
+   },
+   "say": {
+    "chunks": [
+     "short",
+     "hyphen",
+     "tempered"
+    ],
+    "stress": [1]
+   }
+  },
+  "shoulder": {
+   "etymology": {
+    "text": "From the Old English sculdor, meaning \u2018shoulder\u2019.",
+    "family": [
+     "boulder",
+     "smoulder",
+     "mould"
+    ]
+   },
+   "story": {
+    "kind": "quote",
+    "text": "Tinker Bell had been asleep on his shoulder, but now he wakened her and sent her on in front.",
+    "source": "J. M. Barrie, Peter Pan, 1911",
+    "ebook": 16
+   },
+   "say": {
+    "chunks": [
+     "shoul",
+     "der"
+    ],
+    "stress": [0]
+   }
+  },
+  "signature": {
+   "etymology": {
+    "text": "From the Latin signum, meaning \u2018a sign\u2019.",
+    "family": [
+     "sign",
+     "design",
+     "signal"
+    ]
+   },
+   "story": {
+    "kind": "quote",
+    "text": "The note was undated, and without either signature or address.",
+    "source": "Arthur Conan Doyle, The Adventures of Sherlock Holmes, 1892",
+    "ebook": 1661
+   },
+   "say": {
+    "chunks": [
+     "sig",
+     "na",
+     "ture"
+    ],
+    "stress": [0]
+   }
+  },
+  "sincere": {
+   "etymology": {
+    "text": "From the Latin sincerus, meaning \u2018pure, clean\u2019.",
+    "family": [
+     "sincerely",
+     "sincerity",
+     "insincere"
+    ]
+   },
+   "story": {
+    "kind": "quote",
+    "text": "The rain was a mere trifle, and Anne was most sincere in preferring a walk with Mr Elliot.",
+    "source": "Jane Austen, Persuasion, 1817",
+    "ebook": 105
+   },
+   "say": {
+    "chunks": [
+     "sin",
+     "cere"
+    ],
+    "stress": [1]
+   }
+  },
+  "sincerely": {
+   "etymology": {
+    "text": "From the Latin sincerus, meaning \u2018pure, clean\u2019.",
+    "family": [
+     "sincere",
+     "immediately",
+     "definitely"
+    ]
+   },
+   "story": {
+    "kind": "quote",
+    "text": "The Admiral does not seem very ill, and I sincerely hope Bath will do him all the good he wants.",
+    "source": "Jane Austen, Persuasion, 1817",
+    "ebook": 105
+   },
+   "say": {
+    "chunks": [
+     "sin",
+     "cere",
+     "ly"
+    ],
+    "stress": [1,2]
+   }
+  },
+  "soldier": {
+   "etymology": {
+    "text": "From the French solidus, meaning \u2018a gold coin\u2019.",
+    "family": [
+     "solid",
+     "soldiery",
+     "salary"
+    ]
+   },
+   "story": {
+    "kind": "quote",
+    "text": "She thought she had never seen such a strange-looking soldier in all her life.",
+    "source": "Lewis Carroll, Through the Looking-Glass, 1871",
+    "ebook": 12
+   },
+   "say": {
+    "chunks": [
+     "sol",
+     "dier"
+    ],
+    "stress": [1]
+   }
+  },
+  "spectacular": {
+   "etymology": {
+    "text": "From the Latin spectare, meaning \u2018to watch\u2019.",
+    "family": [
+     "spectator",
+     "inspect",
+     "spectacle"
+    ]
+   },
+   "story": {
+    "kind": "written",
+    "text": "The fireworks were spectacular, lighting the whole sky in red and gold.",
+    "source": "Written for you"
+   },
+   "say": {
+    "chunks": [
+     "spectacul",
+     "ar"
+    ],
+    "stress": [1]
+   }
+  },
+  "stomach": {
+   "etymology": {
+    "text": "From the Greek stomachos, meaning \u2018gullet, mouth\u2019.",
+    "family": [
+     "chorus",
+     "character",
+     "echo"
+    ]
+   },
+   "story": {
+    "kind": "quote",
+    "text": "\u201cNo one then is to be feared,\u201d Baloo wound up, patting his big furry stomach with pride.",
+    "source": "Rudyard Kipling, The Jungle Book, 1894",
+    "ebook": 236
+   },
+   "say": {
+    "chunks": [
+     "stom",
+     "ach"
+    ],
+    "stress": [1]
+   }
+  },
+  "stone-faced": {
+   "etymology": {
+    "text": "Made in English from stone + faced: showing no feeling.",
+    "family": [
+     "cold-hearted",
+     "pig-headed",
+     "wide-eyed"
+    ]
+   },
+   "story": {
+    "kind": "written",
+    "text": "The guard stood stone-faced, not even blinking, while the visitors took photos.",
+    "source": "Written for you"
+   },
+   "say": {
+    "chunks": [
+     "stone",
+     "hyphen",
+     "faced"
+    ],
+    "stress": [1]
+   }
+  },
+  "sufficient": {
+   "etymology": {
+    "text": "From the Latin sub + facere, meaning \u2018to make up to\u2019.",
+    "family": [
+     "ancient",
+     "efficient",
+     "suffice"
+    ]
+   },
+   "story": {
+    "kind": "quote",
+    "text": "The Rat came to help him, but their united efforts were not sufficient to right the cart.",
+    "source": "Kenneth Grahame, The Wind in the Willows, 1908",
+    "ebook": 289
+   },
+   "say": {
+    "chunks": [
+     "suf",
+     "fi",
+     "cient"
+    ],
+    "stress": [0,1]
+   }
+  },
+  "suggest": {
+   "etymology": {
+    "text": "From the Latin sub + gerere, meaning \u2018to carry under\u2019.",
+    "family": [
+     "digest",
+     "gesture",
+     "register"
+    ]
+   },
+   "story": {
+    "kind": "quote",
+    "text": "\u201cI hadn\u2019t really decided to suggest it,\u201d said the doctor, with his slight nervousness.",
+    "source": "Frances Hodgson Burnett, The Secret Garden, 1911",
+    "ebook": 113
+   },
+   "say": {
+    "chunks": [
+     "sug",
+     "gest"
+    ],
+    "stress": [0,1]
+   }
+  },
+  "symbol": {
+   "etymology": {
+    "text": "From the Greek symbolon, meaning \u2018a token thrown together\u2019.",
+    "family": [
+     "symmetry",
+     "sympathy",
+     "synonym"
+    ]
+   },
+   "story": {
+    "kind": "written",
+    "text": "A red cross is a symbol that means help is here.",
+    "source": "Written for you"
+   },
+   "say": {
+    "chunks": [
+     "sym",
+     "bol"
+    ],
+    "stress": [0]
+   }
+  },
+  "system": {
+   "etymology": {
+    "text": "From the Greek systema, meaning \u2018set up together\u2019.",
+    "family": [
+     "symbol",
+     "syllable",
+     "synthesis"
+    ]
+   },
+   "story": {
+    "kind": "quote",
+    "text": "For the first six months after Oliver Twist was removed, the system was in full operation.",
+    "source": "Charles Dickens, Oliver Twist, 1838",
+    "ebook": 730
+   },
+   "say": {
+    "chunks": [
+     "sys",
+     "tem"
+    ],
+    "stress": [0]
+   }
+  },
+  "temperature": {
+   "etymology": {
+    "text": "From the Latin temperare, meaning \u2018to mix, to moderate\u2019.",
+    "family": [
+     "temper",
+     "temperate",
+     "temperament"
+    ]
+   },
+   "story": {
+    "kind": "quote",
+    "text": "I dwelt long upon the fertility of our soil, and the temperature of our climate.",
+    "source": "Jonathan Swift, Gulliver's Travels, 1726",
+    "ebook": 829
+   },
+   "say": {
+    "chunks": [
+     "tem",
+     "per",
+     "a",
+     "ture"
+    ],
+    "stress": [1]
+   }
+  },
+  "thorough": {
+   "etymology": {
+    "text": "From the Old English thuruh, meaning \u2018through\u2019.",
+    "family": [
+     "through",
+     "borough",
+     "although"
+    ]
+   },
+   "story": {
+    "kind": "quote",
+    "text": "How thorough she was at bath-time, and up at any moment of the night if one of her charges made the slightest cry.",
+    "source": "J. M. Barrie, Peter Pan, 1911",
+    "ebook": 16
+   },
+   "say": {
+    "chunks": [
+     "thor",
+     "ough"
+    ],
+    "stress": [1]
+   }
+  },
+  "tight-fisted": {
+   "etymology": {
+    "text": "Made in English from tight + fisted: mean with money.",
+    "family": [
+     "cold-hearted",
+     "stone-faced",
+     "short-tempered"
+    ]
+   },
+   "story": {
+    "kind": "quote",
+    "text": "But he was a tight-fisted hand at the grind-stone, Scrooge! a squeezing, wrenching, grasping, scraping, clutching, covetous, old sinner!",
+    "source": "Charles Dickens, A Christmas Carol, 1843",
+    "ebook": 46
+   },
+   "say": {
+    "chunks": [
+     "tight",
+     "hyphen",
+     "fisted"
+    ],
+    "stress": [1]
+   }
+  },
+  "tolerance": {
+   "etymology": {
+    "text": "From the Latin tolerare, meaning \u2018to bear, to put up with\u2019.",
+    "family": [
+     "tolerant",
+     "toleration",
+     "tolerate"
+    ]
+   },
+   "story": {
+    "kind": "quote",
+    "text": "\u201cAye, but there\u2019s this in it, Dowlas,\u201d said the landlord, speaking in a tone of much candour and tolerance.",
+    "source": "George Eliot, Silas Marner, 1861",
+    "ebook": 550
+   },
+   "say": {
+    "chunks": [
+     "toler",
+     "ance"
+    ],
+    "stress": [1]
+   }
+  },
+  "tolerant": {
+   "etymology": {
+    "text": "From the Latin tolerare, meaning \u2018to bear, to put up with\u2019.",
+    "family": [
+     "tolerance",
+     "toleration",
+     "tolerate"
+    ]
+   },
+   "story": {
+    "kind": "quote",
+    "text": "It was nothing to her that the kindness took the form of tolerant patronage; she was used to that.",
+    "source": "Charles Dickens, Little Dorrit, 1857",
+    "ebook": 963
+   },
+   "say": {
+    "chunks": [
+     "toler",
+     "ant"
+    ],
+    "stress": [1]
+   }
+  },
+  "twelfth": {
+   "etymology": {
+    "text": "From the Old English twelfta, meaning \u2018twelfth\u2019.",
+    "family": [
+     "twelve",
+     "fifth",
+     "twentieth"
+    ]
+   },
+   "story": {
+    "kind": "quote",
+    "text": "When the twelfth day after the accident came, I was taken to the sale, a few miles out of London.",
+    "source": "Anna Sewell, Black Beauty, 1877",
+    "ebook": 271
+   },
+   "say": {
+    "chunks": [
+     "twelfth"
+    ],
+    "stress": [0]
+   }
+  },
+  "variety": {
+   "etymology": {
+    "text": "From the Latin varius, meaning \u2018changing, spotted\u2019.",
+    "family": [
+     "various",
+     "vary",
+     "variable"
+    ]
+   },
+   "story": {
+    "kind": "quote",
+    "text": "Mr. Snagsby, as a timid man, is accustomed to cough with a variety of expressions, and so to save words.",
+    "source": "Charles Dickens, Bleak House, 1853",
+    "ebook": 1023
+   },
+   "say": {
+    "chunks": [
+     "va",
+     "ri",
+     "e",
+     "ty"
+    ],
+    "stress": [1,2,3]
+   }
+  },
+  "vegetable": {
+   "etymology": {
+    "text": "From the Latin vegetare, meaning \u2018to enliven\u2019.",
+    "family": [
+     "vegetation",
+     "vegetate",
+     "comfortable"
+    ]
+   },
+   "story": {
+    "kind": "quote",
+    "text": "In the end, wisely and carefully we shall readjust the balance of animal and vegetable life to suit our human needs.",
+    "source": "H. G. Wells, The Time Machine, 1895",
+    "ebook": 35
+   },
+   "say": {
+    "chunks": [
+     "veg",
+     "e",
+     "ta",
+     "ble"
+    ],
+    "stress": [0]
+   }
+  },
+  "vehicle": {
+   "etymology": {
+    "text": "From the Latin vehiculum, meaning \u2018carrier\u2019.",
+    "family": [
+     "vehicular",
+     "convey",
+     "conveyance"
+    ]
+   },
+   "story": {
+    "kind": "quote",
+    "text": "As he walked briskly along the road, he heard behind him, the noise of some vehicle, approaching at a furious pace.",
+    "source": "Charles Dickens, Oliver Twist, 1838",
+    "ebook": 730
+   },
+   "say": {
+    "chunks": [
+     "ve",
+     "hi",
+     "cle"
+    ],
+    "stress": [1]
+   }
+  },
+  "wide-eyed": {
+   "etymology": {
+    "text": "Made in English from wide + eyed: with eyes wide open.",
+    "family": [
+     "green-eyed",
+     "pig-headed",
+     "cold-hearted"
+    ]
+   },
+   "story": {
+    "kind": "quote",
+    "text": "Louisa, Mrs. Vincy\u2019s darling, now ran to her with wide-eyed serious excitement...",
+    "source": "George Eliot, Middlemarch, 1871",
+    "ebook": 145
+   },
+   "say": {
+    "chunks": [
+     "wide",
+     "hyphen",
+     "eyed"
+    ],
+    "stress": [1]
+   }
+  },
+  "yacht": {
+   "etymology": {
+    "text": "From the Dutch jacht, meaning \u2018a hunting ship\u2019.",
+    "family": [
+     "Dutch loans: sketch",
+     "landscape",
+     "skipper"
+    ]
+   },
+   "story": {
+    "kind": "quote",
+    "text": "I must not forget that we went on board the yacht, where they all three descended into the cabin, and were busy with some papers.",
+    "source": "Charles Dickens, David Copperfield, 1850",
+    "ebook": 766
+   },
+   "say": {
+    "chunks": [
+     "yacht"
+    ],
+    "stress": [0]
+   }
+  }
+ },
+ "excluded": [
+  "beautiful",
+  "chemistry",
+  "delicious",
+  "irregular",
+  "knowledge",
+  "possession",
+  "separate",
+  "useful"
+ ]
+}

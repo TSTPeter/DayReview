@@ -1,0 +1,190 @@
+{
+  "rules": {
+    ".read": false,
+    ".write": false,
+    "learners": {
+      "$uid": {
+        ".read": "auth != null && auth.uid === $uid",
+        ".write": "auth != null && auth.uid === $uid",
+        "days": {
+          "$date": {
+            "date": {
+              ".validate": "newData.isString() && newData.val().length <= 64"
+            },
+            "attempts": {
+              ".validate": "newData.isNumber() && newData.val() >= 0 && newData.val() % 1 === 0"
+            },
+            "correct": {
+              ".validate": "newData.isNumber() && newData.val() >= 0 && newData.val() % 1 === 0"
+            },
+            "accuracy": {
+              ".validate": "newData.isNumber() && newData.val() >= 0 && newData.val() <= 1"
+            },
+            "minutes": {
+              ".validate": "newData.isNumber() && newData.val() >= 0 && newData.val() % 1 === 0"
+            },
+            "phonological_reliance": {
+              ".validate": "newData.isNumber() && newData.val() >= 0 && newData.val() <= 1"
+            },
+            "orthographic_choice_rate": {
+              ".validate": "newData.isNumber() && newData.val() >= 0 && newData.val() <= 1"
+            },
+            "delayed_7": {
+              ".validate": "newData.isNumber() && newData.val() >= 0 && newData.val() <= 1"
+            },
+            "delayed_28": {
+              ".validate": "newData.isNumber() && newData.val() >= 0 && newData.val() <= 1"
+            },
+            "transfer_on": {
+              ".validate": "newData.isNumber() && newData.val() >= 0 && newData.val() <= 1"
+            },
+            "transfer_off": {
+              ".validate": "newData.isNumber() && newData.val() >= 0 && newData.val() <= 1"
+            },
+            "patterns_cracked": {
+              ".validate": "newData.isNumber() && newData.val() >= 0 && newData.val() % 1 === 0"
+            },
+            "typing_median_ms": {
+              ".validate": "newData.isNumber() && newData.val() >= 0 && newData.val() % 1 === 0"
+            },
+            "pattern_strength": {
+              "$pattern": {
+                ".validate": "newData.isNumber() && newData.val() >= 0 && newData.val() <= 1"
+              }
+            },
+            "updated_at": {
+              ".validate": "newData.isString() && newData.val().length <= 64"
+            },
+            "$other": {
+              ".validate": false
+            },
+            ".validate": "$date.matches(/^\\d{4}-\\d{2}-\\d{2}$/) && newData.child('date').val() === $date"
+          }
+        },
+        "profile": {
+          "date": {
+            ".validate": "newData.isString() && newData.val().length <= 64"
+          },
+          "attempts": {
+            ".validate": "newData.isNumber() && newData.val() >= 0 && newData.val() % 1 === 0"
+          },
+          "correct": {
+            ".validate": "newData.isNumber() && newData.val() >= 0 && newData.val() % 1 === 0"
+          },
+          "accuracy": {
+            ".validate": "newData.isNumber() && newData.val() >= 0 && newData.val() <= 1"
+          },
+          "minutes": {
+            ".validate": "newData.isNumber() && newData.val() >= 0 && newData.val() % 1 === 0"
+          },
+          "phonological_reliance": {
+            ".validate": "newData.isNumber() && newData.val() >= 0 && newData.val() <= 1"
+          },
+          "orthographic_choice_rate": {
+            ".validate": "newData.isNumber() && newData.val() >= 0 && newData.val() <= 1"
+          },
+          "delayed_7": {
+            ".validate": "newData.isNumber() && newData.val() >= 0 && newData.val() <= 1"
+          },
+          "delayed_28": {
+            ".validate": "newData.isNumber() && newData.val() >= 0 && newData.val() <= 1"
+          },
+          "transfer_on": {
+            ".validate": "newData.isNumber() && newData.val() >= 0 && newData.val() <= 1"
+          },
+          "transfer_off": {
+            ".validate": "newData.isNumber() && newData.val() >= 0 && newData.val() <= 1"
+          },
+          "patterns_cracked": {
+            ".validate": "newData.isNumber() && newData.val() >= 0 && newData.val() % 1 === 0"
+          },
+          "typing_median_ms": {
+            ".validate": "newData.isNumber() && newData.val() >= 0 && newData.val() % 1 === 0"
+          },
+          "pattern_strength": {
+            "$pattern": {
+              ".validate": "newData.isNumber() && newData.val() >= 0 && newData.val() <= 1"
+            }
+          },
+          "updated_at": {
+            ".validate": "newData.isString() && newData.val().length <= 64"
+          },
+          "$other": {
+            ".validate": false
+          }
+        },
+        "experiment": {
+          "etymology": {
+            "words": {
+              ".validate": "newData.isNumber() && newData.val() >= 0 && newData.val() % 1 === 0"
+            },
+            "outcomes": {
+              ".validate": "newData.isNumber() && newData.val() >= 0 && newData.val() % 1 === 0"
+            },
+            "correct": {
+              ".validate": "newData.isNumber() && newData.val() >= 0 && newData.val() % 1 === 0"
+            },
+            "$other": {
+              ".validate": false
+            },
+            ".validate": "newData.hasChildren(['words', 'outcomes', 'correct'])"
+          },
+          "story": {
+            "words": {
+              ".validate": "newData.isNumber() && newData.val() >= 0 && newData.val() % 1 === 0"
+            },
+            "outcomes": {
+              ".validate": "newData.isNumber() && newData.val() >= 0 && newData.val() % 1 === 0"
+            },
+            "correct": {
+              ".validate": "newData.isNumber() && newData.val() >= 0 && newData.val() % 1 === 0"
+            },
+            "$other": {
+              ".validate": false
+            },
+            ".validate": "newData.hasChildren(['words', 'outcomes', 'correct'])"
+          },
+          "say": {
+            "words": {
+              ".validate": "newData.isNumber() && newData.val() >= 0 && newData.val() % 1 === 0"
+            },
+            "outcomes": {
+              ".validate": "newData.isNumber() && newData.val() >= 0 && newData.val() % 1 === 0"
+            },
+            "correct": {
+              ".validate": "newData.isNumber() && newData.val() >= 0 && newData.val() % 1 === 0"
+            },
+            "$other": {
+              ".validate": false
+            },
+            ".validate": "newData.hasChildren(['words', 'outcomes', 'correct'])"
+          },
+          "blend": {
+            "words": {
+              ".validate": "newData.isNumber() && newData.val() >= 0 && newData.val() % 1 === 0"
+            },
+            "outcomes": {
+              ".validate": "newData.isNumber() && newData.val() >= 0 && newData.val() % 1 === 0"
+            },
+            "correct": {
+              ".validate": "newData.isNumber() && newData.val() >= 0 && newData.val() % 1 === 0"
+            },
+            "$other": {
+              ".validate": false
+            },
+            ".validate": "newData.hasChildren(['words', 'outcomes', 'correct'])"
+          },
+          "updated_at": {
+            ".validate": "newData.isString() && newData.val().length <= 64"
+          },
+          "$other": {
+            ".validate": false
+          }
+        },
+        "$other": {
+          ".validate": false
+        }
+      }
+    }
+  }
+}

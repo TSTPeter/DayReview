@@ -54,11 +54,36 @@
   </div>
 
   <p id="home-probe-note" class="small muted"></p>
+  <!-- ICO Children's code standard 11: if a grown-up can see how she is doing, she is
+       told so, plainly. Shown only while sync is on. -->
+  <p id="home-sync-note" class="small muted" hidden>Your grown-up can see your totals,
+     but never the words you write.</p>
   <p style="margin-top:1.5rem">
     <button id="btn-week" class="link">This week&rsquo;s spellings</button>
     &nbsp;&nbsp;
     <button id="btn-grownup" class="link">Grown-up view</button>
+    &nbsp;&nbsp;
+    <button id="btn-share" class="link">Share the game</button>
   </p>
+</section>
+
+<!-- Sharing is the game's address and nothing else (docs/16-dpia.md): no name, no
+     scores, no connection. A friend who scans it starts fresh, and nobody sees
+     anybody. -->
+<section id="screen-share" class="screen">
+  <h1>Share the game</h1>
+  <p>Show this to a friend. It opens the spelling game on their tablet, starting fresh.</p>
+  <div class="sheet share-card">
+    <img src="img/share-qr.svg" alt="A QR code that opens the spelling game" width="264" height="264">
+    <p class="share-url">www.tsttalent.com/Spelling</p>
+  </div>
+  <p class="small muted">Nothing about you goes with it: not your name, not your words,
+     not your garden. Your friend will not see you, and you will not see them.</p>
+  <p class="small"><a href="privacy.html">For grown-ups: what the game keeps, and where</a></p>
+  <div class="row">
+    <button id="share-send" hidden>Send the link</button>
+    <button id="share-back" class="link">Back</button>
+  </div>
 </section>
 
 <!-- ============================================ 1. attempt
@@ -108,14 +133,21 @@
     <div class="sheet kraft tilt-r" id="reveal-about">
       <span class="tab plum">How it is built</span>
       <p id="reveal-morph" class="morphemes"></p>
-      <span class="tab">Where it comes from</span>
-      <p id="reveal-origin" class="muted"></p>
+      <div id="reveal-origin-part">
+        <span class="tab">Where it comes from</span>
+        <p id="reveal-origin" class="muted"></p>
+      </div>
       <span class="tab">Why</span>
       <p id="reveal-why"></p>
-      <span class="tab">Same family</span>
-      <div id="reveal-siblings" class="siblings"></div>
+      <div id="reveal-family-part">
+        <span class="tab">Same family</span>
+        <div id="reveal-siblings" class="siblings"></div>
+      </div>
     </div>
   </div>
+
+  <!-- After a miss, the word's support: experiments/2026-10-support-types.md. -->
+  <div class="sheet support-sheet" id="reveal-support" hidden></div>
 
   <!-- docs/03: at most one item in five, four options, one tap, never after
        a failure. -->
@@ -267,6 +299,7 @@
   <div id="jig-board" class="jig-board" aria-label="Your word" aria-live="polite"></div>
   <div id="jig-tray" class="jig-tray" aria-label="Pieces"></div>
   <p id="jig-feedback" class="game-feedback" aria-live="polite"></p>
+  <div id="jig-support" class="sheet support-sheet" hidden></div>
   <div class="row">
     <button id="jig-check" class="primary" disabled>Check</button>
     <button id="jig-clear">Clear</button>
@@ -290,12 +323,14 @@
   </div>
 </section>
 
-<section id="screen-sort" class="screen">
+<section id="screen-sort" class="screen has-scene">
+  <div id="sort-scene" class="scene" aria-hidden="true"></div>
   <div class="game-head"><h1 id="sort-title">Pattern sort</h1><span class="points-chip" id="sort-points"></span></div>
   <p id="sort-count" class="small muted"></p>
   <div id="sort-card" class="sort-card" aria-live="polite"></div>
   <div id="sort-bins" class="sort-bins"></div>
   <p id="sort-feedback" class="game-feedback" aria-live="polite"></p>
+  <div id="sort-support" class="sheet support-sheet" aria-live="polite" hidden></div>
   <div id="sort-result" class="sort-result" hidden></div>
   <div class="row">
     <button id="sort-again" class="primary" hidden>Another round</button>
@@ -370,6 +405,7 @@
       <p id="bonus-verdict" class="verdict"></p>
       <div id="bonus-marked" class="marked"></div>
       <p id="bonus-why" class="muted"></p>
+      <div id="bonus-support" class="support-inline" hidden></div>
       <button id="bonus-back" class="primary">Back to the board</button>
     </div>
   </div>
@@ -509,6 +545,22 @@
        compare this with the calendar above.</p>
   </div>
 
+  <div class="sheet" id="gu-experiment">
+    <span class="tab teal">Which help works for her</span>
+    <p id="gu-exp-state"></p>
+    <table id="gu-exp-table" class="exp-table" hidden>
+      <thead><tr><th>After a miss</th><th>Words</th><th>Checked a day or more later</th>
+        <th>Right then</th><th>Chance it is best</th></tr></thead>
+      <tbody></tbody>
+    </table>
+    <p class="small muted">Each word gets one kind of help for the whole term, picked at
+       random, and a miss always keeps the rule. The test is her next dictation of the
+       word a day or more later. Registered before it started, in
+       experiments/2026-10-support-types.md: nothing changes before 6 November,
+       whatever this table shows. With one child it can choose for her; it cannot
+       prove anything for anyone else.</p>
+  </div>
+
   <div class="sheet">
     <span class="tab">Sound and comfort</span>
     <div class="row">
@@ -532,14 +584,37 @@
   </div>
 
   <div class="sheet">
+    <span class="tab">Saying it aloud</span>
+    <div class="row" style="margin-bottom:.6rem">
+      <label for="opt-voice" class="small">Listen for her voice in the pattern game</label>
+      <select id="opt-voice"><option value="off">Off</option><option value="on">On</option></select>
+    </div>
+    <p class="small muted">When a word's help is to say it aloud, the game listens for her
+       voice and ends the pause when it hears her. It only measures how loud the room
+       is, on this iPad: nothing is recorded, kept, sent or turned into words. The
+       microphone opens when the game starts, the browser shows that it is on, and it
+       closes when she leaves the game.</p>
+    <p class="small muted" id="gu-voice-state"></p>
+  </div>
+
+  <div class="sheet">
     <span class="tab coral">Her data</span>
     <div class="row" style="margin-bottom:.6rem">
       <label for="opt-sync" class="small">Sync to Firebase</label>
       <select id="opt-sync"><option value="off">Off</option><option value="on">On</option></select>
     </div>
+    <div id="gu-fb-config" hidden>
+      <label for="opt-fb-config" class="small">Firebase web app config, copied from the
+        Firebase console (Project settings, Your apps)</label>
+      <textarea id="opt-fb-config" rows="6" spellcheck="false" autocapitalize="none"
+                autocorrect="off" placeholder="const firebaseConfig = { apiKey: ... };"></textarea>
+      <div class="row" style="margin:.5rem 0"><button id="opt-fb-save">Save on this iPad</button></div>
+    </div>
     <p class="small muted" id="gu-sync-state"></p>
     <p class="small muted">What she types stays on this device. If sync is on, only counts
-       and percentages leave it: never a word she wrote, never her keystrokes.</p>
+       and percentages leave it: never a word she wrote, never her keystrokes. The
+       config lives only on this iPad, so no other device that opens the game syncs
+       anything.</p>
     <div class="row">
       <button id="gu-export">Export everything</button>
       <button id="gu-delete" class="warm">Delete everything</button>

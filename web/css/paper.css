@@ -552,6 +552,58 @@ button.games-btn { background: var(--cut-mustard); color: #23201c; }
 .hunt-found { display: flex; flex-wrap: wrap; justify-content: center; gap: .4rem 1.1rem;
               min-height: 2rem; font-size: 1.3rem; letter-spacing: .03em; margin: 0 0 .6rem; }
 
+/* The support after a miss (experiments/2026-10-support-types.md). One card, one
+ * part per piece of help, each with its tab, so the arms look alike apart from what
+ * they say. */
+.support-sheet { margin: .4rem 0 1rem; }
+.support-inline { margin-top: .8rem; }
+.support { display: grid; gap: .9rem; }
+.support-part .tab { margin-bottom: .35rem; }
+.support-part p { margin: 0 0 .25rem; }
+.support-quote { font-family: Georgia, "Iowan Old Style", "Times New Roman", serif;
+                 font-size: 1.12rem; line-height: 1.5; }
+.support-say { font-size: 1.5rem; font-weight: 700; letter-spacing: .03em; }
+.support-say b { color: var(--cut-plum); font-weight: 900; }
+.listen { display: flex; align-items: center; gap: .7rem; margin-top: .2rem; }
+.listen .mic { font-weight: 800; font-size: .9rem; color: var(--ink-2); }
+.listen .mic.heard { color: var(--right); }
+.listen .meter { flex: 0 1 10rem; height: 10px; border-radius: 5px; overflow: hidden;
+                 background: color-mix(in srgb, var(--ink) 10%, transparent); }
+.listen .meter i { display: block; height: 100%; width: 0; background: var(--cut-teal);
+                   transition: width .08s linear; }
+
+/* The pattern sort rests its bins after a miss: dimmed, not counted down. */
+.sort-bins.resting button { opacity: .45; }
+
+/* The background that grows with a run (scene.js). White on white: a few percent of
+ * contrast, under everything, never in the way of a tap. */
+:root { --scene-lite: #fffdf9; --scene-shade: rgba(35, 32, 28, .055); }
+[data-theme="dark"] { --scene-lite: rgba(255, 255, 255, .05); --scene-shade: rgba(0, 0, 0, .35); }
+.scene { position: fixed; inset: 0; z-index: 0; pointer-events: none; overflow: hidden; }
+.scene svg { width: 100%; height: 100%; display: block; }
+.scene .lite, .scene .lite * { stroke: var(--scene-lite); }
+.scene .lite:not([fill="none"]), .scene .lite *:not([fill="none"]) { fill: var(--scene-lite); }
+.scene .shade, .scene .shade * { stroke: var(--scene-shade); }
+.scene .shade:not([fill="none"]), .scene .shade *:not([fill="none"]) { fill: var(--scene-shade); }
+.scene .layer { opacity: 0; }
+.scene .layer.shown { opacity: 1; }
+.screen.has-scene > :not(.scene) { position: relative; z-index: 1; }
+
+/* Share the game: the code and the address, large enough to scan across a table. */
+.share-card { display: flex; flex-direction: column; align-items: center; gap: .4rem;
+              max-width: 22rem; margin: 1rem auto; }
+.share-card img { width: min(264px, 70vw); height: auto; image-rendering: pixelated; }
+.share-url { font-weight: 800; letter-spacing: .02em; margin: 0; }
+textarea { font: inherit; font-size: .9rem; width: 100%; padding: .6rem .7rem;
+           border-radius: 10px; border: 2px solid color-mix(in srgb, var(--ink) 14%, transparent);
+           background: var(--paper-1); color: var(--ink); }
+
+/* The grown-up view's experiment table. */
+.exp-table { width: 100%; border-collapse: collapse; margin: .4rem 0 .8rem; font-size: .9rem; }
+.exp-table th, .exp-table td { text-align: left; padding: .35rem .4rem;
+  border-bottom: 1px solid color-mix(in srgb, var(--ink) 12%, transparent); }
+.exp-table th { font-weight: 700; color: var(--ink-2); }
+
 @media (prefers-reduced-motion: no-preference) {
   .shake { animation: shake .36s ease; }
   @keyframes shake { 25% { transform: translateX(-7px); } 50% { transform: translateX(6px); }
@@ -565,6 +617,8 @@ button.games-btn { background: var(--cut-mustard); color: #23201c; }
   @keyframes fall { 0% { opacity: 1; transform: none; }
                     100% { opacity: 0; transform: translate(18px, 130px) rotate(70deg); } }
   .hunt-cell.found { transition: background-color .25s ease, color .25s ease; }
+  /* A new layer of the background fades in; a step back fades out. Nothing else moves. */
+  .scene .layer { transition: opacity .6s ease; }
 }
 
 @media (max-width: 600px) {

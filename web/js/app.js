@@ -18,6 +18,8 @@ import * as audio from "./audio.js";
 import * as store from "./store.js";
 import * as sfx from "./sfx.js";
 import * as sync from "./sync.js";
+import * as supports from "./supports.js";
+import * as voice from "./voice.js";
 import * as dash from "./dashboard.js";
 import { Keystrokes, fluency } from "./keystrokes.js";
 import { crackedPatterns, settle, renderWorld, artFor, assignArt } from "./rewards.js";
@@ -67,7 +69,7 @@ const app = {
 // --------------------------------------------------------------- boot
 
 async function boot() {
-  const [words, sentences, clips, term, gameData] = await Promise.all([
+  const [words, sentences, clips, term, gameData, supportData] = await Promise.all([
     fetch("data/words.json").then((r) => r.json()),
     fetch("data/sentences.json").then((r) => r.json()).catch(() => ({})),
     // Pre-rendered dictation (tools/render_audio.py). Missing or empty is fine: every
@@ -78,6 +80,8 @@ async function boot() {
     fetch("data/term.json").then((r) => r.json()).catch(() => ({})),
     // The games' content (engine/games.py). Missing means the games hub says so.
     fetch("data/games.json").then((r) => r.json()).catch(() => ({ words: {}, weeks: {} })),
+    // What a miss shows, and the experiment (engine/supports.py). Missing: no supports.
+    fetch("data/supports.json").then((r) => r.json()).catch(() => null),
   ]);
   audio.setClips(clips);
   app.data = words;
@@ -90,6 +94,9 @@ async function boot() {
   app.authored = new Map((term.entries || []).map((e) => [e.word, e]));
   app.byWord = new Map(app.curated);
   assignArt(Object.keys(words.patterns));   // one distinct piece per rule
+  // The experiment's arms, once its content is reviewed. Off until then.
+  await supports.init(supportData, store,
+    (w) => app.curated.get(w) || app.authored.get(w) || null);
 
   audio.setOverrides(await store.getKV("pronunciation_overrides", {}));
   applyComfort(await store.getKV("comfort", { size: "default", theme: "light" }));
@@ -102,7 +109,7 @@ async function boot() {
   await rebuildScheduler();
 
   games.init({
-    $, el, show, store, sfx,
+    $, el, show, store, sfx, supports,
     data: () => app.games,
     // The games follow the term's calendar, not an edited list: their content
     // is written per school week.
@@ -132,7 +139,8 @@ async function boot() {
   };
   window.addEventListener("pointerdown", armOnce, { once: true });
 
-  await sync.load(await store.getKV("sync_enabled", false));
+  // The config is pasted on this iPad, in the grown-up view; the site never serves one.
+  sync.load(await store.getKV("sync_enabled", false), await store.getKV("firebase_config", null));
   await loadCollection();
   await refreshHome();
   show("home");
@@ -253,6 +261,7 @@ function setProgress(done, total) {
 // --------------------------------------------------------------- home
 
 async function refreshHome() {
+  $("#home-sync-note").hidden = !sync.isConfigured();
   const attempts = await store.allAttempts();
   const name = await store.getKV("learner_name", "");
   $("#home-hello").textContent = name ? `Hi ${name}!` : "Hi there!";
@@ -539,7 +548,10 @@ async function recordAttempt(entry, raw, prompt) {
     trap: d.trap,
     mark_scheme: d.mark_scheme,
     method_shown: null,       // the ladder is off. docs/08 M5.
-    arm: null,                // no experiment running. docs/04 requires pre-registration.
+    // experiments/2026-10-support-types.md: the word's arm (null before it starts),
+    // and the support a miss puts on the answer screen.
+    arm: supports.armOf(entry.word),
+    support_shown: !d.correct && supports.armOf(entry.word) ? supports.armOf(entry.word) : null,
     box_before: boxBefore,
     box_after: st ? st.box : null,
     days_since_last: last
@@ -610,6 +622,18 @@ function showReveal(entry, d) {
   $("#reveal-siblings").replaceChildren(
     ...entry.family.slice(0, 3).map((w) => el("span", { textContent: w })));
   $("#reveal-rule-btn").hidden = !entry.patterns.length;
+
+  // Once the experiment runs, where it comes from and its family belong to the
+  // etymology arm, so they leave the card everyone sees; the baseline keeps the parts
+  // and the why. A miss then gets the word's own support. Before it runs, nothing
+  // here changes. experiments/2026-10-support-types.md.
+  const inExp = supports.inExperiment(entry.word);
+  $("#reveal-origin-part").hidden = inExp;
+  $("#reveal-family-part").hidden = inExp;
+  const card = !d.correct && inExp ? supports.render(entry.word) : null;
+  $("#reveal-support").replaceChildren(...(card ? [card] : []));
+  $("#reveal-support").hidden = !card;
+  if (card) supports.logShown(entry.word, "dictation");
 
   // docs/03: ask at most one item in five, and NEVER after a failure.
   const askStrategy = d.correct && (app.index + 1) % STRATEGY_EVERY === 0;
@@ -742,31 +766,11 @@ function renderUnlocks(host, outcome) {
 }
 
 /**
- * Send the day's arithmetic, and only the arithmetic. sync.js enforces the
- * allowlist; this function must never hand it an attempt row.
+ * Send the day's arithmetic, and only the arithmetic, and the experiment's tallies.
+ * sync.js enforces the allowlist; this function must never hand it an attempt row.
+ * The record is filed under the anonymous sign-in's id (sync.js), never a name:
+ * docs/06 standard 8.
  */
-/**
- * The key a synced row is filed under. docs/06 standard 8: no name, no email,
- * no date of birth, no school in the learner record. A child's first name was
- * hardcoded here, which put it in a file the site serves to anyone with the
- * URL and made it the primary key of every row that would ever be sent.
- *
- * It is an opaque random id instead, minted ONCE on this device and kept in
- * IndexedDB, so days and profiles still group together over time without
- * naming the child they belong to. Minted lazily, inside the isConfigured
- * guard, so a device with sync off never generates an identifier at all.
- */
-async function learnerKey() {
-  let key = await store.getKV("learner_key", null);
-  if (!key) {
-    key = (self.crypto && self.crypto.randomUUID)
-      ? self.crypto.randomUUID()
-      : `k-${Date.now().toString(36)}-${Math.random().toString(36).slice(2, 10)}`;
-    await store.setKV("learner_key", key);
-  }
-  return key;
-}
-
 async function pushAggregates() {
   if (!sync.isConfigured()) return;
   try {
@@ -774,14 +778,20 @@ async function pushAggregates() {
     const days = dash.byDay(attempts);
     const today = new Date().toISOString().slice(0, 10);
     const d = days[today];
+    let result = "off";
     if (d) {
-      await sync.pushDay(await learnerKey(), {
+      result = await sync.pushDay({
         date: today, attempts: d.attempts, correct: d.correct,
         accuracy: d.attempts ? d.correct / d.attempts : null,
         patterns_cracked: app.cracked.size,
         // day-level median, never the per-attempt figure
       });
     }
+    if (supports.live()) {
+      const per = supports.outcomes(attempts, await store.getKV("support_log", []));
+      await sync.pushExperiment(supports.tallies(per));
+    }
+    await store.setKV("sync_status", { at: new Date().toISOString(), result });
   } catch { /* sync never blocks practice */ }
 }
 
@@ -861,7 +871,7 @@ async function submitPaper() {
       attempt_text: (input.value || "").trim(), correct: d.correct,
       error_type: d.type, error_detail: d.detail, error_patterns: d.patterns,
       sounds_right: d.sounds_right, trap: d.trap, mark_scheme: d.mark_scheme,
-      method_shown: null, arm: null,
+      method_shown: null, arm: supports.armOf(entry.word), support_shown: null,
       box_before: null, box_after: null, days_since_last: null,
       position_in_session: i + 1, on_list: entry.on_list !== false,
       latency_ms: null, keystroke_count: null, edits_before_submit: null,
@@ -935,12 +945,15 @@ async function showGrownUp() {
     weekCard.hidden = true;
   }
 
+  const status = await store.getKV("sync_status", null);
+  const when = status ? new Date(status.at).toLocaleString() : "";
+  $("#gu-fb-config").hidden = !syncOn;
   $("#gu-sync-state").textContent = !syncOn
     ? "Off. Everything stays on this device and the app makes no network calls."
     : sync.isConfigured()
       ? "On. Only counts and percentages are sent, never her writing or keystrokes."
-      : "On, but no config found. Copy web/data/firebase.example.json to "
-        + "web/data/firebase.json and fill it in.";
+        + (status ? ` Last tried ${when}: ${status.result}.` : " Nothing sent yet: it sends at the end of a practice session.")
+      : "On, but there is no Firebase config on this iPad yet. Paste it below.";
 
   const medians = attempts.map((a) => a.median_inter_key_ms).filter((x) => x != null);
   const f = fluency(medians);
@@ -949,6 +962,7 @@ async function showGrownUp() {
 
   $("#opt-name").value = await store.getKV("learner_name", "");
   await paintGamesSummary();
+  await paintExperiment();
   const drafts = app.week ? app.week.words.filter((w) => app.unreviewed.has(w)) : [];
   $("#gu-week-drafts").hidden = !drafts.length;
   $("#gu-week-drafts").textContent = drafts.length
@@ -957,11 +971,50 @@ async function showGrownUp() {
     : "";
 
   $("#opt-sound").value = sfx.isMuted() ? "off" : "on";
+  $("#opt-voice").value = (await store.getKV("voice_on", false)) ? "on" : "off";
+  $("#gu-voice-state").textContent = voice.supported()
+    ? "" : "This browser cannot use the microphone, so the game will just ask her to say it.";
   const comfort = await store.getKV("comfort", {});
   $("#comfort-size").value = comfort.size || "default";
   $("#comfort-theme").value = comfort.theme || "light";
 
   show("grownup");
+}
+
+// The support experiment, for the adult, with its uncertainty said out loud.
+const ARM_NAMES = { etymology: "Where it comes from", story: "A story of it in use",
+                    say: "Say it aloud", blend: "All three" };
+
+async function paintExperiment() {
+  const table = $("#gu-exp-table");
+  if (!supports.live()) {
+    $("#gu-exp-state").textContent = "Not started. It begins once the quotations have "
+      + "been read and marked reviewed (experiments/2026-10-support-types-content.md).";
+    table.hidden = true;
+    return;
+  }
+  const per = supports.outcomes(await store.allAttempts(), await store.getKV("support_log", []));
+  const enough = supports.ARMS.every((a) => per[a].n >= supports.ENOUGH);
+  const best = enough ? supports.chanceBest(per) : null;
+  const shown = supports.ARMS.reduce((n, a) => n + per[a].words, 0);
+  const checked = supports.ARMS.reduce((n, a) => n + per[a].n, 0);
+  $("#gu-exp-state").textContent = enough
+    ? "Every kind of help has enough words checked to compare. Read the chance column "
+      + "as a betting line, not a verdict."
+    : `Too few to tell yet: ${shown} ${shown === 1 ? "word has" : "words have"} had help `
+      + `after a miss, and ${checked} of them ${checked === 1 ? "has" : "have"} been checked `
+      + `a day or more later. Each kind of help needs ${supports.ENOUGH} before this says anything.`;
+  table.querySelector("tbody").replaceChildren(...supports.ARMS.map((a) => {
+    const p = per[a];
+    const tr = el("tr");
+    for (const v of [ARM_NAMES[a], String(p.words), String(p.n),
+                     p.n ? `${Math.round((100 * p.k) / p.n)}%` : "",
+                     best ? `${Math.round(100 * best[a])}%` : ""]) {
+      tr.append(el("td", { textContent: v }));
+    }
+    return tr;
+  }));
+  table.hidden = false;
 }
 
 // Games, for the adult: how much, and whether it is crowding out the dictation.
@@ -1008,6 +1061,15 @@ function wire() {
   $("#btn-grownup").onclick = showGrownUp;
   $("#btn-week").onclick = showWeek;
   $("#btn-games").onclick = () => games.openHub();
+  $("#btn-share").onclick = () => {
+    // The iPad's own share sheet, where there is one, with the address and nothing more.
+    $("#share-send").hidden = !navigator.share;
+    show("share");
+  };
+  $("#share-send").onclick = () => navigator.share({
+    title: "Spelling", text: "A spelling game", url: "https://www.tsttalent.com/Spelling",
+  }).catch(() => {});
+  $("#share-back").onclick = async () => { await refreshHome(); show("home"); };
   $("#games-home").onclick = async () => { await refreshHome(); show("home"); };
   $("#opt-name-save").onclick = async () => {
     // First name only, trimmed, kept on this device. See the note on screen.
@@ -1072,8 +1134,28 @@ function wire() {
   $("#opt-sync").onchange = async (e) => {
     const on = e.target.value === "on";
     await store.setKV("sync_enabled", on);
-    await sync.load(on);
+    sync.load(on, await store.getKV("firebase_config", null));
     await showGrownUp();
+  };
+
+  // The Firebase config is pasted here, on her iPad, and kept in its IndexedDB.
+  // It is not child data and it is not exported; deleting everything removes it.
+  $("#opt-fb-save").onclick = async () => {
+    const cfg = sync.parseConfig($("#opt-fb-config").value);
+    if (!cfg) {
+      $("#gu-sync-state").textContent = "That does not look like a Firebase web config. "
+        + "It needs apiKey, authDomain, databaseURL, projectId and appId, with a Realtime "
+        + "Database URL.";
+      return;
+    }
+    await store.setKV("firebase_config", cfg);
+    $("#opt-fb-config").value = "";
+    sync.load(await store.getKV("sync_enabled", false), cfg);
+    await showGrownUp();
+  };
+
+  $("#opt-voice").onchange = async (e) => {
+    await store.setKV("voice_on", e.target.value === "on");
   };
 
   $("#opt-sound").onchange = async (e) => {

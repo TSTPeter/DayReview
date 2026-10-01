@@ -216,3 +216,48 @@ What to distrust:
 - **The rude-word screen is a list, and only straight lines are screened.**
 - **Hangman is still mostly letter guessing.** The typed answer is the part with
   evidence behind it.
+
+## 1 October 2026: a quicker pattern sort, an experiment, Firebase and sharing
+
+Built:
+
+- **The pattern sort.** No note on a right answer; a pause to reflect after a miss,
+  with the rule and the word's support; say it aloud, with an on-device voice-level
+  detector; run sounds at 3, 5, 7, 9 and polyphony from 11; a white-on-white background
+  that grows with a run (`docs/15`, `docs/11`).
+- **An experiment, pre-registered** (`experiments/2026-10-support-types.md`): which
+  support helps after a miss. Its content is `engine/supports.py`: 133 quotations from
+  39 British public-domain books, each checked word for word against its Project
+  Gutenberg text, and 22 written uses. It does not start until Peter has read them.
+- **Firebase**, for her tablet only: the config is pasted on the tablet, sign-in is
+  anonymous, and rules enforce the allowlist on the server (`docs/13`).
+- **Share the game**: a QR code of the address, nothing more. The DPIA draft is
+  `docs/16-dpia.md`, and `web/privacy.html` is a notice for families.
+- **`db/schema.sql`** now names arms rather than lettering them A and B, and records
+  `support_shown`, because the first registered experiment has four arms.
+
+Fixed on the way:
+
+- **Pasting the Firebase console's snippet failed.** It opens with
+  `import { initializeApp } from "firebase/app";`, and the parser took the first
+  brace it saw. It now takes the object around `apiKey`; the test pastes the
+  console's whole snippet.
+- **Leaving the sort during a pause and coming straight back left the bins locked**,
+  and a timer from the old round could move the new one on. Each card now carries a
+  token that stale timers check. A browser check reproduces both, and fails without
+  the fix.
+
+What to distrust:
+
+- **The quotations are unreviewed.** They were filtered, chosen one by one and verified
+  word for word, but nobody but Claude has read them yet. The experiment waits on that.
+- **The voice detector has never heard a child.** Its thresholds come from typical
+  microphone levels and were tested in Chromium with a synthetic tone, not on an iPad.
+- **Check the sounds on her iPad with the microphone on.** iOS may move audio to a
+  call-style route while the microphone is open, which could make the run sounds
+  quieter. Unverified either way.
+- **The pause length (3.5 seconds) and the background's subtlety are guesses.**
+- **The experiment is small.** One child and about 39 words per arm. It can choose
+  for her; it cannot prove anything.
+- **Firebase is untested end to end.** The code, the rules and their generator are
+  tested; a real project has not been connected, because that needs Peter's account.

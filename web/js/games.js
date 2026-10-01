@@ -17,6 +17,8 @@
 
 import { classify, feedback } from "./engine/classify.js";
 import { wordForm } from "./engine/derive.js";
+import * as scene from "./scene.js";
+import * as voice from "./voice.js";
 
 export const TICKET = 50;                      // points that open one bonus round
 const ROUND = { jigsaw: 5, match: 5, sort: 10, hangman: 5 };
@@ -163,6 +165,8 @@ function jigItem() {
   $("#jig-next").hidden = true;
   $("#jig-check").hidden = false;
   $("#jig-clear").hidden = false;
+  $("#jig-support").replaceChildren();
+  $("#jig-support").hidden = true;
   const count = c.parts.length;
   const pieces = c.parts.map((p, i) => makePiece(p, pieceShape(p, i, count)));
   for (const d of c.decoys) {
@@ -267,6 +271,7 @@ async function jigCheck() {
     await award(gained);
     return;
   }
+  if (jig.first) showSupport(word, "#jig-support", "jigsaw");
   jig.first = false;
   ctx.sfx.play("notyet");
   fb.className = "game-feedback wrong";
@@ -429,12 +434,32 @@ async function matchPick(btn) {
 
 // ------------------------------------------------------------------ pattern sort
 
-const sort = { deck: null, cards: [], i: 0, first: true, gained: 0, sorted: [] };
+// Quick when she is right, slower when she is not. Peter, 1 October 2026:
+//   * A right answer gets no note: the gap fills, a sound, the next card.
+//   * A miss gets a moment to reflect, not a countdown: the bins rest for a few
+//     seconds while she reads the rule and the word's support, and, where the support
+//     is saying it aloud and an adult has switched the microphone on, hearing her say
+//     it ends the pause early.
+//   * Right answers in a row at the first go earn a run sound at 3, 5, 7 and 9, and
+//     polyphony from 11; the background grows richer with them and steps back gently
+//     on a miss (scene.js).
+// The run and the background last for this sitting only. Points never go down.
+const REFLECT_MS = 3500;
+const NEXT_RIGHT_MS = 650;
+const NEXT_AFTER_MISS_MS = 900;
+const sort = { deck: null, cards: [], i: 0, first: true, gained: 0, sorted: [], run: 0,
+               resting: false, busy: false, listening: null, said: null, shown: null, token: null };
 const SEP = { a: "a", e: "e", c: "c", s: "s", hyphen: "-", none: "", space: " " };
 
-export function startSort() {
+export async function startSort(options = {}) {
   const week = ctx.week();
   sort.deck = ctx.data().weeks[week.id].sort;
+  if (options.fresh !== false) {
+    // A new sitting: a plain background, no run, and the microphone if it is wanted.
+    sort.run = 0;
+    scene.attach($("#sort-scene"));
+    if (await ctx.store.getKV("voice_on", false)) await voice.open();
+  }
   // Both bins in every round, or there is nothing to decide.
   const byBin = sort.deck.bins.map((b) => shuffle(sort.deck.cards.filter((c) => c.answer === b.key)));
   const take = [];
@@ -444,6 +469,11 @@ export function startSort() {
   }
   sort.cards = shuffle(take);
   sort.i = 0; sort.gained = 0; sort.sorted = [];
+  // A pause or a next-card timer from a round she left is still running: it holds
+  // the old card's token, so it can no longer touch this one.
+  if (sort.listening) sort.listening.stopped = true;
+  sort.listening = null;
+  sort.busy = false;
   $("#sort-title").textContent = sort.deck.title;
   $("#sort-result").hidden = true;
   $("#sort-again").hidden = true;
@@ -454,6 +484,7 @@ export function startSort() {
     b.onclick = () => sortPick(bin.key, b);
     return b;
   }));
+  rest(false);
   paintPoints();
   ctx.show("sort");
   sortCard();
@@ -481,57 +512,123 @@ function sortCard(filled = null) {
   } else if (filled !== "") {
     // 'no hyphen' closes the gap: re + turn is simply return.
     kids.push(ctx.el("span", { className: "gap filled part k-hyphen",
-                               textContent: filled === " " ? "\u00a0" : filled }));
+                               textContent: filled === " " ? " " : filled }));
   }
   kids.push(ctx.el("span", { className: k1 ? `part ${k1}` : "", textContent: card.show[1] }));
   host.replaceChildren(...kids);
   $("#sort-count").textContent = `Card ${sort.i + 1} of ${sort.cards.length}`;
   if (filled === null) {
+    sort.token = {};
     sort.first = true;
-    $("#sort-feedback").textContent = "";
-    $("#sort-feedback").className = "game-feedback";
+    sort.said = null;
+    sort.shown = null;
+    say("#sort-feedback", "", "");
+    $("#sort-support").replaceChildren();
+    $("#sort-support").hidden = true;
   }
 }
 
-async function sortPick(key, btn) {
-  if (sort.busy) return;
-  const card = sort.cards[sort.i];
-  const fb = $("#sort-feedback");
-  if (key !== card.answer) {
-    sort.first = false;
-    ctx.sfx.play("notyet");
-    btn.classList.add("shake");
-    setTimeout(() => btn.classList.remove("shake"), 380);
-    fb.className = "game-feedback wrong";
-    fb.textContent = `Not this time: ${card.explain}`;
+function rest(on) {
+  sort.resting = on;
+  $("#sort-bins").classList.toggle("resting", on);
+  for (const b of $("#sort-bins").children) b.disabled = on;
+}
+
+// A miss: the run ends, the background steps back, and the bins rest while she
+// reads. The pause is a moment to reflect, so nothing on screen counts it down.
+async function sortMiss(card, btn) {
+  sort.first = false;
+  sort.run = 0;
+  scene.down();
+  $("#screen-sort").dataset.run = "0";
+  ctx.sfx.play("notyet");
+  btn.classList.add("shake");
+  setTimeout(() => btn.classList.remove("shake"), 380);
+  say("#sort-feedback", "wrong", `Not this time: ${card.explain}`);
+  const shows = card.word ? ctx.supports.showsFor(card.word) : [];
+  const support = shows.length ? ctx.supports.render(card.word, { shows }) : null;
+  $("#sort-support").replaceChildren(...(support ? [support] : []));
+  $("#sort-support").hidden = !support;
+  sort.shown = shows.join(" ") || null;
+  rest(true);
+  const token = sort.token;
+  const pause = new Promise((resolve) => setTimeout(resolve, REFLECT_MS));
+  if (!support || !(shows.includes("say") && voice.isOpen())) {
+    await pause;
+    if (card.word) ctx.supports.logShown(card.word, "sort", null);
+    if (sort.token === token) rest(false);
     return;
   }
+  // Saying it aloud, with the microphone on. Hearing her ends the pause early; if she
+  // is quiet the bins come back at the usual time and it keeps listening until she
+  // picks, so a late "said it" still counts.
+  const signal = { stopped: false };
+  sort.listening = signal;
+  const bar = ctx.el("i");
+  const meter = ctx.el("div", { className: "listen" }, [
+    ctx.el("span", { className: "mic", textContent: "Listening" }),
+    ctx.el("span", { className: "meter" }, [bar])]);
+  support.append(meter);
+  const heard = voice.listen(REFLECT_MS * 3, (v) => { bar.style.width = `${Math.round(v * 100)}%`; },
+                             signal);
+  heard.then((result) => {
+    const said = result === "heard";
+    if (sort.token === token && sort.listening === signal) {
+      sort.said = said;
+      sort.listening = null;
+      if (said) meter.replaceChildren(ctx.el("span", { className: "mic heard", textContent: "I heard you." }));
+    }
+    if (card.word) ctx.supports.logShown(card.word, "sort", said);
+  });
+  await Promise.race([heard, pause]);
+  if (sort.token === token) rest(false);
+}
+
+async function sortPick(key, btn) {
+  if (sort.busy || sort.resting) return;
+  const card = sort.cards[sort.i];
+  if (key !== card.answer) { await sortMiss(card, btn); return; }
   sort.busy = true;
-  const gained = sort.first ? POINTS.sort : 0;
+  if (sort.listening) {
+    // She picked before saying it: stop listening, and it was not said.
+    sort.listening.stopped = true;
+    sort.listening = null;
+    if (sort.said !== true) sort.said = false;
+  }
+  const first = sort.first;
+  const gained = first ? POINTS.sort : 0;
   sort.gained += gained;
-  sort.sorted.push({ card, first_try: sort.first });
+  sort.sorted.push({ card, first_try: first, support: sort.shown, said: sort.said });
   sortCard(SEP[card.answer]);
   $("#sort-card").classList.add("pop");
-  fb.className = "game-feedback right";
-  fb.textContent = `Yes: ${card.explain}` + (gained ? `  +${gained}` : "");
-  ctx.sfx.play("correct");
+  // No note on a right answer, only the points. The rule waits for a miss.
+  say("#sort-feedback", "right", gained ? `+${gained}` : "");
+  if (first) {
+    sort.run += 1;
+    scene.up();
+    $("#screen-sort").dataset.run = String(sort.run);
+    if (!ctx.sfx.isRunMilestone(sort.run) || !ctx.sfx.playRun(sort.run)) ctx.sfx.play("correct");
+  } else {
+    ctx.sfx.play("correct");
+  }
+  const token = sort.token;
   await award(gained);
   setTimeout(async () => {
+    if (sort.token !== token) return;     // she left, and a new round has begun
     $("#sort-card").classList.remove("pop");
     sort.busy = false;
     sort.i += 1;
     if (sort.i < sort.cards.length) { sortCard(); return; }
     await sortEnd();
-  }, 1100);
+  }, first ? NEXT_RIGHT_MS : NEXT_AFTER_MISS_MS);
 }
 
 async function sortEnd() {
-  await logRound("sort", sort.sorted.map((s) => ({ word: s.card.word, full: s.card.full,
-                                                     first_try: s.first_try })), sort.gained);
   ctx.sfx.play("complete");
   $("#sort-card").replaceChildren(ctx.el("span", { textContent: "All sorted." }));
   $("#sort-count").textContent = "Round finished";
   $("#sort-bins").hidden = true;
+  $("#sort-support").hidden = true;
   // The pattern, made visible: every card in its bin.
   const cols = sort.deck.bins.map((bin) => {
     const col = ctx.el("div", { className: "sheet kraft" });
@@ -546,11 +643,18 @@ async function sortEnd() {
   $("#sort-result").replaceChildren(...cols);
   $("#sort-result").hidden = false;
   const firsts = sort.sorted.filter((s) => s.first_try).length;
-  const fb = $("#sort-feedback");
-  fb.className = "game-feedback right";
-  fb.textContent = `${firsts} of ${sort.sorted.length} at the first go.`
-    + (sort.gained ? ` +${sort.gained} points this round.` : "");
+  say("#sort-feedback", "right", `${firsts} of ${sort.sorted.length} at the first go.`
+    + (sort.gained ? ` +${sort.gained} points this round.` : ""));
   $("#sort-again").hidden = false;
+  await logRound("sort", sort.sorted.map((s) => ({ word: s.card.word, full: s.card.full,
+    first_try: s.first_try, support: s.support, said: s.said })), sort.gained);
+}
+
+/** Leaving the game ends the sitting: the microphone closes at once. */
+function leaveSort() {
+  if (sort.listening) sort.listening.stopped = true;
+  voice.close();
+  openHub();
 }
 
 // ------------------------------------------------------------------ shared by the letter games
@@ -558,6 +662,15 @@ async function sortEnd() {
 // A hint halves what the word is worth: enough to make trying first worth it,
 // not so much that she stays stuck rather than ask. Judgement (docs/15).
 const hinted = (n) => Math.floor(n / 2);
+
+// After a miss, the word's support (experiments/2026-10-support-types.md): its arm's
+// pieces once the experiment runs, where it comes from and saying it aloud before.
+function showSupport(word, sel, where) {
+  const card = ctx.supports.render(word);
+  $(sel).replaceChildren(...(card ? [card] : []));
+  $(sel).hidden = !card;
+  if (card) ctx.supports.logShown(word, where);
+}
 
 function say(sel, tone, text) {
   const fb = $(sel);
@@ -713,6 +826,13 @@ async function hangEnd(solved, typed = false) {
     ctx.el("p", { className: "whole" }, partSpans(hang.word)),
     ctx.el("p", { className: "muted", textContent: ctx.data().words[hang.word].why }));
   $("#hang-reveal").hidden = false;
+  if (!solved) {
+    const card = ctx.supports.render(hang.word);
+    if (card) {
+      $("#hang-reveal").append(card);
+      ctx.supports.logShown(hang.word, "hangman");
+    }
+  }
   say("#hang-feedback", solved ? "right" : "wrong", solved
     ? `${typed ? "You knew it!" : "You got it!"}${gained ? `  +${gained}` : ""}`
     : "Out of petals this time. Here is the word.");
@@ -1087,6 +1207,9 @@ async function bonusCheck() {
   v.textContent = d.correct ? `Correct! +${tile.value}` : feedback(d, entry).headline;
   $("#bonus-marked").replaceChildren(ctx.markedUp(tile.word, d));
   $("#bonus-why").textContent = d.correct ? (entry.why || "") : `${tile.word}. ${entry.why || ""}`;
+  $("#bonus-support").replaceChildren();
+  $("#bonus-support").hidden = true;
+  if (!d.correct) showSupport(tile.word, "#bonus-support", "bonus");
   tile.btn.classList.add("done", d.correct ? "right" : "wrong");
   tile.btn.textContent = tile.word;
   $("#bonus-score").textContent = `Score: ${bonus.score}`;
@@ -1118,7 +1241,7 @@ async function bonusEnd() {
 export function wire() {
   $("#game-jigsaw").onclick = startJigsaw;
   $("#game-match").onclick = startMatch;
-  $("#game-sort").onclick = startSort;
+  $("#game-sort").onclick = () => startSort({ fresh: true });
   $("#game-bonus").onclick = startBonus;
   $("#game-hangman").onclick = startHangman;
   $("#game-hunt").onclick = startHunt;
@@ -1145,7 +1268,7 @@ export function wire() {
   $("#jig-clear").onclick = () => { for (const p of [...$("#jig-board").children]) movePiece(p, $("#jig-tray")); };
   $("#jig-next").onclick = jigNext;
   $("#match-again").onclick = startMatch;
-  $("#sort-again").onclick = startSort;
+  $("#sort-again").onclick = () => startSort({ fresh: false });
   $("#bonus-input").addEventListener("input", (e) => {
     $("#bonus-check").disabled = !e.target.value.trim();
   });
@@ -1154,6 +1277,7 @@ export function wire() {
   });
   $("#bonus-check").onclick = bonusCheck;
   $("#bonus-back").onclick = bonusBack;
-  for (const id of ["#jig-quit", "#match-quit", "#sort-quit", "#bonus-quit", "#hang-quit",
+  for (const id of ["#jig-quit", "#match-quit", "#bonus-quit", "#hang-quit",
                     "#hunt-quit"]) $(id).onclick = openHub;
+  $("#sort-quit").onclick = leaveSort;
 }

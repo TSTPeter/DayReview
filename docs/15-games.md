@@ -267,3 +267,30 @@ A perfect round of either is 50, one bonus round, the same as a perfect jigsaw r
 Both log every round to `game_log`: for hangman each word, whether it was solved, the
 hint, the misses and whether it was typed; for hidden words each word and whether it
 was hinted. The grown-up view counts both beside the dictation sessions.
+
+## 1 October 2026: the pattern sort, quick when right, slow when not
+
+Peter: the sort works because it is quick, so keep it quick, but build stronger links
+to the conventions. What changed, and what each part rests on:
+
+| Change | What it rests on |
+|---|---|
+| **No note on a right answer.** The gap fills, a sound plays, and the next card comes in two thirds of a second | Judgement. The note was teaching what she had just shown she knew |
+| **A miss gets a moment to reflect.** The bins rest for three and a half seconds while she reads the rule and the word's support. Nothing counts down | Elaborated feedback after an error (Shute 2008); the pause makes sure she reads it. The length is a guess |
+| **The support after a miss** is the word's arm in the experiment: where it comes from, a real sentence that uses it, saying it aloud, or all three. Before the experiment starts, it is where it comes from plus saying it aloud | `experiments/2026-10-support-types.md` |
+| **Say it aloud.** If the support includes it and an adult has switched the microphone on, the game listens for her voice and ends the pause when it hears her | The production effect: words said aloud are remembered better than words read silently, but only when some are said and others are not ([MacLeod et al. 2010](https://doi.org/10.1037/a0018785)). Saying a word as it is spelt helps children spell it ([Hilte and Reitsma 2006](https://doi.org/10.1007/s11881-006-0013-3)). Both are recognition and spelling studies, not studies of this game |
+| **Run sounds** for right answers in a row at the first go, at 3, 5, 7 and 9, and polyphony from 11 | Performance-contingent reward (d = -0.28), the least harmful expected class. Peter's call; see `docs/11` |
+| **A background that grows** white on white with the run, and steps back two levels on a miss | Judgement, kept subtle because of `docs/02`'s coherence finding. See `docs/11` |
+
+**Beatrix's three-in-a-row sound did not exist.** The special sound she noticed was
+the unlock sting, three rising notes, which plays when her points pass a multiple of
+50 and a bonus round opens. A first-go card is worth 5, so it can land after any run.
+The run sounds are new.
+
+**The microphone never records.** `web/js/voice.js` computes how loud the room is,
+on the tablet, and nothing else. Browser speech recognition was rejected because it
+can send audio away to be transcribed (`docs/06`, `docs/16`).
+
+**The other games get the support too.** A wrong jigsaw check (once per word), a
+hangman word that runs out of petals, and a wrong bonus answer all show the word's
+support. Hidden words and root match have no wrong answer on a word to attach it to.
