@@ -10,3 +10,6 @@ engine/words.csv
 
 # Real Firebase config: never commit. See web/data/firebase.example.json
 web/data/firebase.json
+
+# Downloaded corpora for tools/find_quotes.py: never committed
+.cache/

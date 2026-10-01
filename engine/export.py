@@ -18,6 +18,7 @@ import re
 import games
 import probe
 import sentences
+import supports
 import term
 from derive import NOUN_VERB_PAIRS, SCHOOL_PATTERNS
 from words import PATTERNS, WORDS
@@ -27,6 +28,7 @@ OUT = ROOT / "web" / "data" / "words.json"
 OUT_SENTENCES = ROOT / "web" / "data" / "sentences.json"
 OUT_TERM = ROOT / "web" / "data" / "term.json"
 OUT_GAMES = ROOT / "web" / "data" / "games.json"
+OUT_SUPPORTS = ROOT / "web" / "data" / "supports.json"
 
 
 # Six half-terms is a school year, which is as far ahead as the probe needs to be
@@ -106,6 +108,15 @@ if __name__ == "__main__":
           f"{sum(len(w['blocks']) for w in content['weeks'].values())} word blocks, "
           f"{sum(len(w['roots']) for w in content['weeks'].values())} root pairs, "
           f"{sum(len(w['sort']['cards']) for w in content['weeks'].values() if w['sort'])} sort cards")
+
+    # What is shown after a miss, for experiments/2026-10-support-types.md.
+    help_ = supports.build(payload["words"], entries,
+                           {w: c["parts"] for w, c in content["words"].items()},
+                           {w["word"] for w in payload["off_list"]})
+    OUT_SUPPORTS.write_text(_one_line_numbers(json.dumps(help_, indent=1)) + "\n")
+    print(f"wrote {OUT_SUPPORTS.relative_to(ROOT)}  {len(help_['words'])} words, "
+          f"{sum(1 for w in help_['words'].values() if w['story'] and w['story']['kind'] == 'quote')} "
+          f"quotations, reviewed: {help_['reviewed']}")
 
     gaps = sentences.missing([w["word"] for w in payload["words"]]
                              + [w["word"] for w in payload["off_list"]])
