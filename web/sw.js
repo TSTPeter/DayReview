@@ -3,6 +3,14 @@
 //
 // Cache-first for the shell and the word data, because neither changes between releases
 // and both are needed before the first word can be dictated.
+//
+// HOW AN UPDATE ARRIVES. tools/deploy_to_site.py stamps CACHE with a hash of the files,
+// so every deploy changes this script, and the browser notices when it next checks: on
+// opening the game, and (app.js) whenever an open game comes back to the screen. The new
+// worker downloads the new version into its own cache and takes over at once. The page
+// already on screen was drawn from the old cache, so app.js reloads it on the welcome
+// page, where nothing is lost. Before that reload existed, a phone showed the old
+// version until the game was fully reopened, which on Android can be days (docs/13).
 
 // Namespaced, and the sweep below is limited to this prefix. CacheStorage is
 // per-ORIGIN, not per-scope, so on a shared domain - which is where this now
@@ -19,7 +27,7 @@ const SHELL = [
   "js/engine/derive.js", "js/engine/weekly.js", "js/games.js",
   "js/supports.js", "js/voice.js", "js/scene.js",
   "data/words.json", "data/sentences.json", "data/audio.json", "data/term.json",
-  "data/games.json", "data/supports.json", "img/share-qr.svg",
+  "data/games.json", "data/supports.json", "data/version.json", "img/share-qr.svg",
 ];
 // Clips are NOT in the shell: all of them is several megabytes on a first visit.
 // app.js warms the ones the next session needs, and any clip heard online is kept.

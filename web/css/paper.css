@@ -588,6 +588,9 @@ button.games-btn { background: var(--cut-mustard); color: #23201c; }
 .scene .layer { opacity: 0; }
 .scene .layer.shown { opacity: 1; }
 .screen.has-scene > :not(.scene) { position: relative; z-index: 1; }
+/* The background is fixed to the whole window, so the bar above the screens is lifted
+   over it too: its dots were painting across the word "Spelling". */
+header.bar, .progress { position: relative; z-index: 1; }
 
 /* Share the game: the code and the address, large enough to scan across a table. */
 .share-card { display: flex; flex-direction: column; align-items: center; gap: .4rem;

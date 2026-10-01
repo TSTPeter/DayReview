@@ -64,12 +64,19 @@ const app = {
   cracked: new Set(),        // rules she has cracked, ever
   curios: [],                // surprise pieces, ever
   week: null,                // this week's list from school, or null
+  screen: "home",            // the screen on show, so an update knows when it may reload
+  version: null,             // data/version.json: which deploy this device is showing
 };
+
+// Whether a service worker already controlled this page when it loaded. If not, the
+// worker that takes charge in a moment is the first install, not an update, and the
+// page is already the newest there is.
+const hadWorker = "serviceWorker" in navigator && !!navigator.serviceWorker.controller;
 
 // --------------------------------------------------------------- boot
 
 async function boot() {
-  const [words, sentences, clips, term, gameData, supportData] = await Promise.all([
+  const [words, sentences, clips, term, gameData, supportData, version] = await Promise.all([
     fetch("data/words.json").then((r) => r.json()),
     fetch("data/sentences.json").then((r) => r.json()).catch(() => ({})),
     // Pre-rendered dictation (tools/render_audio.py). Missing or empty is fine: every
@@ -82,8 +89,11 @@ async function boot() {
     fetch("data/games.json").then((r) => r.json()).catch(() => ({ words: {}, weeks: {} })),
     // What a miss shows, and the experiment (engine/supports.py). Missing: no supports.
     fetch("data/supports.json").then((r) => r.json()).catch(() => null),
+    // Which deploy this is (tools/deploy_to_site.py), for the grown-up view.
+    fetch("data/version.json").then((r) => r.json()).catch(() => null),
   ]);
   audio.setClips(clips);
+  app.version = version;
   app.data = words;
   app.sentences = sentences.sentences || {};
   app.unreviewed = new Set(sentences.unreviewed || []);
@@ -146,6 +156,7 @@ async function boot() {
   show("home");
 
   if ("serviceWorker" in navigator) {
+    watchForUpdates();
     navigator.serviceWorker.register("sw.js").catch(() => {});
     navigator.serviceWorker.ready.then(warmClips).catch(() => {});
   }
@@ -242,6 +253,9 @@ async function warmClips() {
 
 function show(name) {
   for (const s of document.querySelectorAll(".screen")) s.classList.toggle("on", s.id === `screen-${name}`);
+  app.screen = name;
+  // Back on the welcome page with a new version waiting: now it can load.
+  if (name === "home" && updateReady) setTimeout(reloadIfSafe, 250);
   // Two guards ride on the router so neither can be forgotten at a call site:
   // dictation refuses to speak while the word is on screen (redundancy), and
   // effects refuse to sound at all while she is mid-attempt (coherence).
@@ -256,6 +270,37 @@ function show(name) {
 
 function setProgress(done, total) {
   $("#progress-bar").style.width = total ? `${Math.round((done / total) * 100)}%` : "0%";
+}
+
+// --------------------------------------------------------------- updates
+
+// A deploy reaches a device through its service worker, which keeps the game in a cache
+// so it works offline. On the first open after a deploy that cache still holds the old
+// version: the new one downloads behind it and takes over a few seconds later (sw.js).
+// The page on screen was drawn from the old cache, so it reloads itself, but only on
+// the welcome page, where nothing is lost; anywhere else it waits until she is back
+// there. Coming back to an open tab is not a reload, so a game left open checks again
+// whenever it returns to the screen. Peter, 1 October 2026: the changes were live, and
+// his Android phone went on showing the version it had saved.
+let updateReady = false;
+
+function watchForUpdates() {
+  navigator.serviceWorker.addEventListener("controllerchange", () => {
+    if (!hadWorker) return;        // the first install taking charge, not an update
+    updateReady = true;
+    reloadIfSafe();
+  });
+  document.addEventListener("visibilitychange", () => {
+    if (document.visibilityState !== "visible") return;
+    navigator.serviceWorker.getRegistration()
+      .then((r) => r && r.update()).catch(() => { /* offline: next time */ });
+  });
+}
+
+function reloadIfSafe() {
+  if (!updateReady || app.screen !== "home") return;
+  updateReady = false;
+  location.reload();
 }
 
 // --------------------------------------------------------------- home
@@ -969,6 +1014,18 @@ async function showGrownUp() {
     ? `Draft sentences waiting for you to check (engine/sentences.py, UNREVIEWED): `
       + `${drafts.join(", ")}. Until they are checked these use the iPad's own voice.`
     : "";
+
+  // Which deploy this device is showing, so a grown-up can tell whether a change has
+  // reached it. A newer one installs itself on the welcome page (see "updates").
+  const v = app.version;
+  const made = v && /^\d{4}-\d{2}-\d{2}$/.test(v.synced || "")
+    ? new Date(`${v.synced}T12:00:00Z`).toLocaleDateString("en-GB",
+      { day: "numeric", month: "long", year: "numeric", timeZone: "UTC" })
+    : null;
+  $("#gu-version").textContent = v && v.stamp && v.stamp !== "dev"
+    ? `This device has the version ${made ? `of ${made} ` : ""}(${v.stamp}). A newer `
+      + "version installs itself a few seconds after the game is opened, on the welcome page."
+    : "This is a development copy of the game.";
 
   $("#opt-sound").value = sfx.isMuted() ? "off" : "on";
   $("#opt-voice").value = (await store.getKV("voice_on", false)) ? "on" : "off";
