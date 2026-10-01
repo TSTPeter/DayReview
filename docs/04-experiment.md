@@ -99,3 +99,14 @@ Not "words practised" or "minutes". Four numbers, per child, over time:
 4. **Transfer**: accuracy on off-list words using the same pattern. This is the number the
    interleaving study says will lag, and the one that tells you whether she learned the rule
    or the word.
+
+## Registered experiments
+
+| Registration | Question | Status |
+|---|---|---|
+| `experiments/2026-10-support-types.md` | After a miss: etymology, a story of the word in use, saying it aloud, or all three? | Registered 1 October 2026. Starts once the quotations are reviewed. Runs to 6 November 2026 |
+
+The arm a word is in rides on every attempt row as `arm`, and the support a miss
+showed as `support_shown`. Outcomes are computed from the attempt log, as this
+document's analysis section asks. The grown-up view shows the running result with
+its uncertainty, and nothing in it can change an arm before the stop date.

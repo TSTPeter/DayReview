@@ -52,11 +52,13 @@ repo's `web/` subfolder, not this repo. The site would also have acquired
 
 ## What is deliberately not copied
 
-`data/firebase.json` switches sync on. It is gitignored here, excluded by the
-sync script, and the script **refuses to run** if it finds one, because shipping
-it would turn on cloud sync for every visitor. That is `docs/06` standard 7,
-high privacy by default, enforced rather than remembered.
-`data/firebase.example.json` is developer documentation and stays out too.
+`data/firebase.json` would switch sync on for every visitor. It is gitignored here,
+excluded by the sync script, and the script **refuses to run** if it finds one.
+That is `docs/06` standard 7, high privacy by default, enforced rather than
+remembered. Since 1 October 2026 the app no longer reads that file at all: the
+Firebase config is pasted into the grown-up view on the one tablet that should
+sync, and kept in that tablet's IndexedDB. The example file that used to sit beside
+it is gone with it.
 
 ## The scope question, since `docs/06` says to answer it deliberately
 
@@ -112,3 +114,34 @@ whole browser suite passes unchanged against `/Games/Spelling/`:
   repo's `web/`. A CI job on either side could compare them and fail on drift.
 - **The 122 sentences are still unreviewed** (`docs/05` decision 2). The site
   being unlisted limits the exposure; it does not remove the obligation.
+
+## Switching Firebase on, for her tablet only
+
+Peter's steps, once:
+
+1. In the [Firebase console](https://console.firebase.google.com/), create a project.
+   Analytics can stay off.
+2. **Build, Authentication, Sign-in method:** enable **Anonymous**.
+3. **Build, Realtime Database:** create one in a European location (Belgium,
+   `europe-west1`), in locked mode.
+4. **Rules:** paste in `firebase/database.rules.json` and publish. They let each
+   anonymous sign-in write its own record only, and refuse any field not on
+   `web/js/sync.js`'s allowlist, so even a broken app could not store a word she wrote.
+5. **Project settings, Your apps:** add a web app, and copy the `firebaseConfig`
+   snippet it shows. Do this after step 3: the snippet only carries a `databaseURL`
+   once the database exists, and the app refuses a config without one. Pasting the
+   whole snippet, imports and all, is fine.
+6. On her iPad, in the grown-up view: set **Sync to Firebase** to On, paste the
+   snippet, and press **Save on this iPad**.
+
+What arrives, under `learners/{anonymous id}`: one row of counts per day, and the
+experiment's tallies per arm. Her welcome page says "Your grown-up can see your
+totals, but never the words you write" while sync is on (ICO standard 11).
+
+## 1 October 2026: sharing beyond the family
+
+"Share the game" shows a QR code of the address and nothing else (`web/img/share-qr.svg`,
+from `tools/make_share_qr.py`). Its DPIA, in draft, is `docs/16-dpia.md`. The reading
+above still holds: what is published is a program, and nothing it does sends a
+child's data anywhere unless that child's own grown-up switches sync on.
+

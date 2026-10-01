@@ -79,6 +79,52 @@ const VOICES = {
                            type: "triangle" }); },
 };
 
+// RUNS. Peter, 1 October 2026: right answers in a row in a game deserve a sound at
+// three, five, seven and nine, and polyphony from eleven. Each milestone is a longer
+// climb up the same pentatonic scale as the stings above, so nothing can clash, and
+// each adds a voice: from eleven, three voices in canon and a chord that gains a
+// voice every two more. Performance-contingent (d = -0.28, the least harmful expected
+// class), confined to the games, and silent whenever sound is off. docs/15.
+const PENTA = [261.63, 293.66, 329.63, 392.00, 440.00, 523.25, 587.33, 659.25,
+               783.99, 880.00, 1046.50, 1174.66, 1318.51, 1567.98, 1760.00];
+const RUNS = { 3: [7, 8, 10], 5: [5, 6, 7, 8, 10], 7: [5, 6, 7, 8, 9, 10, 12],
+               9: [3, 5, 6, 7, 8, 9, 10, 12, 13] };
+const STEP = 0.065;
+
+export const isRunMilestone = (n) => n >= 3 && n % 2 === 1;
+
+function climb(notes, { at = 0, gain = 0.1, last = 0.45 } = {}) {
+  notes.forEach((k, i) => tone({ freq: PENTA[Math.max(0, Math.min(PENTA.length - 1, k))],
+    at: at + i * STEP, dur: i === notes.length - 1 ? last : 0.16, gain }));
+  return at + (notes.length - 1) * STEP;
+}
+
+export function playRun(n) {
+  if (muted || attemptScreenUp || !isRunMilestone(n)) return false;
+  if (!arm() || !ctx) return false;
+  try {
+    if (n < 11) {
+      const notes = RUNS[n];
+      const end = climb(notes);
+      if (n >= 7) tone({ freq: PENTA[notes[notes.length - 1] - 2], at: end, dur: 0.5, gain: 0.07 });
+      if (n >= 9) tone({ freq: PENTA[0], dur: end + 0.5, gain: 0.05, type: "triangle" });
+      return true;
+    }
+    const voices = Math.min(3 + Math.floor((n - 11) / 2), 6);
+    const r = RUNS[9];
+    climb(r, { gain: 0.07 });
+    climb(r.map((k) => k + 2), { at: 0.09, gain: 0.05 });
+    const end = climb(r.map((k) => k - 3), { at: 0.18, gain: 0.05 });
+    for (const k of [5, 7, 8, 10, 12, 14].slice(0, voices)) {
+      tone({ freq: PENTA[k], at: end + 0.08, dur: 0.95, gain: 0.16 / voices });
+    }
+    tone({ freq: PENTA[0], dur: end + 1, gain: 0.05, type: "triangle" });
+    return true;
+  } catch {
+    return false;
+  }
+}
+
 export function play(name) {
   if (muted) return false;
   if (attemptScreenUp) return false;      // the rule, enforced not remembered

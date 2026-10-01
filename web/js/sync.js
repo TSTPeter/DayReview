@@ -67,42 +67,84 @@ export const FORBIDDEN = Object.freeze([
 
 let config = null;
 let db = null;
+let uid = null;
 let failed = false;
 
 export function isConfigured() { return !!config; }
+export const whoAmI = () => uid;
+
+const REQUIRED = ["apiKey", "authDomain", "databaseURL", "projectId", "appId"];
+
+/** Is this a Firebase web config with a Realtime Database URL? */
+export function validConfig(c) {
+  if (!c || typeof c !== "object") return false;
+  if (!REQUIRED.every((k) => typeof c[k] === "string" && c[k].length && c[k].length < 200)) return false;
+  return /^https:\/\/[a-z0-9-]+(\.[a-z0-9-]+)*\.(firebaseio\.com|firebasedatabase\.app)\/?$/
+    .test(c.databaseURL);
+}
 
 /**
- * Load config, but only when an adult has switched sync on.
- *
- * ICO Children's code standard 7 is high privacy BY DEFAULT, so off is the
- * resting state and nothing is fetched, attempted or reported until someone
- * deliberately changes it. It also means the app makes no network request at
- * all on a normal launch, which is what keeps the offline promise honest.
+ * Read what the Firebase console gives you to paste: either JSON, or the snippet
+ * `const firebaseConfig = { apiKey: "...", ... };`. Returns the config, or null.
  */
-export async function load(enabled = false) {
-  if (!enabled) { config = null; return false; }
-  if (config) return true;
+export function parseConfig(text) {
+  if (!text) return null;
+  // The object that holds apiKey. The console's snippet opens with imports that have
+  // braces of their own, and none of the config's values contain one.
+  const key = text.search(/["']?apiKey["']?\s*:/);
+  const open = key < 0 ? -1 : text.lastIndexOf("{", key);
+  const close = key < 0 ? -1 : text.indexOf("}", key);
+  if (open < 0 || close < 0) return null;
+  const body = text.slice(open, close + 1);
+  const json = body
+    .replace(/^\s*\/\/[^\n]*$/gm, "")                  // comment lines, not the // in a URL
+    .replace(/([{,]\s*)([A-Za-z_][A-Za-z0-9_]*)\s*:/g, '$1"$2":')   // bare keys
+    .replace(/'([^']*)'/g, '"$1"')                      // single quotes
+    .replace(/,\s*}/g, "}");                            // a trailing comma
   try {
-    const res = await fetch("data/firebase.json", { cache: "no-store" });
-    if (!res.ok) return false;
-    const cfg = await res.json();
-    if (!cfg || !cfg.databaseURL) return false;
-    config = cfg;
-    return true;
+    const c = JSON.parse(json);
+    const out = {};
+    for (const k of [...REQUIRED, "storageBucket", "messagingSenderId"]) if (c[k]) out[k] = String(c[k]);
+    return validConfig(out) ? out : null;
   } catch {
-    return false;   // no config file is the normal, supported state
+    return null;
   }
+}
+
+/**
+ * Switch sync on, with the config an adult pasted into the grown-up view on THIS
+ * iPad and kept in its IndexedDB. The public site never serves one, and
+ * tools/deploy_to_site.py refuses to ship one, so no other device syncs anything.
+ *
+ * ICO Children's code standard 7 is high privacy BY DEFAULT, so off is the resting
+ * state: nothing is fetched, attempted or reported until someone changes it, and a
+ * normal launch makes no network request at all.
+ */
+export function load(enabled = false, cfg = null) {
+  config = null; db = null; uid = null; failed = false;
+  if (!enabled || !validConfig(cfg)) return false;
+  config = cfg;
+  return true;
 }
 
 async function connect() {
   if (db || failed) return db;
   if (!config || !navigator.onLine) return null;
   try {
-    const [{ initializeApp }, { getDatabase }] = await Promise.all([
-      import(`${SDK}/firebase-app.js`),
-      import(`${SDK}/firebase-database.js`),
-    ]);
-    db = getDatabase(initializeApp(config));
+    const [{ initializeApp, getApps }, { getAuth, signInAnonymously }, { getDatabase }] =
+      await Promise.all([
+        import(`${SDK}/firebase-app.js`),
+        import(`${SDK}/firebase-auth.js`),
+        import(`${SDK}/firebase-database.js`),
+      ]);
+    // Named by project, so a changed config never reuses a stale app.
+    const name = `spelling-${config.projectId}`;
+    const fb = getApps().find((a) => a.name === name) || initializeApp(config, name);
+    // Anonymous sign-in: an opaque id, no account, no name, no email. The database
+    // rules (firebase/database.rules.json) let this id write its own record only.
+    const cred = await signInAnonymously(getAuth(fb));
+    uid = cred.user.uid;
+    db = getDatabase(fb);
     return db;
   } catch {
     failed = true;   // offline, blocked, or misconfigured: stop trying
@@ -144,37 +186,56 @@ export function shape(aggregate) {
   return out;
 }
 
-/**
- * Push one day's aggregates. Returns "sent" | "offline" | "off" | "error".
- * Never throws, never blocks the practice loop.
- */
-export async function pushDay(learnerKey, day) {
+// The experiment's tallies (experiments/2026-10-support-types.md): for each arm, how
+// many words have had help, how many reached the delayed check, how many were right.
+// Counts only. Which words, and what she wrote, never leave the device.
+export const EXPERIMENT_ARMS = Object.freeze(["etymology", "story", "say", "blend"]);
+const TALLY = Object.freeze(["words", "outcomes", "correct"]);
+
+export function shapeExperiment(tallies) {
+  const out = {};
+  for (const arm of EXPERIMENT_ARMS) {
+    const t = tallies && tallies[arm];
+    if (!t || typeof t !== "object") continue;
+    const row = {};
+    for (const k of TALLY) if (valid("count", t[k])) row[k] = t[k];
+    if (Object.keys(row).length === TALLY.length) out[arm] = row;
+  }
+  return out;
+}
+
+async function put(path, payload) {
   if (!config) return "off";
-  const payload = shape({ ...day, updated_at: new Date().toISOString() });
-  if (!payload.date) return "error";
   const conn = await connect();
   if (!conn) return navigator.onLine ? "error" : "offline";
   try {
     const { ref, set } = await import(`${SDK}/firebase-database.js`);
-    await set(ref(conn, `learners/${learnerKey}/days/${payload.date}`), payload);
+    await set(ref(conn, `learners/${uid}/${path}`), payload);
     return "sent";
   } catch {
     return "error";
   }
 }
 
-/** Push the rolling profile. Same allowlist, same guarantees. */
-export async function pushProfile(learnerKey, profile) {
+/**
+ * Push one day's aggregates. Returns "sent" | "offline" | "off" | "error".
+ * Never throws, never blocks the practice loop.
+ */
+export async function pushDay(day) {
   if (!config) return "off";
-  const conn = await connect();
-  if (!conn) return navigator.onLine ? "error" : "offline";
-  try {
-    const { ref, set } = await import(`${SDK}/firebase-database.js`);
-    await set(ref(conn, `learners/${learnerKey}/profile`), shape({
-      ...profile, updated_at: new Date().toISOString(),
-    }));
-    return "sent";
-  } catch {
-    return "error";
-  }
+  const payload = shape({ ...day, updated_at: new Date().toISOString() });
+  if (!payload.date) return "error";
+  return put(`days/${payload.date}`, payload);
+}
+
+/** Push the rolling profile. Same allowlist, same guarantees. */
+export async function pushProfile(profile) {
+  return put("profile", shape({ ...profile, updated_at: new Date().toISOString() }));
+}
+
+/** Push the experiment's tallies. Counts per arm, nothing else. */
+export async function pushExperiment(tallies) {
+  const payload = shapeExperiment(tallies);
+  if (!Object.keys(payload).length) return "off";
+  return put("experiment", { ...payload, updated_at: new Date().toISOString() });
 }

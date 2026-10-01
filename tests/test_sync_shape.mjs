@@ -8,7 +8,7 @@
  *
  *   node tests/test_sync_shape.mjs
  */
-import { shape, ALLOWED, FORBIDDEN } from "../web/js/sync.js";
+import { shape, ALLOWED, FORBIDDEN, shapeExperiment, parseConfig, validConfig } from "../web/js/sync.js";
 
 let failures = 0;
 const check = (name, ok, detail = "") => {
@@ -85,6 +85,62 @@ check("a ratio outside 0..1 is refused",
 check("the whole attempt row now yields nothing but the empty object",
       Object.keys(shape(attemptRow)).length === 0,
       JSON.stringify(shape(attemptRow)));
+
+// The experiment's tallies: counts per arm, and nothing that names a word.
+const tallies = shapeExperiment({
+  etymology: { words: 9, outcomes: 4, correct: 3 },
+  story: { words: 8, outcomes: 4, correct: 2, word: "government", attempt_text: "goverment" },
+  say: { words: 7, outcomes: "4", correct: 1 },
+  blend: { words: 6, outcomes: 3, correct: true },
+  observant: { words: 1, outcomes: 1, correct: 1 },
+});
+check("experiment tallies keep the four arms' counts",
+      tallies.etymology && tallies.etymology.correct === 3 && tallies.story && tallies.story.words === 8);
+check("a word or her writing riding with the tallies is dropped",
+      !JSON.stringify(tallies).includes("government") && !JSON.stringify(tallies).includes("goverment"));
+check("an arm with a string or boolean count is dropped whole",
+      !("say" in tallies) && !("blend" in tallies));
+check("a word dressed as an arm is dropped", !("observant" in tallies));
+check("the whole attempt row yields no tallies", Object.keys(shapeExperiment(attemptRow)).length === 0);
+
+// The config is pasted by an adult, from the Firebase console, as JSON or as JS.
+const pasted = `// Your web app's Firebase configuration
+const firebaseConfig = {
+  apiKey: "AIzaSyExample-key_123",
+  authDomain: "spelling-test.firebaseapp.com",
+  databaseURL: "https://spelling-test-default-rtdb.europe-west1.firebasedatabase.app",
+  projectId: "spelling-test",
+  storageBucket: "spelling-test.appspot.com",
+  messagingSenderId: "1234567890",
+  appId: "1:1234567890:web:abcdef",
+};`;
+const cfg = parseConfig(pasted);
+check("the console's JavaScript snippet is understood",
+      cfg && cfg.projectId === "spelling-test" && cfg.databaseURL.endsWith("firebasedatabase.app"));
+check("JSON works too", !!parseConfig(JSON.stringify(cfg)));
+// What the console's "Add app" page actually shows: imports first, braces and all,
+// then the config, then the code that uses it.
+const whole = `// Import the functions you need from the SDKs you need
+import { initializeApp } from "firebase/app";
+import { getAnalytics } from "firebase/analytics";
+// TODO: Add SDKs for Firebase products that you want to use
+// https://firebase.google.com/docs/web/setup#available-libraries
+
+${pasted.replace("};", '  measurementId: "G-ABC123",\n};')}
+
+// Initialize Firebase
+const app = initializeApp(firebaseConfig);
+const analytics = getAnalytics(app);`;
+const fromWhole = parseConfig(whole);
+check("the whole snippet, imports and all, is understood",
+      fromWhole && fromWhole.databaseURL === cfg.databaseURL && fromWhole.appId === cfg.appId,
+      JSON.stringify(fromWhole));
+check("only the settings sync needs are kept", fromWhole && !("measurementId" in fromWhole));
+check("a config without a Realtime Database URL is refused",
+      parseConfig(pasted.replace(/databaseURL: "[^"]*",/, "")) === null);
+check("a database URL that is not Firebase's is refused",
+      !validConfig({ ...cfg, databaseURL: "https://example.com" }));
+check("nonsense is refused", parseConfig("hello") === null && parseConfig("") === null);
 
 console.log(`\n${failures ? `${failures} CHECK(S) FAILED` : "all checks passed"}\n`);
 process.exit(failures ? 1 : 0);

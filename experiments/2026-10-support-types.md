@@ -64,7 +64,9 @@ on, whether she was heard saying it.
 
 **Primary.** For each word that has had at least one support shown, the first typed
 dictation attempt at that word made at least 20 hours after the first showing,
-marked correct or not by the classifier.
+marked correct or not by the classifier. A dictation is `prompt_mode`
+`audio_sentence`. A cloze, which the app falls back to only when it cannot speak, is
+a different prompt and does not count.
 
 **Secondary.**
 
@@ -117,8 +119,10 @@ At the stop date:
 ## Content review
 
 The quotations and written uses are drafted by Claude and checked by Peter before
-the experiment starts (`docs/05` decision 2). Until then the app behaves as it did
-before: no arms are assigned and nothing is logged as an exposure.
+the experiment starts (`docs/05` decision 2). Until then no arms are assigned and
+nothing is logged as an exposure. The dictation answer screen stays as it was, and a
+miss in a game shows where the word comes from and how to say it, which contain no
+quotation.
 
 ## Amendments
 

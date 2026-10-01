@@ -98,9 +98,11 @@ unannounced. Why it works that way, and what was deliberately not built, is in
 Sound is four short stings synthesised in the browser, played on the reveal and
 never while she is typing.
 
-Firebase sync is **off by default** and carries aggregates only — counts and
-percentages. What she actually writes never leaves the device. Copy
-`web/data/firebase.example.json` to `web/data/firebase.json` to enable it.
+Firebase sync is **off by default** and carries aggregates only: counts and
+percentages. What she actually writes never leaves the device. To switch it on for
+one tablet, paste that family's own Firebase config into the grown-up view on that
+tablet; the steps are in [`docs/13-hosting.md`](docs/13-hosting.md). The site never
+serves a config, so no other device syncs.
 
 ## This week's spellings
 

@@ -11,14 +11,15 @@
 const PREFIX = "spelling-";
 const CACHE = `${PREFIX}v5`;
 const SHELL = [
-  "./", "index.html", "manifest.json",
+  "./", "index.html", "privacy.html", "manifest.json",
   "css/paper.css",
   "js/app.js", "js/store.js", "js/audio.js", "js/keystrokes.js",
   "js/sfx.js", "js/rewards.js", "js/dashboard.js", "js/sync.js",
   "js/engine/classify.js", "js/engine/schedule.js", "js/engine/profile.js",
   "js/engine/derive.js", "js/engine/weekly.js", "js/games.js",
+  "js/supports.js", "js/voice.js", "js/scene.js",
   "data/words.json", "data/sentences.json", "data/audio.json", "data/term.json",
-  "data/games.json",
+  "data/games.json", "data/supports.json", "img/share-qr.svg",
 ];
 // Clips are NOT in the shell: all of them is several megabytes on a first visit.
 // app.js warms the ones the next session needs, and any clip heard online is kept.

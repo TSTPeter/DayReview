@@ -135,3 +135,33 @@ and this section records the change so the trail stays honest. `docs/15` has the
 **How to tell if it was a mistake.** The grown-up view now counts game rounds against
 dictation sessions. If games start replacing dictation, that is the finding this
 document predicted, and the games should give way.
+
+## 1 October 2026: run sounds, a growing background, and a gentle step back
+
+Peter asked for more of the special sound Beatrix noticed, at 5, 7, 9 and into
+polyphony at 11, and for a background that grows more complex with performance and
+degrades mildly on a miss "as a nudge". This section records what changed against
+this document's rules, and what did not.
+
+**What changed.**
+
+- **Runs exist, in the games only.** A run is consecutive right answers at the first
+  go in the pattern sort. It earns a sound at 3, 5, 7 and 9, and from 11 a fuller,
+  layered one. That is performance-contingent (d = -0.28), the class already accepted
+  for points on 28 September.
+- **Something can be lost now, a little.** A miss ends the run and steps the
+  background back two levels. This document said nothing should be losable, because
+  a losable reward becomes a pressure. Peter chose a mild loss deliberately. It is
+  kept small: two steps, never a wipe, and points never go down.
+
+**What did not change.**
+
+- **Nothing carries over to the next day.** The run and the background last for one
+  sitting and start from nothing the next time. A run that survived overnight would
+  be a streak, and there are still none.
+- The practice screens never hear a run sound, see the background, or show a count.
+- **The garden keeps its rules:** permanent, no targets, rules cracked.
+
+**How to tell if it was a mistake.** Watch whether she plays the sort for the run
+rather than the words: rounds getting faster while first-go accuracy falls would be
+the sign. The game log records every card's first go.

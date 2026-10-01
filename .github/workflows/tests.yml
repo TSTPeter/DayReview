@@ -39,6 +39,11 @@ jobs:
       - name: Firebase payload carries no child writing
         run: node tests/test_sync_shape.mjs
 
+      # experiments/2026-10-support-types.md: the assignment, the outcome rules and
+      # the posterior decide the experiment's answer, so they are held to it here.
+      - name: The support experiment does what its registration says
+        run: node tests/test_supports.mjs
+
       # If words.py or sentences.py changed and export.py was not re-run, the front end
       # silently serves stale data. Cheap to catch, confusing to debug.
       - name: web/data is in step with the word model

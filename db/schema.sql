@@ -99,7 +99,10 @@ CREATE TABLE attempts (
     trap                TEXT,
 
     method_shown        TEXT,                       -- which ladder rung, null if none
-    arm                 CHAR(1) CHECK (arm IN ('A','B')),
+    -- The word's arm, named as its registration in experiments/ names it, and the
+    -- support a miss put on the answer screen. Both null when no experiment runs.
+    arm                 TEXT,
+    support_shown       TEXT,
     experiment_id       UUID,
 
     box_before          SMALLINT,
@@ -161,8 +164,7 @@ CREATE TABLE experiments (
     id              UUID PRIMARY KEY DEFAULT gen_random_uuid(),
     slug            TEXT UNIQUE NOT NULL,
     question        TEXT NOT NULL,
-    method_a        TEXT NOT NULL,
-    method_b        TEXT NOT NULL,
+    arms            TEXT[] NOT NULL CHECK (cardinality(arms) >= 2),
     error_type      TEXT NOT NULL,
     outcome_measure TEXT NOT NULL,
     stop_rule       TEXT NOT NULL,
@@ -175,8 +177,8 @@ CREATE TABLE experiment_assignments (
     experiment_id UUID NOT NULL REFERENCES experiments(id) ON DELETE CASCADE,
     learner_id    UUID NOT NULL REFERENCES learners(id) ON DELETE CASCADE,
     word          TEXT NOT NULL REFERENCES words(word),
-    arm           CHAR(1) NOT NULL CHECK (arm IN ('A','B')),
-    pair_id       UUID NOT NULL,                    -- the matched pair this word belongs to
+    arm           TEXT NOT NULL,                    -- one of experiments.arms
+    balance_group TEXT NOT NULL,                    -- the matched pair or pattern group it was balanced within
     assigned_at   TIMESTAMPTZ NOT NULL DEFAULT now(),
     PRIMARY KEY (experiment_id, learner_id, word)
 );

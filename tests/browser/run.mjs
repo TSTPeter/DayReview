@@ -55,6 +55,17 @@ const readAttempts = (page) => page.evaluate(async () => {
   });
 });
 
+const readKV = (page, key) => page.evaluate(async (k) => {
+  const db = await new Promise((res, rej) => {
+    const r = indexedDB.open("spelling", 1);
+    r.onsuccess = () => res(r.result); r.onerror = () => rej(r.error);
+  });
+  return await new Promise((res) => {
+    const t = db.transaction("kv", "readonly").objectStore("kv").get(k);
+    t.onsuccess = () => res(t.result ? t.result.value : null);
+  });
+}, key);
+
 const browser = await chromium.launch(
   EXECUTABLE ? { executablePath: EXECUTABLE } : {});
 // Every context below tests the DEVICE-voice path unless it says otherwise, so each
@@ -122,6 +133,14 @@ check("keystroke timing captured", last.keystroke_count > 0 && last.latency_ms >
 check("one Backspace counts as one edit", last.edits_before_submit === 1,
       `edits=${last.edits_before_submit}`);
 check("attempt row carries the diagnosis", !!last.error_type && Array.isArray(last.error_patterns));
+// experiments/2026-10-support-types.md: until the quotations are reviewed nothing
+// here changes, and no word has an arm.
+check("before the experiment starts, the answer screen is as it was, and no arm is recorded",
+      await page.locator("#reveal-origin-part").isVisible()
+      && await page.locator("#reveal-family-part").isVisible()
+      && await page.locator("#reveal-support").isHidden()
+      && last.arm === null && last.support_shown === null,
+      `arm=${last.arm} support_shown=${last.support_shown}`);
 
 console.log("\n— 3. rule card —");
 await page.click("#reveal-rule-btn");
@@ -928,8 +947,8 @@ check("no call to Firebase or Google on a default launch", !calledFirebase);
 
 // docs/06 standard 8: no name in the learner record. The sync key used to be a
 // child's first name, hardcoded, which put it in a file the site serves to
-// anyone with the URL. It is now an opaque id minted lazily, so a device with
-// sync off should finish a whole session without an identifier existing at all.
+// anyone with the URL. Sync now signs in anonymously and holds the id Firebase
+// gives it in memory, so no identifier is ever stored, with sync on or off.
 const learnerKey = await page.evaluate(async () => {
   const db = await new Promise((r) => { const q = indexedDB.open("spelling", 1);
     q.onsuccess = () => r(q.result); });
@@ -952,6 +971,12 @@ for (const f of served) {
   if (/pushDay\s*\(\s*["'`]/.test(body)) names.push(`${f}: literal sync key`);
 }
 check("the sync key is never a hardcoded string", names.length === 0, names.join("; "));
+// The config is pasted on her iPad. A served one would switch sync on for everyone.
+check("the site serves no Firebase config",
+      (await fetch(new URL("data/firebase.json", BASE))).status === 404);
+check("before the experiment starts, nothing is assigned or logged, even after misses",
+      (await readKV(page, "experiment_seed")) === null && (await readKV(page, "support_arms")) === null
+      && (await readKV(page, "support_log")) === null);
 
 // ---------------------------------------------------------------- welcome and games
 // The real term and the real game content, whatever week it is: every answer is
@@ -964,6 +989,24 @@ const todayISO = new Date().toISOString().slice(0, 10);
 const liveWeek = termData.weeks.filter((w) => w.set_on <= todayISO).pop();
 const gctx = await browser.newContext({ viewport: { width: 820, height: 1180 }, acceptDownloads: true });
 await noClips(gctx);
+// Every tone the sound module starts, by its pitch, so a headless browser can tell
+// which sound played; and every request for the microphone, which nothing here
+// should make, because nobody has switched it on.
+await gctx.addInitScript(() => {
+  window.__tones = [];
+  window.__gum = 0;
+  const make = BaseAudioContext.prototype.createOscillator;
+  BaseAudioContext.prototype.createOscillator = function () {
+    const osc = make.call(this);
+    const set = osc.frequency.setValueAtTime.bind(osc.frequency);
+    osc.frequency.setValueAtTime = (v, t) => { window.__tones.push(Math.round(v)); return set(v, t); };
+    return osc;
+  };
+  if (navigator.mediaDevices && navigator.mediaDevices.getUserMedia) {
+    const real = navigator.mediaDevices.getUserMedia.bind(navigator.mediaDevices);
+    navigator.mediaDevices.getUserMedia = (c) => { window.__gum += 1; return real(c); };
+  }
+});
 const g = await gctx.newPage();
 const gErrors = [];
 g.on("pageerror", (e) => gErrors.push(e.message));
@@ -1030,6 +1073,10 @@ if (!liveWeek) {
       leftMisspelling = board.endsWith(c.decoys[0].text);
       check("a wrong ending is explained, and bounces back off the board",
             /Not that ending/.test(fb) && !leftMisspelling, `${fb} | board: ${board}`);
+      const jigCard = g.locator("#jig-support .support");
+      check("a wrong jigsaw check shows the word's support",
+            (await jigCard.count()) === 1 && await jigCard.isVisible()
+            && (await jigCard.getAttribute("data-shows")) === "etymology say");
       await place(c.parts[c.parts.length - 1].text);
       decoyTried = true;
     } else {
@@ -1078,28 +1125,55 @@ if (!liveWeek) {
         afterMatch.earned - afterJig.earned === 5 * (lefts.length - 1),
         `+${afterMatch.earned - afterJig.earned}`);
 
-  // --- pattern sort: the first card into the wrong bin first
+  // --- pattern sort: quick when right, a moment to reflect when not (docs/15, 1 October)
   await g.click("#match-quit");
   if (!content.sort) {
     console.log("  skip  no pattern sort this week");
   } else {
     await g.click("#game-sort");
     await g.waitForSelector("#screen-sort.on");
-    let sortRight = 0, first = true;
-    for (let i = 0; i < 10; i++) {
+    const level = () => g.getAttribute("#sort-scene", "data-level");
+    const cardShown = async () => {
       const shown = await g.textContent("#sort-card");
-      const card = content.sort.cards.find((c) => c.show[0] + c.show[1] === shown);
+      return content.sort.cards.find((c) => c.show[0] + c.show[1] === shown);
+    };
+    const wrongFor = (card) => content.sort.bins.find((b) => b.key !== card.answer).key;
+    let sortRight = 0, first = true, quietRight = true;
+    const runSounds = [];
+    for (let i = 0; i < 10; i++) {
+      const card = await cardShown();
       if (!card) break;
       if (first) {
-        const wrong = content.sort.bins.find((b) => b.key !== card.answer).key;
-        await g.click(`#sort-bins button[data-key="${wrong}"]`);
+        await g.click(`#sort-bins button[data-key="${wrongFor(card)}"]`);
+        const missedAt = Date.now();
         check("a card in the wrong bin gets the rule, not a buzzer",
               /Not this time/.test(await g.textContent("#sort-feedback")));
+        const sup = g.locator("#sort-support .support");
+        check("a miss shows the word's support: before the experiment, where it comes from and how to say it",
+              (await sup.count()) === 1 && await sup.isVisible()
+              && (await sup.getAttribute("data-shows")) === "etymology say",
+              (await sup.count()) ? await sup.getAttribute("data-shows") : "no support card");
+        check("the bins rest while she reads, and nothing counts down",
+              (await g.locator("#sort-bins.resting").count()) === 1
+              && (await g.locator("#sort-bins button:disabled").count()) === content.sort.bins.length
+              && !/\b\d+\s*(s|secs?|seconds?)\b/i.test(await g.innerText("#screen-sort")));
+        check("a miss ends the run and steps the background back, never below nothing",
+              (await level()) === "0" && (await g.getAttribute("#screen-sort", "data-run")) === "0");
+        await g.waitForSelector("#sort-bins:not(.resting)", { timeout: 8000 });
+        const rested = Date.now() - missedAt;
+        check("the bins come back by themselves after a few seconds", rested > 2500 && rested < 6000,
+              `${rested} ms`);
+        await g.click(`#sort-bins button[data-key="${card.answer}"]`);
         first = false;
       } else {
         sortRight += 1;
+        const before = await g.evaluate(() => window.__tones.length);
+        await g.click(`#sort-bins button[data-key="${card.answer}"]`);
+        const tones = await g.evaluate((n) => window.__tones.slice(n), before);
+        if ((await g.textContent("#sort-feedback")).trim() !== "+5") quietRight = false;
+        // A run's climb is the only sound in the app that reaches top C, 1046.5 Hz.
+        if (tones.includes(1047)) runSounds.push(sortRight);
       }
-      await g.click(`#sort-bins button[data-key="${card.answer}"]`);
       await g.waitForTimeout(1250);
     }
     check("a sort round ends with the pattern laid out in its bins",
@@ -1108,6 +1182,56 @@ if (!liveWeek) {
     const afterSort = await readPoints();
     check("sorting earns 5 a card at the first go",
           afterSort.earned - afterMatch.earned === 5 * sortRight, `+${afterSort.earned - afterMatch.earned}`);
+    check("a right answer gets no note, only its points", sortRight > 0 && quietRight);
+    const milestones = [3, 5, 7, 9].filter((n) => n <= sortRight);
+    check("right answers in a row at the first go sound at 3, 5, 7 and 9, and only then",
+          runSounds.join() === milestones.join(), `heard at ${runSounds.join(", ") || "none"}`);
+    const layers = await g.locator("#sort-scene svg > g.layer").count();
+    check("the background gains a layer for each right answer at the first go",
+          (await level()) === String(Math.min(14, sortRight)) && layers === Math.min(14, sortRight),
+          `level ${await level()}, ${layers} layers`);
+    const poly = await g.evaluate(async () => {
+      const sfx = await import("./js/sfx.js");
+      const notes = (n) => {
+        const before = window.__tones.length;
+        return sfx.playRun(n) ? window.__tones.length - before : 0;
+      };
+      return { 9: notes(9), 10: notes(10), 11: notes(11), 13: notes(13), 21: notes(21), 23: notes(23) };
+    });
+    check("from 11 in a row it turns polyphonic, gaining a voice every two, up to six",
+          poly[10] === 0 && poly[11] > 2 * poly[9] && poly[13] === poly[11] + 1
+          && poly[21] === poly[11] + 3 && poly[23] === poly[21], JSON.stringify(poly));
+    let sortLog = null;
+    for (let n = 0; n < 20 && !sortLog; n++) {
+      sortLog = ((await readKV(g, "game_log")) || []).filter((r) => r.game === "sort").pop();
+      if (!sortLog) await g.waitForTimeout(100);
+    }
+    check("the round log says which card had support, and that nothing listened",
+          sortLog && sortLog.items[0].support === "etymology say" && sortLog.items[0].said === null
+          && sortLog.items.slice(1).every((x) => x.support === null),
+          sortLog ? JSON.stringify(sortLog.items[0]) : "no entry");
+
+    // Leaving during a pause, or just after a right answer, and coming straight back
+    // must start a clean round: no bins left resting, no old timer moving it on.
+    await g.click("#sort-quit");
+    await g.click("#game-sort");
+    await g.waitForSelector("#screen-sort.on");
+    await g.click(`#sort-bins button[data-key="${wrongFor(await cardShown())}"]`);
+    await g.click("#sort-quit");
+    await g.click("#game-sort");
+    await g.waitForSelector("#screen-sort.on");
+    const cleanAfterPause = (await g.locator("#sort-bins.resting").count()) === 0
+      && (await g.locator("#sort-bins button:disabled").count()) === 0;
+    await g.click(`#sort-bins button[data-key="${(await cardShown()).answer}"]`, { timeout: 1000 })
+      .catch(() => {});
+    await g.click("#sort-quit");
+    await g.click("#game-sort");
+    await g.waitForSelector("#screen-sort.on");
+    await g.waitForTimeout(4200);        // past the old pause and the old next-card timer
+    check("leaving mid-pause or mid-move and coming straight back starts a clean round",
+          cleanAfterPause && (await g.textContent("#sort-count")) === "Card 1 of 10"
+          && (await g.locator("#sort-bins button:disabled").count()) === 0 && (await level()) === "0",
+          `${cleanAfterPause ? "" : "bins left resting; "}${await g.textContent("#sort-count")}, level ${await level()}`);
     await g.click("#sort-quit");
   }
 
@@ -1217,7 +1341,10 @@ if (!liveWeek) {
     lost = /Out of petals/.test(await g.textContent("#hang-feedback"));
     check("out of petals, the word is shown whole, in its parts, with its rule",
           lost && shown.every((c) => c !== "") && (await g.textContent("#hang-reveal .whole")) === shown.join("")
-          && (await g.locator("#hang-reveal .muted").textContent()).length > 10, shown.join(""));
+          && (await g.locator("#hang-reveal > p.muted").textContent()).length > 10, shown.join(""));
+    const lostCard = g.locator("#hang-reveal .support");
+    check("a lost word gets its support too",
+          (await lostCard.count()) === 1 && (await lostCard.getAttribute("data-shows")) === "etymology say");
     hangWords.push(shown.join(""));
   } else {
     console.log("  skip  no eight letters are missing from every word of that length");
@@ -1379,6 +1506,8 @@ if (!liveWeek) {
               (await g.textContent("#bonus-marked")) === "zzz"
               && (await g.textContent("#bonus-why")).startsWith(word),
               await g.textContent("#bonus-why"));
+        check("and the word's support", (await g.locator("#bonus-support .support").count()) === 1
+              && await g.locator("#bonus-support").isVisible());
       } else if (/Correct/.test(await g.textContent("#bonus-verdict"))) {
         right += 1;
       }
@@ -1415,15 +1544,41 @@ if (!liveWeek) {
   check("the grown-up view reports the games against dictation",
         /jigsaw/.test(await g.textContent("#gu-games-summary"))
         && /dictation sessions/.test(await g.textContent("#gu-games-summary")));
+  check("before it starts, the experiment card says so, with no table",
+        /^Not started/.test(await g.textContent("#gu-exp-state")) && await g.locator("#gu-exp-table").isHidden());
+  check("with sync off there is nowhere to paste a Firebase config", await g.locator("#gu-fb-config").isHidden());
+  check("the microphone stays off until a grown-up switches it on, and nothing asked for it",
+        (await g.inputValue("#opt-voice")) === "off" && (await g.evaluate(() => window.__gum)) === 0);
   const [download] = await Promise.all([g.waitForEvent("download"), g.click("#gu-export")]);
   const exported = readFileSync(await download.path(), "utf8");
   check("the export carries the games but never her name",
         exported.includes("game_points") && !/Beatrix/.test(exported));
 
+  // --- sharing: the address, and nothing about her
+  await g.click("#gu-home");
+  await g.waitForSelector("#screen-home.on");
+  check("with sync off, the welcome page has no note about totals", await g.locator("#home-sync-note").isHidden());
+  await g.click("#btn-share");
+  await g.waitForSelector("#screen-share.on");
+  const qr = await g.waitForFunction(() => {
+    const i = document.querySelector("#screen-share img");
+    return i && i.complete && i.naturalWidth > 0 ? i.getAttribute("src") : null;
+  }, null, { timeout: 3000 }).then((h) => h.jsonValue()).catch(() => null);
+  const shareText = await g.innerText("#screen-share");
+  check("Share shows a QR code of the address, and says nothing about her goes with it",
+        qr === "img/share-qr.svg" && shareText.includes("www.tsttalent.com/Spelling")
+        && /Nothing about you goes with it/.test(shareText), qr || "no image");
+  const notice = await (await fetch(new URL("privacy.html", BASE))).text();
+  check("the share screen links a notice for grown-ups, and it is served",
+        (await g.locator('#screen-share a[href="privacy.html"]').count()) === 1
+        && /stays on your tablet/.test(notice) && /never a word your child/.test(notice));
+  await g.click("#share-back");
+  await g.waitForSelector("#screen-home.on");
+
   // --- the new screens fit an iPad
   for (const [name, vw, vh] of [["iPad portrait", 820, 1180], ["iPad landscape", 1180, 820]]) {
     await g.setViewportSize({ width: vw, height: vh });
-    for (const s of ["games", "jigsaw", "match", "sort", "hangman", "hunt", "bonus"]) {
+    for (const s of ["games", "jigsaw", "match", "sort", "hangman", "hunt", "bonus", "share"]) {
       const res = await g.evaluate((id) => {
         for (const x of document.querySelectorAll(".screen")) x.classList.toggle("on", x.id === `screen-${id}`);
         const over = document.documentElement.scrollWidth > document.documentElement.clientWidth + 1;
@@ -1440,6 +1595,268 @@ if (!liveWeek) {
 }
 check("the welcome and the games raise no page errors", gErrors.length === 0, gErrors.join(" | "));
 await gctx.close();
+
+// ---------------------------------------------------------------- the support experiment
+// experiments/2026-10-support-types.md. The shipped content is unreviewed, so the
+// experiment is off. This context serves the same file marked reviewed, which is
+// exactly what flipping engine/supports.py REVIEWED will ship.
+console.log("\n— the support experiment, once it starts —");
+const supportData = await (await fetch(new URL("data/supports.json", BASE))).json();
+check("the shipped quotations are not yet reviewed, so the experiment is off", supportData.reviewed === false);
+const SHOWS = { etymology: "etymology", story: "story", say: "say", blend: "etymology story say" };
+const xctx = await browser.newContext({ viewport: { width: 820, height: 1180 }, acceptDownloads: true });
+await noClips(xctx);
+await xctx.route("**/data/supports.json", (r) => r.fulfill({
+  contentType: "application/json", body: JSON.stringify({ ...supportData, reviewed: true }) }));
+const x = await xctx.newPage();
+const xErrors = [];
+const xRequests = [];
+x.on("pageerror", (e) => xErrors.push(e.message));
+x.on("request", (r) => xRequests.push(r.url()));
+await x.goto(BASE, { waitUntil: "networkidle" });
+await x.waitForSelector("#screen-home.on");
+const xSeed = await readKV(x, "experiment_seed");
+const xArms = (await readKV(x, "support_arms")) || {};
+check("it mints one seed on this device and gives every word one arm",
+      Number.isInteger(xSeed) && Object.keys(xArms).length === Object.keys(supportData.words).length
+      && Object.values(xArms).every((a) => a in SHOWS), `${Object.keys(xArms).length} words`);
+await x.click("#btn-practise");
+await x.waitForSelector("#screen-attempt.on");
+await x.fill("#attempt-input", "zzz");
+await x.click("#attempt-submit");
+await x.waitForSelector("#screen-reveal.on");
+const xWord = (await x.textContent("#reveal-target")).trim();
+const xArm = xArms[xWord] || null;
+if (!xArm) {
+  console.log(`  skip  ${xWord} is not in the experiment`);
+} else {
+  const card = x.locator("#reveal-support .support");
+  check("a miss on the answer screen shows the word's own arm, and only that",
+        (await card.count()) === 1 && (await card.getAttribute("data-shows")) === SHOWS[xArm],
+        `${xWord}: ${xArm}`);
+  if (SHOWS[xArm].includes("story")) {
+    check("a story says where it is from", (await card.textContent()).includes(supportData.words[xWord].story.source));
+  }
+  check("where it comes from leaves the card everyone sees; the parts and the why stay",
+        await x.locator("#reveal-origin-part").isHidden() && await x.locator("#reveal-family-part").isHidden()
+        && await x.locator("#reveal-morph").isVisible() && await x.locator("#reveal-why").isVisible());
+  const xRow = (await readAttempts(x)).pop();
+  check("the attempt row carries the arm and what the miss showed",
+        xRow.arm === xArm && xRow.support_shown === xArm, `${xRow.arm} / ${xRow.support_shown}`);
+  let xLog = [];
+  for (let n = 0; n < 20 && !xLog.length; n++) {
+    xLog = (await readKV(x, "support_log")) || [];
+    if (!xLog.length) await x.waitForTimeout(100);
+  }
+  check("the showing is logged: the word, its arm, and where",
+        xLog.length === 1 && xLog[0].word === xWord && xLog[0].arm === xArm && xLog[0].where === "dictation",
+        JSON.stringify(xLog));
+}
+await x.reload({ waitUntil: "networkidle" });
+await x.waitForSelector("#screen-home.on");
+check("coming back never changes an arm or the seed",
+      JSON.stringify(await readKV(x, "support_arms")) === JSON.stringify(xArms)
+      && (await readKV(x, "experiment_seed")) === xSeed);
+await x.click("#btn-grownup");
+await x.waitForSelector("#screen-grownup.on");
+const helped = xArm ? 1 : 0;
+const expState = await x.textContent("#gu-exp-state");
+check("the grown-up view says it is too soon to tell, with the counts so far",
+      expState.startsWith(`Too few to tell yet: ${helped} ${helped === 1 ? "word has" : "words have"} had help`)
+      && (await x.locator("#gu-exp-table tbody tr").count()) === 4, expState);
+
+// Firebase, set up the way docs/13 says: the console's own snippet, pasted on this iPad.
+await x.selectOption("#opt-sync", "on");
+await x.waitForSelector("#gu-fb-config:not([hidden])");
+check("switching sync on asks for this iPad's Firebase settings",
+      /no Firebase config on this iPad yet/.test(await x.textContent("#gu-sync-state")));
+await x.fill("#opt-fb-config", "apiKey: 'nope'");
+await x.click("#opt-fb-save");
+check("a paste that is not a Firebase web config is refused, and says why",
+      /does not look like a Firebase web config/.test(await x.textContent("#gu-sync-state"))
+      && (await readKV(x, "firebase_config")) === null);
+const DB_URL = "https://spelling-test-default-rtdb.europe-west1.firebasedatabase.app";
+await x.fill("#opt-fb-config", `// Import the functions you need from the SDKs you need
+import { initializeApp } from "firebase/app";
+// Your web app's Firebase configuration
+const firebaseConfig = {
+  apiKey: "AIzaSy-test-not-a-key",
+  authDomain: "spelling-test.firebaseapp.com",
+  databaseURL: "${DB_URL}",
+  projectId: "spelling-test",
+  storageBucket: "spelling-test.appspot.com",
+  messagingSenderId: "1234567890",
+  appId: "1:1234567890:web:abcdef"
+};
+const app = initializeApp(firebaseConfig);`);
+await x.click("#opt-fb-save");
+await x.waitForFunction(() => /^On\. Only counts/.test(document.querySelector("#gu-sync-state").textContent),
+  null, { timeout: 3000 }).catch(() => {});
+const savedCfg = await readKV(x, "firebase_config");
+check("the console's whole snippet is understood and kept on this iPad, and the box is cleared",
+      savedCfg && savedCfg.databaseURL === DB_URL && savedCfg.projectId === "spelling-test"
+      && (await x.inputValue("#opt-fb-config")) === ""
+      && /^On\. Only counts/.test(await x.textContent("#gu-sync-state")), JSON.stringify(savedCfg));
+const [xdl] = await Promise.all([x.waitForEvent("download"), x.click("#gu-export")]);
+const xEx = JSON.parse(readFileSync(await xdl.path(), "utf8"));
+check("the export carries the seed, every arm and every showing, for the registered analysis",
+      xEx.experiment_seed === xSeed && JSON.stringify(xEx.support_arms) === JSON.stringify(xArms)
+      && (xEx.support_log || []).length === helped);
+check("the export never carries the Firebase settings",
+      !JSON.stringify(xEx).includes("spelling-test") && !("firebase_config" in xEx));
+await x.click("#gu-home");
+await x.waitForSelector("#screen-home.on");
+check("with sync on, her welcome page tells her what her grown-up can see (ICO standard 11)",
+      await x.locator("#home-sync-note").isVisible()
+      && /never the words you write/.test(await x.textContent("#home-sync-note")));
+check("saving the settings sends nothing: sync waits for the end of a session",
+      !xRequests.some((u) => /firebase|googleapis|gstatic/.test(u)));
+
+if (!liveWeek || !gameData.weeks[liveWeek.id].sort) {
+  console.log("  skip  no pattern sort this week");
+} else {
+  const deck = gameData.weeks[liveWeek.id].sort;
+  await x.click("#btn-games");
+  await x.waitForSelector("#screen-games.on");
+  await x.click("#game-sort");
+  await x.waitForSelector("#screen-sort.on");
+  const shownNow = await x.textContent("#sort-card");
+  const sc = deck.cards.find((c) => c.show[0] + c.show[1] === shownNow);
+  const arm = sc && xArms[sc.word];
+  if (!arm) {
+    console.log(`  skip  ${sc ? sc.word : shownNow} is not in the experiment`);
+  } else {
+    await x.click(`#sort-bins button[data-key="${deck.bins.find((b) => b.key !== sc.answer).key}"]`);
+    check("in a game, a miss shows the word's arm too",
+          (await x.getAttribute("#sort-support .support", "data-shows")) === SHOWS[arm], `${sc.word}: ${arm}`);
+    let fromSort = null;
+    for (let n = 0; n < 60 && !fromSort; n++) {
+      fromSort = ((await readKV(x, "support_log")) || []).find((e) => e.where === "sort");
+      if (!fromSort) await x.waitForTimeout(100);
+    }
+    check("and it is logged as shown in the sort",
+          fromSort && fromSort.word === sc.word && fromSort.arm === arm && fromSort.said === null,
+          JSON.stringify(fromSort));
+  }
+}
+check("the experiment raises no page errors", xErrors.length === 0, xErrors.join(" | "));
+await xctx.close();
+
+// ---------------------------------------------------------------- saying it aloud
+// web/js/voice.js listens for a voice on the tablet and keeps nothing. The microphone
+// here is a stand-in the test controls: a tone it turns up when "she" speaks. The
+// app cannot tell it from a real one.
+console.log("\n— saying it aloud —");
+const mctx = await browser.newContext({ viewport: { width: 820, height: 1180 } });
+await noClips(mctx);
+await mctx.addInitScript(() => {
+  window.__mic = { opened: 0, stopped: 0, gain: null };
+  if (!navigator.mediaDevices) return;
+  navigator.mediaDevices.getUserMedia = async (c) => {
+    if (!c || !c.audio || c.video) throw new DOMException("audio only", "NotAllowedError");
+    const ac = new AudioContext();
+    await ac.resume().catch(() => {});
+    const osc = ac.createOscillator();
+    osc.frequency.value = 220;
+    const gain = ac.createGain();
+    gain.gain.value = 0;
+    const dest = ac.createMediaStreamDestination();
+    osc.connect(gain).connect(dest);
+    osc.start();
+    window.__mic.gain = gain;
+    window.__mic.opened += 1;
+    for (const t of dest.stream.getTracks()) {
+      const stop = t.stop.bind(t);
+      t.stop = () => { window.__mic.stopped += 1; stop(); };
+    }
+    return dest.stream;
+  };
+});
+const m = await mctx.newPage();
+const mErrors = [];
+m.on("pageerror", (e) => mErrors.push(e.message));
+await m.goto(BASE, { waitUntil: "networkidle" });
+await m.waitForSelector("#screen-home.on");
+if (!liveWeek || !gameData.weeks[liveWeek.id].sort) {
+  console.log("  skip  no pattern sort this week");
+} else {
+  const deck = gameData.weeks[liveWeek.id].sort;
+  const cardNow = async () => {
+    const shown = await m.textContent("#sort-card");
+    return deck.cards.find((c) => c.show[0] + c.show[1] === shown);
+  };
+  const missBin = (c) => deck.bins.find((b) => b.key !== c.answer).key;
+  const speak = (v) => m.evaluate((g) => { window.__mic.gain.gain.value = g; }, v);
+  await m.click("#btn-grownup");
+  await m.waitForSelector("#screen-grownup.on");
+  await m.selectOption("#opt-voice", "on");
+  await m.click("#gu-home");
+  await m.waitForSelector("#screen-home.on");
+  await m.click("#btn-games");
+  await m.waitForSelector("#screen-games.on");
+  await m.click("#game-sort");
+  await m.waitForSelector("#screen-sort.on");
+  check("with the microphone switched on, the sort opens it", (await m.evaluate(() => window.__mic.opened)) === 1);
+
+  // Card 1: missed, then said aloud.
+  let c = await cardNow();
+  await m.click(`#sort-bins button[data-key="${missBin(c)}"]`);
+  const t0 = Date.now();
+  check("a miss whose support says it aloud shows that it is listening",
+        await m.locator("#sort-support .listen").isVisible());
+  await m.waitForTimeout(700);              // the room's own level is measured first
+  await speak(0.3);
+  await m.waitForSelector("#sort-bins:not(.resting)", { timeout: 4000 }).catch(() => {});
+  const early = Date.now() - t0;
+  await speak(0);
+  check("saying it ends the pause early, and she is told she was heard",
+        early < 2500 && /I heard you/.test(await m.textContent("#sort-support")), `${early} ms`);
+  await m.click(`#sort-bins button[data-key="${c.answer}"]`);
+  await m.waitForTimeout(1100);
+
+  // Card 2: missed, and she stays quiet.
+  c = await cardNow();
+  await m.click(`#sort-bins button[data-key="${missBin(c)}"]`);
+  const t1 = Date.now();
+  await m.waitForSelector("#sort-bins:not(.resting)", { timeout: 6000 }).catch(() => {});
+  const quietFor = Date.now() - t1;
+  check("staying quiet is fine: the bins come back at the usual time", quietFor > 2500 && quietFor < 5000,
+        `${quietFor} ms`);
+  await m.click(`#sort-bins button[data-key="${c.answer}"]`);
+  await m.waitForTimeout(1100);
+
+  // The rest of the round, right at the first go.
+  for (let i = 2; i < 10; i++) {
+    c = await cardNow();
+    if (!c) break;
+    await m.click(`#sort-bins button[data-key="${c.answer}"]`);
+    await m.waitForTimeout(900);
+  }
+  let mLog = null;
+  for (let n = 0; n < 30 && !mLog; n++) {
+    mLog = ((await readKV(m, "game_log")) || []).filter((r) => r.game === "sort").pop();
+    if (!mLog) await m.waitForTimeout(100);
+  }
+  check("the round records whether each word was said, and nothing else about her voice",
+        mLog && mLog.items[0].said === true && mLog.items[1].said === false
+        && mLog.items.slice(2).every((i) => i.said === null),
+        mLog ? mLog.items.map((i) => i.said).join() : "no entry");
+  const kept = await m.evaluate(async () => {
+    const db = await new Promise((res) => { const r = indexedDB.open("spelling", 1); r.onsuccess = () => res(r.result); });
+    const all = await new Promise((res) => {
+      const t = db.transaction("kv", "readonly").objectStore("kv").getAll();
+      t.onsuccess = () => res(t.result);
+    });
+    const binary = (v) => v instanceof Blob || v instanceof ArrayBuffer || ArrayBuffer.isView(v)
+      || (v && typeof v === "object" && Object.values(v).some(binary));
+    return all.filter((row) => binary(row.value)).map((row) => row.key);
+  });
+  check("no sound is kept anywhere on the tablet", kept.length === 0, kept.join(", "));
+  await m.click("#sort-quit");
+  check("leaving the game closes the microphone at once", (await m.evaluate(() => window.__mic.stopped)) >= 1);
+}
+check("saying it aloud raises no page errors", mErrors.length === 0, mErrors.join(" | "));
+await mctx.close();
 
 console.log("\n— tablet —");
 for (const [name, w, h] of [["iPad portrait", 820, 1180], ["iPad landscape", 1180, 820]]) {

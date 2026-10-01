@@ -11,10 +11,11 @@ DEPLOYMENT ARTEFACT: edit it there and the next run of this script silently
 throws the change away. See docs/13-hosting.md.
 
 Deliberately excluded:
-  data/firebase.json          never in git, and must never be served. Its
-                              presence is what switches sync ON, and docs/06
-                              standard 7 is high privacy by default.
-  data/firebase.example.json  developer documentation, not site content.
+  data/firebase.json          never in git, and must never be served. The app
+                              takes its config pasted on the one tablet that
+                              syncs, but a served config would switch sync on
+                              for every visitor, so one is still refused here:
+                              docs/06 standard 7 is high privacy by default.
 """
 import hashlib
 import pathlib
@@ -26,7 +27,7 @@ from datetime import date
 
 ROOT = pathlib.Path(__file__).resolve().parents[1]
 SRC = ROOT / "web"
-EXCLUDE = {"firebase.json", "firebase.example.json"}
+EXCLUDE = {"firebase.json"}
 
 README = """# Spelling: deployed copy, do not edit here
 
@@ -40,8 +41,9 @@ Synced: {when}
 Served at `/Spelling`, routed in `staticwebapp.config.json`.
 
 Fully client-side: no API, no account, no analytics, and no data leaves the
-device. The learner record lives in the browser's IndexedDB. Sync is off and
-there is deliberately no `data/firebase.json`.
+device unless a family pastes its own Firebase config into the grown-up view on
+its own tablet, and then only counts. The learner record lives in the browser's
+IndexedDB. There is deliberately no `data/firebase.json`.
 """
 
 
