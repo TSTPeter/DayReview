@@ -36,6 +36,8 @@ session-end screen has no streak or day count, that the paper probe records
 npm install && npx playwright install chromium
 python3 serve.py --port 8137 &
 node tests/browser/run.mjs
+node tests/browser/phone.mjs      # the games by touch, on two Android phones
+node tests/browser/update.mjs     # a returning phone across three deploys
 ```
 
 `package.json` exists only for that harness. The app ships no dependencies: `web/` is

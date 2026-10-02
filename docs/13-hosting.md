@@ -145,3 +145,35 @@ from `tools/make_share_qr.py`). Its DPIA, in draft, is `docs/16-dpia.md`. The re
 above still holds: what is published is a program, and nothing it does sends a
 child's data anywhere unless that child's own grown-up switches sync on.
 
+## How an update reaches a device
+
+The game works offline because its service worker (`web/sw.js`) keeps every file in a
+cache on the device and serves from there first. The price is that a device always
+opens the version it saved last. After a deploy:
+
+1. The device opens the game, and the welcome page comes from its cache: the old version.
+2. The browser sees that `sw.js` has changed (every deploy changes its stamp), downloads
+   the new version into a new cache behind the page, and the new worker takes over.
+3. **Until 1 October 2026 that was all.** The old page stayed on screen, and the new
+   version showed only when the game was next opened from scratch. On Android, going back
+   to an open tab or a home-screen app is not opening it from scratch, so a phone could
+   stay on an old version for days. That is what Peter saw on 1 October: the pattern sort
+   changes were live and checked, and his phone was showing a version from before
+   hangman and hidden words existed.
+4. **Now** the page reloads itself into the new version as soon as it has arrived, but
+   only on the welcome page, so a session is never cut short: anywhere else it waits until
+   she is back there. An open game also checks for a new version whenever it comes back
+   to the screen.
+
+**Which version a device has** is at the bottom of the grown-up view: the date of the
+deploy and its stamp, the same stamp `sw.js` carries. It comes from `data/version.json`,
+which `tools/deploy_to_site.py` writes and the service worker caches with the version it
+describes, so a device always reports the version it is actually showing.
+
+**The first time.** A device on a version from before this change does not have the code
+that reloads it, so it needs the old way once: open the game, wait a few seconds, close
+it fully (on Android, close the tab, or swipe the app away from the recent apps), and open
+it again. After that, updates arrive by themselves.
+
+`tests/browser/update.mjs` plays a returning Android phone across three deploys: an open
+after a deploy, a deploy in the middle of a dictation session, and a game left open.

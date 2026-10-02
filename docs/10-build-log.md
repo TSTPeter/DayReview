@@ -261,3 +261,48 @@ What to distrust:
   for her; it cannot prove anything.
 - **Firebase is untested end to end.** The code, the rules and their generator are
   tested; a real project has not been connected, because that needs Peter's account.
+
+## 1 October 2026, evening: live, but not on the phone
+
+Peter could not see the pattern sort changes, and could not play hangman or hidden words
+on his Android phone.
+
+What was checked:
+
+- **The live site:** all 361 files, byte for byte against the merge.
+- **The live files played on two emulated Android phones** (Pixel 7, 412 px wide; Galaxy
+  S8, 360 px), by touch: hangman letters, hidden words by taps and by a finger slide, and
+  the sort's new behaviour. All of it worked, with no errors.
+- **A returning phone**, using the three versions in ProductionSite's history. A phone that
+  last opened the game on 28 September showed the 28 September version on its first open
+  after the deploys (no hangman, no hidden words) and the new one only on the open after
+  that. A tab left open never updated at all.
+
+The cause: the service worker serves the saved version first, and nothing reloaded the
+page once the new one had arrived (`docs/13`, "How an update reaches a device").
+
+Fixed:
+
+- The page reloads into a new version on the welcome page, and checks for one whenever
+  it comes back to the screen.
+- The grown-up view says which version the device has.
+- The pattern sort's background was painting its dots over the title bar.
+
+New tests:
+
+- `tests/browser/update.mjs` fails without the fix: the phone stays on the first version
+  through three deploys.
+- `tests/browser/phone.mjs` plays the games by touch at phone sizes. Every earlier browser
+  check used a mouse at iPad sizes.
+- `tests/test_deploy.py` checks the version file against the service worker's stamp.
+
+What to distrust:
+
+- **Emulation is not a phone.** The touch path is Chromium's own, but Peter's phone, browser
+  and settings are unknown. If hangman or hidden words still cannot be played once his
+  phone shows this version, there is a real bug I have not reproduced.
+- **The first update after this change still needs the old way**: open, wait, close fully,
+  open again.
+- **Hidden-word letters are 36 px across on a 360 px phone**, below the 44 px the iPad
+  checks require. They worked by tap and by slide in emulation, but may feel tight to a
+  child on a small phone.

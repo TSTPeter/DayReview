@@ -18,6 +18,7 @@ Deliberately excluded:
                               docs/06 standard 7 is high privacy by default.
 """
 import hashlib
+import json
 import pathlib
 import re
 import shutil
@@ -56,10 +57,14 @@ def short_head(repo):
         return "unknown"
 
 
+# Written after the stamp, so they cannot be part of what it hashes.
+UNHASHED = ("sw.js", "README.md", "version.json")
+
+
 def stamp_cache_version(dest):
     digest = hashlib.sha256()
     for f in sorted(dest.rglob("*")):
-        if f.is_file() and f.name not in ("sw.js", "README.md"):
+        if f.is_file() and f.name not in UNHASHED:
             digest.update(str(f.relative_to(dest)).encode("utf-8"))
             digest.update(f.read_bytes())
     sw = dest / "sw.js"
@@ -68,8 +73,10 @@ def stamp_cache_version(dest):
     if len(pattern.findall(text)) != 1:
         sys.exit("REFUSING: could not find the CACHE line in sw.js to stamp. "
                  "If it was renamed, update stamp_cache_version().")
-    stamped = pattern.sub("const CACHE = `${PREFIX}" + digest.hexdigest()[:12] + "`;", text)
+    stamp = digest.hexdigest()[:12]
+    stamped = pattern.sub("const CACHE = `${PREFIX}" + stamp + "`;", text)
     sw.write_text(stamped, encoding="utf-8")
+    return stamp
 
 
 def main(argv):
@@ -95,7 +102,13 @@ def main(argv):
     # not that string would never reach an installed tablet: the new files would sit
     # on the server while the iPad kept playing the old ones. So the deployed copy is
     # versioned by its content, and every sync that changes anything is picked up.
-    stamp_cache_version(dest)
+    stamp = stamp_cache_version(dest)
+
+    # Which version a device is running, for the grown-up view. It is in the service
+    # worker's shell, so a device always reports the version it is actually showing.
+    (dest / "data" / "version.json").write_text(json.dumps(
+        {"stamp": stamp, "commit": short_head(ROOT), "synced": date.today().isoformat()},
+        indent=2) + "\n", encoding="utf-8")
 
     (dest / "README.md").write_text(
         README.format(commit=short_head(ROOT), when=date.today().isoformat()))

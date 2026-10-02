@@ -1,0 +1,6 @@
+{
+  "_comment": "tools/deploy_to_site.py writes the real one into the deployed copy. This is the development copy.",
+  "stamp": "dev",
+  "commit": null,
+  "synced": null
+}

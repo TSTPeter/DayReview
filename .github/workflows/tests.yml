@@ -81,3 +81,7 @@ jobs:
             sleep 1
           done
           node tests/browser/run.mjs
+          # The games by touch on two Android phones; then a returning phone across
+          # three deploys (update.mjs runs its own server, so it can deploy).
+          node tests/browser/phone.mjs
+          node tests/browser/update.mjs
