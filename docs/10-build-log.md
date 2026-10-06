@@ -340,3 +340,43 @@ What to distrust:
   cost about six times the CI minutes; that is Peter's call.
 - A device keeps its copy of the week it has loaded. A mid-week correction to
   `engine/term.py` reaches it only through "Use the school's list".
+
+## 6 October 2026, evening: the background, and a Share button she can find
+
+Peter asked for four things: the ever-more-complex background back, a few more games, a
+bonus round that is more fun than the game-show board, and a Share function for the
+student and the parent. This is the first of the builds that answer him. It is the
+background and Share; the games and the bonus round follow.
+
+- **The background was not lost; it never got going.** Nothing in the code had changed since
+  1 October. The first build took two layers back on a miss and put the first animal at
+  level 6, so at six right in ten most rounds ended on a page of dots. Now a miss takes
+  back one layer, the first animal comes with her second right answer, and the plan runs
+  to 20 layers (`docs/11`, with the numbers; `tools/simulate_background.py` reproduces
+  them). Peter chose where it appears: the card-by-card games, which today is the pattern
+  sort.
+- **Share existed but was a small link at the foot of the welcome page,** 1,019 px down
+  a phone screen 839 px tall, and a QR code is no use on the phone that is showing it.
+  It is now a labelled button, "Share this with your friends", on the first screen. It
+  opens the device's share sheet where there is one, copies the link where there is not,
+  and still shows the QR code for a tablet. The grown-up view has a message for other
+  parents. It sends the address and a plain sentence and nothing else (`docs/16`).
+- **A fixture used a real first name.** The browser test typed her real first name as the
+  name to greet. It is now synthetic. Her first name still appears in the docs and in
+  comments in three test files, none of them served; whether to remove it from git, and from
+  its history, is Peter's call under TST's rule on personal data.
+
+What to distrust:
+
+- **The step back of one layer is a guess,** the smallest that still shows. The size of a
+  nudge is not something this build can measure.
+- **The wording of the message for other parents is mine,** and it speaks for Peter. It
+  says the game runs offline and keeps what a child types on their own device, which
+  is true of the shipped build, and that words come back over the following weeks. He
+  should read it before anyone else does.
+- **The games follow one school's lists.** A friend at another school gets the same
+  weeks, because the games' content is written per week of this term. They can paste
+  their own list for dictation, but the games will not follow it. The message does not
+  promise otherwise, and this is worth saying to a parent who asks.
+- **The share sheet's own suggestions are the device's,** not this service's.
+

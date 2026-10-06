@@ -124,6 +124,9 @@ made by Peter. See the note added there.
   letter, and a trace in progress is ink, which no part uses.
 - **Nothing touches the scheduler or the attempt log.** The games are extra practice.
   The fixed sequence stays the default, which is `CLAUDE.md`'s rule.
+- **The growing background belongs to the card-by-card games only:** the pattern sort,
+  and the bonus round and any new game where she answers one card at a time. Hangman,
+  hidden words, the jigsaw and root match stay plain (`docs/11`, 6 October).
 - **The games follow the term's calendar,** because their content is written per week.
 
 ## The content, and who has checked it
@@ -280,7 +283,7 @@ to the conventions. What changed, and what each part rests on:
 | **The support after a miss** is the word's arm in the experiment: where it comes from, a real sentence that uses it, saying it aloud, or all three. Before the experiment starts, it is where it comes from plus saying it aloud | `experiments/2026-10-support-types.md` |
 | **Say it aloud.** If the support includes it and an adult has switched the microphone on, the game listens for her voice and ends the pause when it hears her | The production effect: words said aloud are remembered better than words read silently, but only when some are said and others are not ([MacLeod et al. 2010](https://doi.org/10.1037/a0018785)). Saying a word as it is spelt helps children spell it ([Hilte and Reitsma 2006](https://doi.org/10.1007/s11881-006-0013-3)). Both are recognition and spelling studies, not studies of this game |
 | **Run sounds** for right answers in a row at the first go, at 3, 5, 7 and 9, and polyphony from 11 | Performance-contingent reward (d = -0.28), the least harmful expected class. Peter's call; see `docs/11` |
-| **A background that grows** white on white with the run, and steps back two levels on a miss | Judgement, kept subtle because of `docs/02`'s coherence finding. See `docs/11` |
+| **A background that grows** white on white with each card right at the first go, and takes back one layer on a miss (two until 6 October) | Judgement, kept subtle because of `docs/02`'s coherence finding. See `docs/11` |
 
 **Beatrix's three-in-a-row sound did not exist.** The special sound she noticed was
 the unlock sting, three rising notes, which plays when her points pass a multiple of

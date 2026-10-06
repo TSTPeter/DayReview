@@ -67,6 +67,22 @@ for (const phone of ["Pixel 7", "Galaxy S8"]) {
   await page.goto(BASE, { waitUntil: "networkidle" });
   await page.waitForSelector("#screen-home.on");
   check("the welcome page fits the width", await fits());
+  // Share used to be a small link at the very foot of the page, below the fold on a phone
+  // (6 October 2026). It is a labelled button now, and must be on the first screen.
+  const share = await page.$eval("#btn-share", (b) => {
+    const r = b.getBoundingClientRect();
+    return { bottom: Math.round(r.bottom), h: Math.round(r.height), vh: innerHeight };
+  });
+  check("the Share button is on the first screen, without scrolling, and big enough to touch",
+        share.bottom <= share.vh && share.h >= 44, JSON.stringify(share));
+  await page.tap("#btn-share");
+  await page.waitForSelector("#screen-share.on");
+  await page.tap("#share-copy");
+  await page.waitForFunction(() => document.querySelector("#share-note").textContent.length > 0);
+  check("the share screen fits the width, and Copy the link answers a tap",
+        await fits() && /\S/.test(await page.textContent("#share-note")), (await page.textContent("#share-note")).trim());
+  await page.tap("#share-back");
+  await page.waitForSelector("#screen-home.on");
   // The school's list for the week, and the way back to it if a device loses it.
   await page.tap("#btn-week");
   await page.waitForSelector("#screen-week.on");
@@ -175,6 +191,25 @@ for (const phone of ["Pixel 7", "Galaxy S8"]) {
           /Not this time/.test(await page.textContent("#sort-feedback"))
           && (await page.locator("#sort-support .support").count()) === 1
           && (await page.locator("#sort-bins.resting").count()) === 1);
+    // Back on the bins after the pause, the missed card is answered (not at the first go),
+    // then two cards right at the first go bring the first animal onto the page. It sits
+    // in the lower part of the screen, so on a phone it is in view and not under a card.
+    await page.waitForSelector("#sort-bins:not(.resting)", { timeout: 8000 });
+    await page.tap(`#sort-bins button[data-key="${c.answer}"]`);
+    for (let k = 0; k < 2; k++) {
+      const next = await card();
+      await page.tap(`#sort-bins button[data-key="${next.answer}"]`);
+    }
+    await page.waitForTimeout(900);
+    const animal = await page.$eval('#sort-scene g.layer[data-kind="animal"]', (g) => {
+      const r = g.getBoundingClientRect();
+      return { x: Math.round(r.left), y: Math.round(r.top), w: Math.round(r.width), h: Math.round(r.height),
+               opacity: getComputedStyle(g).opacity, vw: innerWidth, vh: innerHeight };
+    }).catch(() => null);
+    check("two right answers at the first go bring the first animal into view",
+          !!animal && Number(animal.opacity) === 1 && animal.x >= 0 && animal.y >= 0
+          && animal.x + animal.w <= animal.vw + 1 && animal.y + animal.h <= animal.vh + 1,
+          JSON.stringify(animal));
     // The background is fixed to the window; the title bar must sit over it.
     check("the title bar sits above the background",
           await page.$eval("header.bar", (h) => getComputedStyle(h).position === "relative"

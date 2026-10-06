@@ -499,7 +499,7 @@ console.log("\n— a real school list, headings and all —");
   await ctx4.close();
 }
 
-// Beatrix's iPad HAS voices, so the path she will actually use is the one
+// Her iPad HAS voices, so the path she will actually use is the one
 // headless Chromium cannot run. Stub the speech API and read back what the app
 // asked it to say: for these ten words the spoken line is the whole question.
 console.log("\n— what the dictation actually says —");
@@ -1113,12 +1113,12 @@ const ready = await g.textContent("#home-summary");
 check("the welcome says what is ready today", /ready|due/i.test(ready), ready);
 await g.click("#btn-grownup");
 await g.waitForSelector("#screen-grownup.on");
-await g.fill("#opt-name", "  Beatrix Example ");
+await g.fill("#opt-name", "  Zinnia Example ");
 await g.click("#opt-name-save");
 await g.click("#gu-home");
 await g.waitForSelector("#screen-home.on");
 check("the welcome calls her by her first name",
-      (await g.textContent("#home-hello")) === "Hi Beatrix!");
+      (await g.textContent("#home-hello")) === "Hi Zinnia!");
 check("this week's theme is on the welcome page",
       !liveWeek || (await g.textContent("#home-week-theme")) === liveWeek.theme,
       liveWeek ? liveWeek.theme : "no term week today");
@@ -1263,6 +1263,8 @@ if (!liveWeek) {
     }
     let sortRight = 0, first = true, quietRight = true;
     const runSounds = [];
+    const animals = () => g.locator('#sort-scene g.layer[data-kind="animal"]').count();
+    const animalsSeen = {};
     for (let i = 0; i < 10; i++) {
       const card = await cardShown();
       if (!card) break;
@@ -1294,6 +1296,7 @@ if (!liveWeek) {
         await g.click(`#sort-bins button[data-key="${card.answer}"]`);
         const tones = await g.evaluate((n) => window.__tones.slice(n), before);
         if ((await g.textContent("#sort-feedback")).trim() !== "+5") quietRight = false;
+        if (sortRight <= 2) animalsSeen[sortRight] = await animals();
         // A run's climb is the only sound in the app that reaches top C, 1046.5 Hz.
         if (tones.includes(1047)) runSounds.push(sortRight);
       }
@@ -1310,9 +1313,12 @@ if (!liveWeek) {
     check("right answers in a row at the first go sound at 3, 5, 7 and 9, and only then",
           runSounds.join() === milestones.join(), `heard at ${runSounds.join(", ") || "none"}`);
     const layers = await g.locator("#sort-scene svg > g.layer").count();
+    const maxLevel = await g.evaluate(async () => (await import("./js/scene.js")).MAX);
     check("the background gains a layer for each right answer at the first go",
-          (await level()) === String(Math.min(14, sortRight)) && layers === Math.min(14, sortRight),
+          (await level()) === String(Math.min(maxLevel, sortRight)) && layers === Math.min(maxLevel, sortRight),
           `level ${await level()}, ${layers} layers`);
+    check("the first animal arrives with her second right answer, and not before",
+          animalsSeen[1] === 0 && animalsSeen[2] === 1, JSON.stringify(animalsSeen));
     const poly = await g.evaluate(async () => {
       const sfx = await import("./js/sfx.js");
       const notes = (n) => {
@@ -1333,6 +1339,18 @@ if (!liveWeek) {
           sortLog && sortLog.items[0].support === "etymology say" && sortLog.items[0].said === null
           && sortLog.items.slice(1).every((x) => x.support === null),
           sortLog ? JSON.stringify(sortLog.items[0]) : "no entry");
+
+    // "Another round" is the same sitting, so the background stays; a miss in it takes
+    // back ONE layer. The first build took two, which kept the page near empty at a
+    // realistic hit rate (docs/11, 6 October 2026).
+    await g.click("#sort-again");
+    const second = await cardShown();
+    const before = Number(await level());
+    check("another round keeps the background it had", before === Math.min(maxLevel, sortRight),
+          `level ${before}`);
+    await g.click(`#sort-bins button[data-key="${wrongFor(second)}"]`);
+    check("a miss takes back one layer, not two", before > 1 && Number(await level()) === before - 1,
+          `${before} then ${await level()}`);
 
     // Leaving during a pause, or just after a right answer, and coming straight back
     // must start a clean round: no bins left resting, no old timer moving it on.
@@ -1680,12 +1698,23 @@ if (!liveWeek) {
   const [download] = await Promise.all([g.waitForEvent("download"), g.click("#gu-export")]);
   const exported = readFileSync(await download.path(), "utf8");
   check("the export carries the games but never her name",
-        exported.includes("game_points") && !/Beatrix/.test(exported));
+        exported.includes("game_points") && !/Zinnia/.test(exported));
 
   // --- sharing: the address, and nothing about her
   await g.click("#gu-home");
   await g.waitForSelector("#screen-home.on");
   check("with sync off, the welcome page has no note about totals", await g.locator("#home-sync-note").isHidden());
+  // The device's share sheet and clipboard are stubbed, to see exactly what would leave.
+  await g.evaluate(() => {
+    window.__shared = [];
+    window.__copied = [];
+    navigator.share = async (d) => { window.__shared.push(d); };
+    Object.defineProperty(navigator, "clipboard", { configurable: true,
+      value: { writeText: async (t) => { window.__copied.push(t); } } });
+  });
+  check("the welcome page has one Share button, labelled for a child, and no second link",
+        (await g.locator("#btn-share").count()) === 1
+        && (await g.textContent("#btn-share")).trim() === "Share this with your friends");
   await g.click("#btn-share");
   await g.waitForSelector("#screen-share.on");
   const qr = await g.waitForFunction(() => {
@@ -1700,7 +1729,42 @@ if (!liveWeek) {
   check("the share screen links a notice for grown-ups, and it is served",
         (await g.locator('#screen-share a[href="privacy.html"]').count()) === 1
         && /stays on your tablet/.test(notice) && /never a word your child/.test(notice));
+  const ADDRESS = "https://www.tsttalent.com/Spelling";
+  check("where the device can share, Send the link is offered", await g.locator("#share-send").isVisible());
+  await g.click("#share-send");
+  const sent = await g.evaluate(() => window.__shared);
+  check("Send the link hands over a title, a plain sentence and the address, and nothing else",
+        sent.length === 1 && Object.keys(sent[0]).sort().join() === "text,title,url"
+        && sent[0].url === ADDRESS && /^A spelling game for Year 5 and 6/.test(sent[0].text)
+        && !/[?#]/.test(sent[0].url) && !/Zinnia|Example/.test(JSON.stringify(sent[0])), JSON.stringify(sent[0]));
+  await g.click("#share-copy");
+  await g.waitForFunction(() => document.querySelector("#share-note").textContent.length > 0);
+  const copied = await g.evaluate(() => window.__copied);
+  check("Copy the link puts the same sentence and the address on the clipboard, and says so",
+        copied.length === 1 && copied[0] === `${sent[0].text}\n${ADDRESS}`
+        && /^Copied/.test(await g.textContent("#share-note")), JSON.stringify(copied));
   await g.click("#share-back");
+  await g.waitForSelector("#screen-home.on");
+
+  // --- the grown-up's message for other parents
+  await g.click("#btn-grownup");
+  await g.waitForSelector("#screen-grownup.on");
+  const parentText = await g.textContent("#gu-share-text");
+  check("the grown-up view has a message for other parents: what it is, what it keeps, the address",
+        /A spelling game for Years 5 and 6/.test(parentText) && /keeps what a child types on their own device/.test(parentText)
+        && parentText.includes(ADDRESS) && parentText.includes("/privacy.html")
+        && !/Zinnia|Example/.test(parentText));
+  await g.click("#gu-share-copy");
+  await g.waitForFunction(() => document.querySelector("#gu-share-note").textContent.length > 0);
+  const copiedParents = await g.evaluate(() => window.__copied.at(-1));
+  check("copying it puts exactly that message on the clipboard",
+        copiedParents.replace(/\s+/g, " ") === parentText.replace(/\s+/g, " "), copiedParents.slice(0, 60));
+  await g.click("#gu-share-send");
+  const sentParents = await g.evaluate(() => window.__shared.at(-1));
+  check("sending it hands over only a title, the message and the address",
+        Object.keys(sentParents).sort().join() === "text,title,url" && sentParents.url === ADDRESS
+        && !/[?#]/.test(sentParents.url), JSON.stringify(sentParents).slice(0, 80));
+  await g.click("#gu-home");
   await g.waitForSelector("#screen-home.on");
 
   // --- the new screens fit an iPad

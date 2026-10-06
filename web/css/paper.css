@@ -597,6 +597,12 @@ header.bar, .progress { position: relative; z-index: 1; }
               max-width: 22rem; margin: 1rem auto; }
 .share-card img { width: min(264px, 70vw); height: auto; image-rendering: pixelated; }
 .share-url { font-weight: 800; letter-spacing: .02em; margin: 0; }
+.share-actions { margin: 1rem 0 .4rem; }
+button.share-btn { display: inline-flex; align-items: center; gap: .6rem; }
+.share-icon { flex: none; fill: none; stroke: currentColor; stroke-width: 1.8; stroke-linecap: round; }
+.share-icon circle { fill: currentColor; stroke: none; }
+.share-msg { margin: .6rem 0 1rem; padding: .8rem 1rem; background: var(--paper-2);
+             border-radius: 10px; font-size: .95rem; white-space: pre-line; overflow-wrap: anywhere; }
 textarea { font: inherit; font-size: .9rem; width: 100%; padding: .6rem .7rem;
            border-radius: 10px; border: 2px solid color-mix(in srgb, var(--ink) 14%, transparent);
            background: var(--paper-1); color: var(--ink); }
