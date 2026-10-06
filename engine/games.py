@@ -657,6 +657,7 @@ def term_entries():
 
 
 def build(weeks, curated, sentences, noun_verb_pairs):
+    import crossword
     import wordblocks
     words = {}
     for week in weeks:
@@ -673,13 +674,18 @@ def build(weeks, curated, sentences, noun_verb_pairs):
                 "origin": {"lang": entry["lang"], "root": entry["root"], "gloss": entry["gloss"]},
             }
     per_week = {}
+    meanings = {w: c["meaning"] for w, c in words.items()}
+    earlier = []
     for week in weeks:
         per_week[week["id"]] = {
             "roots": [{"part": part, "means": means, "from": source, "words": ws}
                       for part, means, source, ws in ROOTS.get(week["id"], [])],
             "sort": sort_deck(week["id"], weeks, sentences, noun_verb_pairs),
             "blocks": wordblocks.week_blocks(week["id"], week["words"]),
+            # This week's words first, earlier weeks' to fill: engine/crossword.py.
+            "crosswords": crossword.week_puzzles(week["id"], week["words"], earlier, meanings),
         }
+        earlier += [w for w in week["words"] if w not in earlier]
     return {
         "generated_by": "engine/games.py",
         "review_note": "Written offline. Read these before a child does. See engine/games.py.",

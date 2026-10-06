@@ -20,6 +20,7 @@ import { existsSync, readFileSync } from "node:fs";
 import { chromium } from "playwright-core";
 import { namingLine } from "../../web/js/audio.js";
 import { hintFor } from "../../web/js/engine/derive.js";
+import { blank } from "../../web/js/gap.js";
 
 const BASE = process.env.BASE || "http://localhost:8137/";
 
@@ -1629,6 +1630,283 @@ if (!liveWeek) {
   }
   await g.click("#hunt-quit");
 
+  // --- 6 October 2026: four more games (docs/15). All typed or tapped, none leaves a
+  // misspelling on screen, and the three that answer a card at a time grow the background.
+  await g.waitForSelector("#screen-games.on");
+  check("the hub offers the four new games, all open this week",
+        (await Promise.all(["gap", "lcw", "tiles", "cross"].map((n) => g.locator(`#game-${n}`).isDisabled())))
+          .every((off) => !off));
+  const sentenceData = (await (await fetch(new URL("data/sentences.json", BASE))).json()).sentences;
+  const levelOf = (scene) => g.getAttribute(scene, "data-level");
+  // A layer taken back fades for under a second before it leaves the page, so the ones still
+  // fading do not count.
+  const animalsIn = (scene) => g.locator(`${scene} g.layer:not(.going)[data-kind="animal"]`).count();
+  const lastRound = async (game) => {
+    for (let n = 0; n < 20; n++) {
+      const row = ((await readKV(g, "game_log")) || []).filter((r) => r.game === game).pop();
+      if (row) return row;
+      await g.waitForTimeout(100);
+    }
+    return null;
+  };
+
+  // --- fill the gap: five sentences, one missed on purpose
+  const beforeGap = await readPoints();
+  await g.click("#game-gap");
+  await g.waitForSelector("#screen-gap.on");
+  check("fill the gap starts on a plain background", (await levelOf("#gap-scene")) === "0");
+  let gapRight = 0, gapMiss = null, gapOk = true;
+  for (let i = 0; i < 5; i++) {
+    const shown = await g.textContent("#gap-sentence");
+    const word = liveWeek.words.find((w) => { const b = blank(sentenceData[w] || "", w); return b && b.before + b.after === shown; });
+    if (!word) { gapOk = false; break; }
+    if (i === 0) {
+      const screenText = (await g.innerText("#screen-gap")).toLowerCase();
+      check("the sentence has a gap, its meaning, and the first letter and length, and never the word",
+            (await g.locator("#gap-sentence .gap-blank").count()) === 1
+            && (await g.textContent("#gap-hint")).includes(`Starts with "${word[0]}"`)
+            && (await g.textContent("#gap-meaning")).includes(gameData.words[word].meaning)
+            && !screenText.includes(word.toLowerCase()), word);
+    }
+    if (i === 2) {
+      gapMiss = word;
+      await g.fill("#gap-answer input", word.slice(0, -1));
+      await g.keyboard.press("Enter");
+      await g.waitForSelector("#gap-next:not([hidden])");
+      check("a wrong answer shows her attempt against the word, with the why and the word's support",
+            /\S/.test(await g.textContent("#gap-answer .marked")) && (await g.textContent("#gap-answer .verdict")).length > 0
+            && (await g.textContent("#gap-answer .muted")).startsWith(word)
+            && (await g.locator("#gap-answer .support").count()) === 1, await g.textContent("#gap-answer .muted"));
+      check("and the sentence is filled with the right spelling, never hers",
+            (await g.textContent("#gap-sentence .gap-filled")).toLowerCase() === word
+            && (await g.locator("#gap-sentence .gap-filled.wrong").count()) === 1);
+    } else {
+      await g.fill("#gap-answer input", word);
+      await g.click("#gap-answer button.primary");
+      await g.waitForSelector("#gap-next:not([hidden])");
+      if (/Correct!\s+\+10/.test(await g.textContent("#gap-answer .verdict"))) gapRight += 1;
+    }
+    await g.click("#gap-next");
+  }
+  await g.waitForSelector("#gap-end:not([hidden])", { timeout: 5000 }).catch(() => {});
+  const afterGap = await readPoints();
+  check("fill the gap earns 10 a sentence right at the first go",
+        gapOk && gapRight === 4 && afterGap.earned - beforeGap.earned === 40, `+${afterGap.earned - beforeGap.earned}`);
+  check("its round ends with the score and the one worth another look",
+        /^4 of 5 right at the first go/.test(await g.textContent("#gap-end-text"))
+        && (await g.textContent("#gap-end-words")).includes(gapMiss));
+  // right, right, MISS, right, right: 1, 2, 1, 2, 3
+  check("the background grew with each right answer and took back one layer on the miss",
+        (await levelOf("#gap-scene")) === "3" && (await animalsIn("#gap-scene")) === 1,
+        `level ${await levelOf("#gap-scene")}`);
+  const gapLog = await lastRound("gap");
+  check("the round is logged: five words, the first go of each, and the points",
+        gapLog && gapLog.items.length === 5 && gapLog.items.filter((x) => x.first_try).length === 4
+        && gapLog.points === 40, gapLog ? JSON.stringify(gapLog.items[2]) : "no entry");
+  await g.click("#gap-again");
+  check("another round is the same sitting, so the background stays", (await levelOf("#gap-scene")) === "3");
+  await g.click("#gap-quit");
+  await g.waitForSelector("#screen-games.on");
+
+  // --- look, cover, write: the word goes under a cover, and a miss comes round once more
+  const beforeLcw = await readPoints();
+  await g.click("#game-lcw");
+  await g.waitForSelector("#screen-lcw.on");
+  let lcwRight = 0, lcwMissWord = null, lcwNext = "", lcwSteps = [];
+  for (let i = 0; i < 5; i++) {
+    const word = (await g.textContent("#lcw-word")).replace(/\s+/g, "");
+    if (i === 0) {
+      check("looking: the word is on screen in its coloured parts, and there is nothing to type into yet",
+            (await g.locator("#lcw-word .part").count()) >= 1 && await g.locator("#lcw-answer").isHidden()
+            && (await g.textContent("#lcw-tab")) === "Look");
+    }
+    await g.click("#lcw-cover");
+    if (i === 0) {
+      const lookText = (await g.innerText("#screen-lcw")).toLowerCase();
+      check("covering: the word is gone from the screen and a box to write it in has appeared",
+            !lookText.includes(word.toLowerCase()) && await g.locator("#lcw-answer input").isVisible()
+            && await g.locator("#lcw-word .lcw-cover").count() === 1, word);
+    }
+    if (i === 1) {
+      lcwMissWord = word;
+      await g.fill("#lcw-answer input", word.slice(0, -1));
+    } else {
+      await g.fill("#lcw-answer input", word);
+    }
+    await g.keyboard.press("Enter");
+    await g.waitForSelector("#lcw-next:not([hidden])");
+    if (i === 1) {
+      check("a miss shows her attempt against the word, and the word comes out from under the cover",
+            (await g.textContent("#lcw-answer .muted")).startsWith(word) && (await g.textContent("#lcw-tab")) === "Check"
+            && (await g.textContent("#lcw-word")).replace(/\s+/g, "") === word);
+    } else if (/Correct!\s+\+10/.test(await g.textContent("#lcw-answer .verdict"))) {
+      lcwRight += 1;
+    }
+    lcwNext = (await g.textContent("#lcw-next")).trim();
+    lcwSteps.push(lcwNext);
+    await g.click("#lcw-next");
+  }
+  check("the last word of the round offers another look at the one she missed",
+        lcwSteps[4] === "Another look" && /Another look: word 1 of 1/.test(await g.textContent("#lcw-count"))
+        && (await g.textContent("#lcw-tab")) === "Look again"
+        && (await g.textContent("#lcw-word")).replace(/\s+/g, "") === lcwMissWord, lcwSteps.join(", "));
+  await g.click("#lcw-cover");
+  await g.fill("#lcw-answer input", lcwMissWord);
+  await g.keyboard.press("Enter");
+  await g.waitForSelector("#lcw-next:not([hidden])");
+  check("the second look earns nothing and says only that it is right",
+        /^Correct!$/.test((await g.textContent("#lcw-answer .verdict")).trim()));
+  await g.click("#lcw-next");
+  await g.waitForSelector("#lcw-end:not([hidden])", { timeout: 5000 }).catch(() => {});
+  const afterLcw = await readPoints();
+  check("look cover write earns 10 a word right at the first go, and nothing for the second look",
+        lcwRight === 4 && afterLcw.earned - beforeLcw.earned === 40, `+${afterLcw.earned - beforeLcw.earned}`);
+  // right, MISS, right, right, right: 1, 0, 1, 2, 3. The second look leaves the background alone.
+  check("the background took the miss, grew with the rights, and ignored the second look",
+        (await levelOf("#lcw-scene")) === "3", `level ${await levelOf("#lcw-scene")}`);
+  const lcwLog = await lastRound("lcw");
+  check("the round is logged with the second look marked as such",
+        lcwLog && lcwLog.items.length === 6 && lcwLog.items.filter((x) => x.again).length === 1
+        && lcwLog.items.filter((x) => x.first_try).length === 4, lcwLog ? `${lcwLog.items.length} items` : "no entry");
+  await g.click("#lcw-quit");
+  await g.waitForSelector("#screen-games.on");
+
+  // --- letter tiles: jumbled letters, a spare hyphen, locks after a miss, and a reveal after three
+  const beforeTiles = await readPoints();
+  await g.click("#game-tiles");
+  await g.waitForSelector("#screen-tiles.on");
+  const wordForMeaning = (m) => Object.keys(gameData.words).find((w) => gameData.words[w].meaning === m);
+  const firstOpen = () => g.evaluate(() => [...document.querySelectorAll("#tiles-slots .slot")]
+    .findIndex((s) => !s.classList.contains("locked") && !s.querySelector(".tile")));
+  const tapTile = (ch) => g.locator(`#tiles-tray .tile[aria-label="${ch === "-" ? "hyphen" : ch}"]`).first().click();
+  // Fill every open slot: right letters, or (wrong) one decoy hyphen in the first open slot.
+  const fill = async (word, wrong) => {
+    let used = false;
+    for (let k = await firstOpen(); k >= 0; k = await firstOpen()) {
+      if (wrong && !used && !word.includes("-")) { used = true; await tapTile("-"); } else await tapTile(word[k]);
+    }
+  };
+  let tilesFirst = 0, revealed = false, locksOk = null, trayOk = null, tilesPlayed = [];
+  for (let i = 0; i < 5; i++) {
+    const word = wordForMeaning(await g.textContent("#tiles-clue"));
+    tilesPlayed.push(word);
+    if (i === 0) {
+      const tray = (await g.$$eval("#tiles-tray .tile", (ts) => ts.map((t) => t.textContent))).sort().join("");
+      const want = [...word, ...(word.includes("-") ? [] : ["-"])].sort().join("");
+      trayOk = tray === want && (await g.locator("#tiles-slots .slot").count()) === word.length;
+    }
+    if (i === 1 && !word.includes("-")) {
+      // a wrong go: the decoy hyphen in the first slot, everything else right
+      await fill(word, true);
+      await g.click("#tiles-check");
+      const locked = await g.locator("#tiles-slots .slot.locked").count();
+      const placed = await g.locator("#tiles-slots .tile").count();
+      locksOk = locked === word.length - 1 && placed === locked
+        && new RegExp(`^${word.length - 1} of ${word.length} are in the right place`).test(await g.textContent("#tiles-feedback"))
+        && (await g.locator("#tiles-support .support").count()) === 1;
+      await fill(word, false);
+    } else if (i === 3 && !word.includes("-")) {
+      // three wrong goes, and the word is shown
+      for (let m = 0; m < 3; m++) { await fill(word, true); await g.click("#tiles-check"); }
+      revealed = /^Here it is/.test(await g.textContent("#tiles-feedback"))
+        && (await g.locator("#tiles-slots.shown").count()) === 1;
+      await g.waitForSelector("#tiles-next:not([hidden])");
+      await g.click("#tiles-next");
+      continue;
+    } else {
+      await fill(word, false);
+    }
+    await g.click("#tiles-check");
+    await g.waitForSelector("#tiles-next:not([hidden])");
+    if (/\+10/.test(await g.textContent("#tiles-feedback"))) tilesFirst += 1;
+    await g.click("#tiles-next");
+  }
+  await g.waitForSelector("#tiles-end:not([hidden])", { timeout: 5000 }).catch(() => {});
+  check("the tray holds the word's own letters and a hyphen, which every word has so it never gives one away",
+        trayOk === true);
+  if (locksOk === null) console.log("  skip  no plain word came second this round, so the locks were not tried");
+  else check("a wrong go keeps what is right, sends the rest back, and leaves no misspelling on screen", locksOk);
+  if (!revealed && tilesPlayed.every((w, i) => i !== 3 || w.includes("-"))) {
+    console.log("  skip  the fourth word has a hyphen, so three misses could not be forced");
+  } else {
+    check("after three wrong goes the word is shown whole, with its rule", revealed);
+  }
+  const afterTiles = await readPoints();
+  check("letter tiles earns 10 a word at the first go, and nothing once it has gone wrong",
+        afterTiles.earned - beforeTiles.earned === 10 * tilesFirst, `+${afterTiles.earned - beforeTiles.earned}, ${tilesFirst} first go`);
+  const tilesLog = await lastRound("tiles");
+  check("the round is logged with the misses and whether the word had to be shown",
+        tilesLog && tilesLog.items.length === 5 && tilesLog.items.every((x) => "misses" in x && "revealed" in x),
+        tilesLog ? JSON.stringify(tilesLog.items[3]) : "no entry");
+  await g.click("#tiles-quit");
+  await g.waitForSelector("#screen-games.on");
+
+  // --- the mini crossword: whole answers typed, crossing letters as the hint, no growing background
+  const beforeCross = await readPoints();
+  await g.click("#game-cross");
+  await g.waitForSelector("#screen-cross.on");
+  const puzzles = gameData.weeks[liveWeek.id].crosswords;
+  const letterCells = await g.locator("#cross-grid .xw-cell").count();
+  const wantCells = puzzles[0].grid.join("").replace(/\./g, "").length;
+  check("the crossword draws the first puzzle of the week, with every square empty",
+        letterCells === wantCells && (await g.$$eval("#cross-grid .xw-l", (xs) => xs.every((x) => x.textContent === ""))),
+        `${letterCells} squares`);
+  check("it has no growing background, because it is a grid and not a card at a time",
+        (await g.locator("#screen-cross .scene").count()) === 0);
+  const entryFor = (clue) => puzzles[0].entries.find((e) => e.clue === clue);
+  let crossRight = 0, sawHint = false, missed = null, crossDone = [];
+  for (let i = 0; i < 7; i++) {
+    const clue = await g.textContent("#cross-clue");
+    const e = entryFor(clue);
+    if (!e) break;
+    const pattern = await g.textContent("#cross-pattern");
+    if (i > 0 && /[a-z]/.test(pattern.replace(/letters/, ""))) sawHint = true;
+    if (i === 0) {
+      check("the clue says how many letters, and an answer is typed whole",
+            new RegExp(`^${e.word.length} letters:`).test(pattern) && await g.locator("#cross-answer input").isVisible()
+            && !pattern.includes(e.word));
+    }
+    if (i === 2) {
+      missed = e;
+      await g.fill("#cross-answer input", e.word.slice(0, -1));
+      await g.keyboard.press("Enter");
+      await g.waitForSelector("#cross-next:not([hidden])");
+      const cells = e.dir === "a"
+        ? Array.from({ length: e.word.length }, (_, k) => [e.row, e.col + k])
+        : Array.from({ length: e.word.length }, (_, k) => [e.row + k, e.col]);
+      const shown = [];
+      for (const [r, c] of cells) shown.push(await g.textContent(`#cross-grid .xw-cell[data-r="${r}"][data-c="${c}"] .xw-l`));
+      check("a wrong answer is marked against the word, and the grid is filled with the RIGHT letters",
+            shown.join("") === e.word && (await g.textContent("#cross-answer .muted")).startsWith(e.word)
+            && (await g.locator("#cross-answer .support").count()) === 1, shown.join(""));
+    } else {
+      await g.fill("#cross-answer input", e.word);
+      await g.keyboard.press("Enter");
+      await g.waitForSelector("#cross-next:not([hidden])");
+      if (/Correct!\s+\+10/.test(await g.textContent("#cross-answer .verdict"))) crossRight += 1;
+    }
+    crossDone.push(e.word);
+    await g.click("#cross-next");
+  }
+  await g.waitForSelector("#cross-end:not([hidden])", { timeout: 5000 }).catch(() => {});
+  const afterCross = await readPoints();
+  check("a letter she already has shows in the pattern for the next answer that crosses it", sawHint);
+  check("the crossword earns 10 an answer right at the first go",
+        crossRight === 6 && afterCross.earned - beforeCross.earned === 60, `+${afterCross.earned - beforeCross.earned}`);
+  check("its puzzle ends with the score and the one worth another look",
+        /^6 of 7 right at the first go/.test(await g.textContent("#cross-end-text"))
+        && (await g.textContent("#cross-end-words")).includes(missed.word));
+  const crossLog = await lastRound("cross");
+  check("the puzzle is logged, one item for each answer",
+        crossLog && crossLog.items.length === 7 && crossLog.points === 60 && new Set(crossDone).size === 7,
+        crossLog ? `${crossLog.items.length} items` : "no entry");
+  await g.click("#cross-again");
+  await g.waitForSelector("#cross-end", { state: "hidden" });
+  check("another puzzle is the next of the week's three",
+        /^Puzzle 2 of 3/.test(await g.textContent("#cross-count")));
+  await g.click("#cross-quit");
+  await g.waitForSelector("#screen-games.on");
+
   // --- the bonus round: open, answer every square, one wrong on purpose
   await g.waitForSelector("#screen-games.on");
   const beforeBonus = await readPoints();
@@ -1689,6 +1967,7 @@ if (!liveWeek) {
   await g.waitForSelector("#screen-grownup.on");
   check("the grown-up view reports the games against dictation",
         /jigsaw/.test(await g.textContent("#gu-games-summary"))
+        && /1 fill the gap, 1 look cover write, 1 letter tiles, 1 crosswords/.test(await g.textContent("#gu-games-summary"))
         && /dictation sessions/.test(await g.textContent("#gu-games-summary")));
   check("before it starts, the experiment card says so, with no table",
         /^Not started/.test(await g.textContent("#gu-exp-state")) && await g.locator("#gu-exp-table").isHidden());
@@ -1770,7 +2049,7 @@ if (!liveWeek) {
   // --- the new screens fit an iPad
   for (const [name, vw, vh] of [["iPad portrait", 820, 1180], ["iPad landscape", 1180, 820]]) {
     await g.setViewportSize({ width: vw, height: vh });
-    for (const s of ["games", "jigsaw", "match", "sort", "hangman", "hunt", "bonus", "share", "week"]) {
+    for (const s of ["games", "jigsaw", "match", "sort", "hangman", "hunt", "gap", "lcw", "tiles", "cross", "bonus", "share", "week"]) {
       const res = await g.evaluate((id) => {
         for (const x of document.querySelectorAll(".screen")) x.classList.toggle("on", x.id === `screen-${id}`);
         const over = document.documentElement.scrollWidth > document.documentElement.clientWidth + 1;

@@ -282,6 +282,26 @@
       <b>Hidden words</b>
       <span class="small muted">Find this week&rsquo;s words in a block of letters</span>
     </button>
+    <button id="game-gap" class="game-card">
+      <span class="game-icon" aria-hidden="true"></span>
+      <b>Fill the gap</b>
+      <span class="small muted">Type the missing word in a sentence</span>
+    </button>
+    <button id="game-lcw" class="game-card">
+      <span class="game-icon" aria-hidden="true"></span>
+      <b>Look, cover, write</b>
+      <span class="small muted">Look at a word, cover it, write it from memory</span>
+    </button>
+    <button id="game-tiles" class="game-card">
+      <span class="game-icon" aria-hidden="true"></span>
+      <b>Letter tiles</b>
+      <span class="small muted">Put the jumbled letters back in order</span>
+    </button>
+    <button id="game-cross" class="game-card">
+      <span class="game-icon" aria-hidden="true"></span>
+      <b>Mini crossword</b>
+      <span class="small muted">Clues are meanings; the answers are words from the term</span>
+    </button>
   </div>
   <div class="sheet torn bonus-card" id="games-bonus">
     <span class="tab plum">Bonus round</span>
@@ -390,6 +410,111 @@
     <button id="hunt-clear">Clear</button>
     <button id="hunt-again" class="primary" hidden>Another block</button>
     <button id="hunt-quit" class="link">Back to games</button>
+  </div>
+</section>
+
+<!-- ============================================ 6 October 2026: four more games
+     Fill the gap, look cover write and letter tiles answer one card at a time, so they have
+     the growing background; the crossword is a grid and does not. See docs/15-games.md. -->
+<section id="screen-gap" class="screen has-scene">
+  <div id="gap-scene" class="scene" aria-hidden="true"></div>
+  <div class="game-head"><h1>Fill the gap</h1><span class="points-chip"></span></div>
+  <p id="gap-count" class="small muted"></p>
+  <div id="gap-card" class="sheet clue-sheet">
+    <span class="tab">The sentence</span>
+    <p id="gap-sentence" class="clue gap-sentence" aria-live="polite"></p>
+    <p id="gap-meaning" class="small muted"></p>
+    <p id="gap-hint" class="small muted"></p>
+  </div>
+  <div id="gap-answer"></div>
+  <div class="sheet torn" id="gap-end" hidden>
+    <span class="tab teal">Round over</span>
+    <p id="gap-end-text" class="end-text"></p>
+    <p id="gap-end-words" class="muted"></p>
+  </div>
+  <div class="row" style="margin-top:1rem">
+    <button id="gap-next" class="primary" hidden>Next sentence</button>
+    <button id="gap-again" class="primary" hidden>Another round</button>
+    <button id="gap-quit" class="link">Back to games</button>
+  </div>
+</section>
+
+<section id="screen-lcw" class="screen has-scene">
+  <div id="lcw-scene" class="scene" aria-hidden="true"></div>
+  <div class="game-head"><h1>Look, cover, write</h1><span class="points-chip"></span></div>
+  <p id="lcw-count" class="small muted"></p>
+  <div id="lcw-card" class="sheet clue-sheet">
+    <span class="tab" id="lcw-tab">Look</span>
+    <p id="lcw-word" class="lcw-word" aria-live="polite"></p>
+    <p id="lcw-meaning" class="small muted"></p>
+    <p id="lcw-prompt" class="lcw-prompt"></p>
+  </div>
+  <div class="row"><button id="lcw-cover" class="primary">Cover it</button></div>
+  <div id="lcw-answer" hidden></div>
+  <div class="sheet torn" id="lcw-end" hidden>
+    <span class="tab teal">Round over</span>
+    <p id="lcw-end-text" class="end-text"></p>
+    <p id="lcw-end-words" class="muted"></p>
+  </div>
+  <div class="row" style="margin-top:1rem">
+    <button id="lcw-next" class="primary" hidden>Next word</button>
+    <button id="lcw-again" class="primary" hidden>Another round</button>
+    <button id="lcw-quit" class="link">Back to games</button>
+  </div>
+</section>
+
+<section id="screen-tiles" class="screen has-scene">
+  <div id="tiles-scene" class="scene" aria-hidden="true"></div>
+  <div class="game-head"><h1>Letter tiles</h1><span class="points-chip"></span></div>
+  <p id="tiles-count" class="small muted"></p>
+  <div id="tiles-stage">
+    <div class="sheet kraft clue-sheet">
+      <span class="tab">The clue</span>
+      <p id="tiles-clue" class="clue"></p>
+    </div>
+    <div id="tiles-slots" class="tile-slots" aria-label="Your word" aria-live="polite"></div>
+    <div id="tiles-tray" class="tile-tray" aria-label="Letters"></div>
+    <div class="row">
+      <button id="tiles-check" class="primary" disabled>Check</button>
+      <button id="tiles-clear">Clear</button>
+      <button id="tiles-next" class="primary" hidden>Next word</button>
+    </div>
+    <p id="tiles-feedback" class="game-feedback" aria-live="polite"></p>
+    <div id="tiles-support" class="sheet support-sheet" hidden></div>
+  </div>
+  <div class="sheet torn" id="tiles-end" hidden>
+    <span class="tab teal">Round over</span>
+    <p id="tiles-end-text" class="end-text"></p>
+    <p id="tiles-end-words" class="muted"></p>
+  </div>
+  <div class="row">
+    <button id="tiles-again" class="primary" hidden>Another round</button>
+    <button id="tiles-quit" class="link">Back to games</button>
+  </div>
+</section>
+
+<section id="screen-cross" class="screen">
+  <div class="game-head"><h1>Mini crossword</h1><span class="points-chip"></span></div>
+  <p id="cross-count" class="small muted"></p>
+  <div id="cross-stage">
+    <div id="cross-current" class="sheet clue-sheet">
+      <span class="tab" id="cross-tab"></span>
+      <p id="cross-clue" class="clue"></p>
+      <p id="cross-pattern" class="small muted xw-pattern"></p>
+      <div id="cross-answer"></div>
+      <div class="row" style="margin-top:1rem"><button id="cross-next" class="primary" hidden>Next clue</button></div>
+    </div>
+    <div id="cross-grid" class="xw-grid" aria-label="The crossword"></div>
+    <div id="cross-clues" class="xw-clues"></div>
+  </div>
+  <div class="sheet torn" id="cross-end" hidden>
+    <span class="tab teal">Puzzle over</span>
+    <p id="cross-end-text" class="end-text"></p>
+    <p id="cross-end-words" class="muted"></p>
+  </div>
+  <div class="row" style="margin-top:1rem">
+    <button id="cross-again" class="primary" hidden>Another puzzle</button>
+    <button id="cross-quit" class="link">Back to games</button>
   </div>
 </section>
 

@@ -380,3 +380,43 @@ What to distrust:
   promise otherwise, and this is worth saying to a parent who asks.
 - **The share sheet's own suggestions are the device's,** not this service's.
 
+## 6 October 2026, night: four more games
+
+Peter chose all four of the games put to him: fill the gap, look cover write, letter tiles
+and the mini crossword (`docs/15`, with what each rests on).
+
+- **Built.** Four small modules (`gap.js`, `lcw.js`, `tiles.js`, `crossword.js`) that
+  `games.js` hands the shared parts: points, the log, the growing background and one typed-answer
+  box (`answer.js`) that marks a word the way the dictation does. The crossword's puzzles are
+  built offline (`engine/crossword.py`): every run of letters is exactly one answer, every
+  answer crosses another, and each week has three, this week's words first.
+- **Tests.** The browser suite plays each of the four, and the phone suite taps through them on a
+  Pixel 7 and a Galaxy S8. Python checks every shipped puzzle, and the checker itself against
+  deliberately broken ones. `tests/test_gap.mjs` checks that all 88 words are in their sentences
+  exactly once, which Fill the gap needs. `tests/test_shell.py` is new and general: every script
+  and data file has to be in the service worker's offline list, because six games have been
+  added in two months, each with a module of its own, and a module that is missing from the
+  list works online and fails offline on the one device where nobody can tell why.
+
+Found on the way:
+
+- **The crossword generator at first left the hyphen weeks' puzzles with one of the week's own
+  words.** Those weeks have only five plain words, because a hyphen cannot sit in a square. The
+  scoring now rewards this week's other words as well as the ones a puzzle must hold, and a test
+  holds each puzzle to at least two of them.
+- **The points chip is every game's, but the old bonus board's score chip is not.** Making the
+  chips one class would have overwritten the bonus round's own score with the running total, so
+  that one is left out.
+- **A layer taken back from the background fades for under a second before it leaves the page.**
+  The test counted it as still there. It now counts only what is not fading.
+
+What to distrust:
+
+- **Nobody has played these on a phone or an iPad.** The suites use a mouse and an emulated touch
+  screen.
+- **The crossword on a small phone** has squares about 29 px wide. She chooses a clue from a list
+  with large rows, but it is the tightest screen.
+- **Three misses before the tiles show the word, ten points a game, five sentences a round:** all
+  guesses. So is the choice to let a missed look-cover-write word come round once more.
+- **The clues are the games' meanings,** which are unreviewed. The sentences were reviewed.
+

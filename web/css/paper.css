@@ -638,3 +638,82 @@ textarea { font: inherit; font-size: .9rem; width: 100%; padding: .6rem .7rem;
   .bonus-board { gap: .4rem; }
   .bonus-board .cat { font-size: .75rem; }
 }
+
+/* ---------------------------------------------------------------- 6 October 2026: four more games
+ * Fill the gap, look cover write, letter tiles and the mini crossword (docs/15-games.md).
+ * Same cut-paper look, same colour for each kind of word part. */
+
+#game-gap .game-icon { background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 52 40'%3E%3Crect x='2' y='4' width='22' height='7' rx='3.5' fill='%232f7d72'/%3E%3Crect x='28' y='4' width='22' height='7' rx='3.5' fill='%236b4c7a'/%3E%3Crect x='2' y='17' width='14' height='7' rx='3.5' fill='%23e2725b'/%3E%3Crect x='20' y='20' width='16' height='5' rx='2.5' fill='%23e0a32e'/%3E%3Crect x='40' y='17' width='10' height='7' rx='3.5' fill='%238fa97f'/%3E%3Crect x='2' y='30' width='30' height='7' rx='3.5' fill='%232f7d72'/%3E%3C/svg%3E"); }
+#game-lcw .game-icon { background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 52 40'%3E%3Crect x='2' y='4' width='48' height='32' rx='5' fill='%23f2e8d5'/%3E%3Cellipse cx='26' cy='24' rx='13' ry='7' fill='%23fffdf7'/%3E%3Ccircle cx='26' cy='24' r='4.5' fill='%232f7d72'/%3E%3Cpath d='M2 9a5 5 0 0 1 5-5h38a5 5 0 0 1 5 5v8H2z' fill='%236b4c7a'/%3E%3C/svg%3E"); }
+#game-tiles .game-icon { background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 52 40'%3E%3Crect x='2' y='9' width='14' height='20' rx='3' fill='%232f7d72' transform='rotate(-6 9 19)'/%3E%3Crect x='19' y='6' width='14' height='20' rx='3' fill='%23e2725b'/%3E%3Crect x='36' y='10' width='14' height='20' rx='3' fill='%236b4c7a' transform='rotate(7 43 20)'/%3E%3Crect x='6' y='33' width='40' height='4' rx='2' fill='%23e0a32e'/%3E%3C/svg%3E"); }
+#game-cross .game-icon { background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 52 40'%3E%3Crect x='2' y='15' width='48' height='10' rx='2' fill='%23fffdf7' stroke='%2323201c' stroke-width='1.5'/%3E%3Crect x='20' y='2' width='10' height='36' rx='2' fill='%23fffdf7' stroke='%2323201c' stroke-width='1.5'/%3E%3Crect x='20' y='15' width='10' height='10' fill='%23e0a32e'/%3E%3Cpath d='M12 15v10M38 15v10M20 8h10M20 32h10' stroke='%2323201c' stroke-width='1.5'/%3E%3C/svg%3E"); }
+.game-card:nth-child(4) { transform: rotate(-.5deg); }
+.game-card:nth-child(7) { transform: rotate(.6deg); }
+
+.end-text { font-weight: 800; font-size: 1.3rem; }
+
+/* Fill the gap. The word is missing from a real sentence. */
+.gap-sentence { line-height: 1.7; }
+.gap-blank { display: inline-block; width: calc(var(--len, 6) * .62em); min-width: 3em;
+             border-bottom: 4px solid var(--cut-mustard); margin: 0 .15em; vertical-align: baseline; }
+.gap-filled { font-weight: 800; border-radius: 6px; padding: 0 .25em; }
+.gap-filled.right { color: var(--right); background: color-mix(in srgb, var(--cut-teal) 14%, transparent); }
+.gap-filled.wrong { color: var(--wrong); background: color-mix(in srgb, var(--cut-coral) 16%, transparent); }
+
+/* Look, cover, write. The word in its parts; then a cover where it was. */
+.lcw-word { font-size: clamp(2rem, 8vw, 3rem); font-weight: 800; letter-spacing: .04em;
+            margin: .3rem 0 .4rem; min-height: 1.4em; word-break: break-word; }
+.lcw-cover { display: inline-block; width: calc(var(--len, 8) * .62em); min-width: 3em; height: 1.1em;
+             vertical-align: middle; border-radius: 8px;
+             background: repeating-linear-gradient(135deg, var(--paper-2) 0 8px,
+                          color-mix(in srgb, var(--ink) 9%, var(--paper-2)) 8px 16px);
+             box-shadow: var(--lift-1); }
+.lcw-prompt { font-weight: 700; margin: .6rem 0 0; }
+.lcw-prompt:empty { display: none; }
+
+/* Letter tiles. Slots to fill, and a tray to take letters from. */
+#screen-tiles { --tile: clamp(44px, 11.5vw, 58px); }
+.tile-slots, .tile-tray { display: flex; flex-wrap: wrap; justify-content: center; gap: .45rem;
+                          padding: .9rem 1rem; border-radius: var(--radius); margin: 0 0 1rem; }
+.tile-slots { background: var(--paper-1); box-shadow: inset 0 0 0 3px color-mix(in srgb, var(--ink) 12%, transparent);
+              min-height: calc(var(--tile) * 1.15 + 1.8rem); }
+.tile-tray { background: var(--paper-2); min-height: calc(var(--tile) * 1.15 + 1.8rem); }
+.tile-slots .slot { width: var(--tile); height: calc(var(--tile) * 1.15); border-radius: 3px;
+                    border-bottom: 4px solid color-mix(in srgb, var(--ink) 22%, transparent); }
+.tile-slots .slot.locked { border-bottom-color: var(--cut-teal); }
+.tile { width: var(--tile); height: calc(var(--tile) * 1.15); min-height: 0; padding: 0;
+        border-radius: 8px; font-size: calc(var(--tile) * .58); font-weight: 800; line-height: 1;
+        background: var(--paper-1); }
+.tile.hyphen { background: var(--cut-mustard); color: #23201c; }
+.tile-slots .tile { box-shadow: var(--lift-1); }
+.tile-slots .slot.locked .tile { background: color-mix(in srgb, var(--cut-teal) 20%, var(--paper-1));
+                                 opacity: 1; box-shadow: 0 0 0 3px var(--cut-teal); }
+.tile-slots.done .tile { background: var(--cut-teal); color: #fff; box-shadow: var(--lift-1); opacity: 1; }
+.tile-slots.shown .tile { background: color-mix(in srgb, var(--cut-coral) 22%, var(--paper-1)); opacity: 1; }
+.tile:disabled { opacity: 1; }
+
+/* The mini crossword. A grid you read, a clue you answer, and the clues to choose from. */
+.xw-grid { --cell: min(46px, calc((100vw - 2.6rem) / var(--cols, 11)));
+           display: grid; grid-template-columns: repeat(var(--cols, 11), var(--cell));
+           grid-auto-rows: var(--cell); gap: 2px; justify-content: center; margin: 1rem auto; }
+.xw-cell { position: relative; width: var(--cell); height: var(--cell); min-height: 0; min-width: 0;
+           padding: 0; border-radius: 6px; background: var(--paper-1); box-shadow: var(--lift-1);
+           font-size: calc(var(--cell) * .56); font-weight: 800; line-height: 1; }
+.xw-cell .xw-n { position: absolute; left: 3px; top: 1px; font-size: calc(var(--cell) * .26);
+                 font-weight: 700; color: var(--ink-2); line-height: 1; }
+.xw-cell.sel { background: color-mix(in srgb, var(--cut-mustard) 38%, var(--paper-1));
+               box-shadow: 0 0 0 2px var(--cut-mustard), var(--lift-1); }
+.xw-cell.right { color: var(--cut-teal); }
+.xw-cell.missed { color: var(--cut-coral); }
+.xw-pattern { font-size: 1.15rem; letter-spacing: .14em; font-weight: 700; color: var(--ink); margin: .4rem 0 .8rem; }
+.xw-clues { display: grid; grid-template-columns: 1fr; gap: 0 1.2rem; margin: 1rem 0; }
+@media (min-width: 640px) { .xw-clues { grid-template-columns: 1fr 1fr; } }
+.xw-col h2 { font-size: 1rem; text-transform: uppercase; letter-spacing: .09em; margin: .4rem 0 .5rem; }
+.xw-list { list-style: none; margin: 0; padding: 0; }
+.xw-clue { display: block; width: 100%; text-align: left; min-height: 48px; padding: .5rem .8rem;
+           margin: 0 0 .45rem; font-weight: 600; font-size: .95rem; line-height: 1.35; }
+.xw-clue b { margin-right: .2rem; }
+.xw-clue.sel { box-shadow: 0 0 0 3px var(--cut-mustard), var(--lift-1); }
+.xw-clue.right { background: color-mix(in srgb, var(--cut-teal) 16%, var(--paper-1)); }
+.xw-clue.missed { background: color-mix(in srgb, var(--cut-coral) 14%, var(--paper-1)); }
+.xw-clue:disabled { opacity: .75; }

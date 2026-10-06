@@ -13,6 +13,7 @@
  */
 import { existsSync } from "node:fs";
 import { chromium, devices } from "playwright-core";
+import { blank } from "../../web/js/gap.js";
 
 const BASE = process.env.BASE || "http://localhost:8137/";
 
@@ -44,6 +45,7 @@ if (!week) {
   process.exit(0);
 }
 const content = games.weeks[week.id];
+const sentences = (await (await fetch(new URL("data/sentences.json", BASE))).json()).sentences;
 
 const browser = await chromium.launch(EXECUTABLE ? { executablePath: EXECUTABLE } : {});
 
@@ -215,6 +217,70 @@ for (const phone of ["Pixel 7", "Galaxy S8"]) {
           await page.$eval("header.bar", (h) => getComputedStyle(h).position === "relative"
             && Number(getComputedStyle(h).zIndex) >= 1));
   }
+  // --- the four newer games, by touch (6 October 2026)
+  if (content.sort) await page.tap("#sort-quit");
+  await page.waitForSelector("#screen-games.on");
+  check("the games hub fits the width with the four new games on it",
+        await fits() && (await page.locator(".game-card:not([disabled])").count()) >= 8);
+
+  // fill the gap: a typed answer, checked by a tap
+  await page.tap("#game-gap");
+  await page.waitForSelector("#screen-gap.on");
+  check("fill the gap fits the width", await fits());
+  const shown = await page.textContent("#gap-sentence");
+  const gapWord = week.words.find((w) => { const b = blank(sentences[w] || "", w); return b && b.before + b.after === shown; });
+  await page.fill("#gap-answer input", gapWord || "");
+  await page.tap("#gap-answer button.primary");
+  check("a typed answer is checked by a tap, and the right one earns its points",
+        !!gapWord && /Correct!\s+\+10/.test(await page.textContent("#gap-answer .verdict")), gapWord || shown);
+  await page.tap("#gap-quit");
+  await page.waitForSelector("#screen-games.on");
+
+  // look, cover, write: the cover goes on when she taps it
+  await page.tap("#game-lcw");
+  await page.waitForSelector("#screen-lcw.on");
+  const lcwWord = (await page.textContent("#lcw-word")).replace(/\s+/g, "");
+  await page.tap("#lcw-cover");
+  check("look cover write fits the width, and the word is covered after one tap",
+        await fits() && !(await page.innerText("#screen-lcw")).toLowerCase().includes(lcwWord.toLowerCase()), lcwWord);
+  await page.tap("#lcw-quit");
+  await page.waitForSelector("#screen-games.on");
+
+  // letter tiles: tiles are tapped into place, and are big enough to touch
+  await page.tap("#game-tiles");
+  await page.waitForSelector("#screen-tiles.on");
+  const meaning = await page.textContent("#tiles-clue");
+  const tilesWord = Object.keys(games.words).find((w) => games.words[w].meaning === meaning);
+  const tile = await page.$eval("#tiles-tray .tile", (b) => {
+    const r = b.getBoundingClientRect();
+    return { w: Math.round(r.width), h: Math.round(r.height) };
+  });
+  check("letter tiles fit the width, and each tile is big enough to touch",
+        await fits() && Math.min(tile.w, tile.h) >= 44, JSON.stringify(tile));
+  const firstOpen = () => page.evaluate(() => [...document.querySelectorAll("#tiles-slots .slot")]
+    .findIndex((x) => !x.classList.contains("locked") && !x.querySelector(".tile")));
+  for (let k = await firstOpen(); k >= 0; k = await firstOpen()) {
+    await page.tap(`#tiles-tray .tile[aria-label="${tilesWord[k] === "-" ? "hyphen" : tilesWord[k]}"] >> nth=0`);
+  }
+  await page.tap("#tiles-check");
+  await page.waitForSelector("#tiles-next:not([hidden])");
+  check("tapping the tiles into order and checking earns the points",
+        /\+10/.test(await page.textContent("#tiles-feedback")), tilesWord);
+  await page.tap("#tiles-quit");
+  await page.waitForSelector("#screen-games.on");
+
+  // the crossword: a clue is chosen by tap, and the grid fits
+  await page.tap("#game-cross");
+  await page.waitForSelector("#screen-cross.on");
+  const cell = await page.$eval("#cross-grid .xw-cell", (b) => Math.round(b.getBoundingClientRect().width));
+  check("the crossword fits the width, with squares big enough to read", await fits() && cell >= 26, `${cell} px`);
+  const second = await page.locator("#cross-clues .xw-clue >> nth=1").textContent();
+  await page.tap("#cross-clues .xw-clue >> nth=1");
+  check("tapping a clue picks it, and its clue is the one to answer",
+        second.includes(await page.textContent("#cross-clue")), second.slice(0, 40));
+  await page.tap("#cross-quit");
+  await page.waitForSelector("#screen-games.on");
+
   check("no page errors", errors.length === 0, errors.join(" | "));
   await ctx.close();
 }

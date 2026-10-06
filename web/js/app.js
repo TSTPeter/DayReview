@@ -126,6 +126,8 @@ async function boot() {
     week: () => weekly.scheduledWeek(app.term, today()),
     weeksSoFar: () => app.term.filter((w) => w.set_on <= today()),
     entryFor: (word) => app.byWord.get(word) || app.authored.get(word) || makeEntry(word),
+    // The sentence she heard in the dictation, for Fill the gap.
+    sentenceFor: (word) => app.sentences[word] || null,
     markedUp: (word, d) => markedUp(normalise(word), d.attempt, d.type === "hyphen" ? word : ""),
   });
   wire();
@@ -1127,7 +1129,9 @@ async function paintGamesSummary() {
   $("#gu-games-summary").textContent = log.length
     ? `Last 7 days: ${count("jigsaw")} jigsaw, ${count("match")} root match, `
       + `${count("sort")} pattern sort, ${count("hangman")} hangman, `
-      + `${count("hunt")} hidden words and ${count("bonus")} bonus rounds, `
+      + `${count("hunt")} hidden words, ${count("gap")} fill the gap, `
+      + `${count("lcw")} look cover write, ${count("tiles")} letter tiles, `
+      + `${count("cross")} crosswords and ${count("bonus")} bonus rounds, `
       + `touching ${words.size} words; ${sessions} dictation sessions. `
       + `${pts.earned || 0} points earned in all.`
     : "No games played yet.";

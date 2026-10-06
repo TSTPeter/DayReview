@@ -97,8 +97,9 @@ Older weeks are on the board on purpose: a round is spaced retrieval of the term
   (d = -0.28, against -0.40 for engagement-contingent; `docs/02`). Nothing is given
   for turning up, finishing, or time spent.
 - **Every 50 opens one bonus round.** A jigsaw word is 10, a match or a sort card 5,
-  a bonus square 5, 10 or 15, a hangman or hidden word 10. The number 50, about one
-  game's worth, is a guess.
+  a bonus square 5, 10 or 15, a hangman or hidden word 10, and a fill-the-gap sentence,
+  a look-cover-write word, a letter-tiles word or a crossword answer 10. The number 50,
+  about one game's worth, is a guess.
 - **Hangman and hidden words pay for the word, not the first go.** Misses are part of
   hangman and searching is the whole of hidden words, so a word solved or found earns
   10, and a hint halves it to 5. Still performance-contingent.
@@ -297,3 +298,89 @@ can send audio away to be transcribed (`docs/06`, `docs/16`).
 **The other games get the support too.** A wrong jigsaw check (once per word), a
 hangman word that runs out of petals, and a wrong bonus answer all show the word's
 support. Hidden words and root match have no wrong answer on a word to attach it to.
+
+## 6 October 2026: four more games
+
+Peter asked for "a few more games". Offered four, he chose all four: **fill the gap,
+look cover write, letter tiles and the mini crossword.** Each answers `docs/01`'s
+non-negotiables in the same way: she types or taps, a miss is marked against the word
+with its rule and its support, no misspelling is left on screen as something to look at,
+and nothing reaches the scheduler or the attempt log. The first three answer one card at
+a time, so they have the growing background (`docs/11`); the crossword is a grid and does
+not.
+
+| Game | What she does | Points | Rests on |
+|---|---|---|---|
+| **Fill the gap** | A sentence from her dictation set with the word missing. She types it. The meaning, the first letter and the length are shown, never the word | 10 a sentence at the first go | Retrieval, typed and marked, in a sentence she has heard: KS2's standard is spelling in her own writing, and explicit instruction transfers to free writing (Graham and Santangelo 2014, ES 0.94, `docs/01`). That a cloze transfers to her own writing is judgement |
+| **Look, cover, write** | The word appears in its parts and she says it. She taps Cover when she is ready, writes it from memory, and checks. A word she missed comes round once more | 10 a word at the first go, nothing for the second look | The school's own method. A meta-analysis found the cover-copy-compare family effective for spelling and for maths, strongest when combined with other evidence-based components ([Joseph et al. 2012](https://onlinelibrary.wiley.com/doi/abs/10.1002/pits.20622); the abstract gives no figures). A small controlled trial with 55 seven-year-olds found look, say, cover, write, check, fix improved the words taught, though rule-based teaching transferred better to new words ([Dymock and Nicholson 2017](https://eric.ed.gov/?id=EJ1163271)). So what is supported is check-and-retry on the words practised, not transfer. The retrieval in the middle is what `docs/01` backs; the look is preparation, so nothing counts down |
+| **Letter tiles** | The word's letters, jumbled. She taps them into the slots and checks. What is right stays, the rest go back, and she is told how many were right. After three misses the word is shown | 10 a word at the first go | Judgement, and the little evidence leans the other way. It is a classroom activity ([Cunningham and Cunningham 1992](https://eric.ed.gov/?id=EJ451254), a teachers' guide with no controlled data), and the one controlled comparison found, with first-graders, had children spell better after writing words by hand than after typing them or arranging letter tiles ([Cunningham and Stanovich 1990](https://doi.org/10.1037/0022-0663.82.1.159)). It is here for variety and because it is quick, and it earns no more than the jigsaw |
+| **Mini crossword** | Clues are meanings; the answers are words from the term. She types a whole answer, and the squares it fills are the hint for the answers that cross it | 10 an answer at the first go | Judgement. Retrieval of a word from its meaning, with a cue, is practice `docs/01` supports. This build found no controlled evidence on crosswords and children's spelling. It is here because it is a puzzle she may enjoy, and it says so |
+
+**Rules these four keep, and the one place they do not.**
+
+- **One attempt a word.** A second go straight after seeing the answer would be copying,
+  not recall. A typed answer is marked, shown, and left. The exception is look cover
+  write, where a miss comes round once more at the end of the round for no points,
+  because a miss, then feedback, then a second retrieval is the sequence retrieval
+  practice relies on. That is judgement about how to use the miss, not a finding about
+  this game.
+- **A tile or a square never shows a wrong letter.** Tiles that are in the wrong place go
+  back to the tray. Crossword answers are typed whole and never into a square, so the grid
+  only ever holds right letters, and a missed answer is filled in with the right word.
+- **Letter tiles always has a hyphen tile,** a spare in any word that has none, so its
+  presence never gives a hyphen away. Hangman has the same rule.
+- **Nothing counts down.** In look cover write the cover goes on when she taps it.
+
+**What they share.** One typed-answer box (`web/js/answer.js`) built once: the same
+classifier as the dictation, the same marked feedback, the rule and the support after a
+miss. Each game is a small module that games.js hands the shared parts (`points`, the log,
+the background), so none repeats them.
+
+**The crossword's content is built offline** (`engine/crossword.py`) and held to its rules
+by `tests/test_crossword.py`: every run of letters, across or down, is exactly one answer, so
+nothing is spelt by accident; every answer crosses another; the grid is at most 11 squares
+wide so a square stays readable on a phone; and every clue is the word's meaning, which the
+game's own tests already hold to not giving the word away. Each week has three puzzles. This
+week's words come first because the test is on Friday, and the rest of each puzzle is earlier
+weeks' words, so it is also spaced retrieval of the term. The hyphen weeks (12 and 19 October)
+have only five plain words of their own, and a hyphen cannot sit in a square, so those two
+weeks' puzzles are mostly older words. A crossword would also have to give the hyphen away,
+which is the thing those weeks are about. Fill the gap needs each word in its sentence once,
+as a whole word, and `tests/test_gap.mjs` checks all 88.
+
+**What is logged** (`game_log`, on the device, and counted in the grown-up view beside the
+dictation sessions): the game, the week, each word, whether it was right at the first go, the
+error type, and for tiles the misses and whether the word had to be shown.
+
+**Games in general.** A meta-analysis of serious games found they helped learning (d = 0.29)
+and retention (d = 0.36) but were not reliably more motivating (d = 0.26, not significant),
+and that they did better alongside other instruction and over several sessions
+([Wouters et al. 2013](https://doi.org/10.1037/a0031311)). That is how these are used: extra
+practice beside the dictation, never instead of it, and not claimed to be more motivating.
+
+**What was left out, and why.** A Wordle-style guessing game and a "spot the mistake" game both
+leave misspellings on screen as the thing to look at, which `docs/01` rules out (the DysEggxia
+point: never display a wrong spelling as the object of attention, or only as a separate,
+labelled exercise outside the main loop). That rule is a precaution, not a finding about her.
+Adults spell worse after reading misspellings ([Jacoby and Hollingshead 1990](https://doi.org/10.1037/h0084259);
+[Brown 1988](https://doi.org/10.1037/0022-0663.80.4.488)), but the one study found in
+fifth-graders saw exposure to correct spellings help and exposure to misspellings do no
+significant harm to the group as a whole, though a few pupils were badly affected
+([Bradley and King 1992](https://doi.org/10.1080/10862969209547789)). So the evidence for
+children is mixed, and a proofreading game could be added as a separate, labelled exercise if
+Peter wants one. Wheel of Fortune is hangman with a spinner, and the spin adds luck, not
+spelling (judgement).
+
+**Still open.**
+
+- **Nobody has played them on a phone or an iPad.** The browser suite plays every game with
+  a mouse and a phone-sized touch screen, and the phone suite taps through each of them on a
+  Pixel 7 and a Galaxy S8. A child's thumbs are different.
+- **The crossword on a small phone** has squares about 29 px wide for an 11-wide puzzle. It
+  is read and chosen from the clue list, which has large rows, but it is the tightest screen.
+- **Three misses before the tiles show the word** is a guess.
+- **Novelty.** Gamified engagement is documented to decline after the first weeks
+  (`docs/15`, "Still open"), and ten games is a lot to choose from. Judge them at eight weeks.
+- **The meanings the clues use are unreviewed,** as the rest of the games' content is.
+  The sentences Fill the gap uses were reviewed by Peter.
+

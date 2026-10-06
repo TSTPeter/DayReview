@@ -19,10 +19,15 @@ import { classify, feedback } from "./engine/classify.js";
 import { wordForm } from "./engine/derive.js";
 import * as scene from "./scene.js";
 import * as voice from "./voice.js";
+import * as gap from "./gap.js";
+import * as lcw from "./lcw.js";
+import * as tiles from "./tiles.js";
+import * as crossword from "./crossword.js";
 
 export const TICKET = 50;                      // points that open one bonus round
 const ROUND = { jigsaw: 5, match: 5, sort: 10, hangman: 5 };
-const POINTS = { jigsaw: 10, match: 5, sort: 5, hangman: 10, hunt: 10 };
+const POINTS = { jigsaw: 10, match: 5, sort: 5, hangman: 10, hunt: 10,
+                 gap: 10, lcw: 10, tiles: 10, cross: 10 };
 const BONUS_VALUES = [5, 10, 15];
 const PAIR_COLOURS = ["var(--cut-teal)", "var(--cut-coral)", "var(--cut-plum)",
                       "var(--cut-mustard)", "var(--cut-sage)"];
@@ -32,7 +37,14 @@ const SVG = "http://www.w3.org/2000/svg";
 let ctx = null;          // wired by app.js: see init()
 let points = { earned: 0, rounds: 0 };
 
-export function init(context) { ctx = context; }
+export function init(context) {
+  ctx = context;
+  // What the newer games are handed: the app's context and the shared parts of this file,
+  // so each is a small module of its own and none repeats points, logging or the marking.
+  const kit = { ctx, $, shuffle, plural, POINTS, scene, award, logRound, paintPoints, say,
+                partSpans, openHub };
+  for (const game of [gap, lcw, tiles, crossword]) game.init(kit);
+}
 
 const $ = (sel) => document.querySelector(sel);
 const shuffle = (xs) => {
@@ -65,9 +77,9 @@ async function award(n) {
 }
 
 function paintPoints() {
-  for (const id of ["#jig-points", "#match-points", "#sort-points", "#hang-points", "#hunt-points"]) {
-    const chip = $(id);
-    if (chip) chip.textContent = `Points: ${points.earned}`;
+  // Every game's chip, but not the bonus round's, which shows that round's own score.
+  for (const chip of document.querySelectorAll(".points-chip:not(#bonus-score)")) {
+    chip.textContent = `Points: ${points.earned}`;
   }
 }
 
@@ -85,9 +97,11 @@ export async function openHub() {
   const week = ctx.week();
   const content = week && ctx.data().weeks[week.id];
   $("#games-empty").hidden = !!content;
-  for (const id of ["#game-jigsaw", "#game-match", "#game-sort", "#game-hangman"]) {
+  for (const id of ["#game-jigsaw", "#game-match", "#game-sort", "#game-hangman",
+                    "#game-gap", "#game-lcw", "#game-tiles"]) {
     $(id).disabled = !content;
   }
+  $("#game-cross").disabled = !(content && content.crosswords && content.crosswords.length);
   $("#game-hunt").disabled = !(content && content.blocks && content.blocks.length);
   $("#games-week").textContent = week ? `This week: ${week.theme || week.words.join(", ")}` : "";
   $("#game-sort").disabled = !(content && content.sort);
@@ -1245,6 +1259,11 @@ export function wire() {
   $("#game-bonus").onclick = startBonus;
   $("#game-hangman").onclick = startHangman;
   $("#game-hunt").onclick = startHunt;
+  $("#game-gap").onclick = () => gap.start();
+  $("#game-lcw").onclick = () => lcw.start();
+  $("#game-tiles").onclick = () => tiles.start();
+  $("#game-cross").onclick = () => crossword.start();
+  for (const game of [gap, lcw, tiles, crossword]) game.wire();
   $("#hang-hint").onclick = hangHint;
   $("#hang-solve").onclick = hangSolve;
   $("#hang-input").addEventListener("input", (e) => {
