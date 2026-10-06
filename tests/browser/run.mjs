@@ -20,6 +20,7 @@ import { existsSync, readFileSync } from "node:fs";
 import { chromium } from "playwright-core";
 import { namingLine } from "../../web/js/audio.js";
 import { hintFor } from "../../web/js/engine/derive.js";
+import { blank } from "../../web/js/gap.js";
 
 const BASE = process.env.BASE || "http://localhost:8137/";
 
@@ -499,7 +500,7 @@ console.log("\n— a real school list, headings and all —");
   await ctx4.close();
 }
 
-// Beatrix's iPad HAS voices, so the path she will actually use is the one
+// Her iPad HAS voices, so the path she will actually use is the one
 // headless Chromium cannot run. Stub the speech API and read back what the app
 // asked it to say: for these ten words the spoken line is the whole question.
 console.log("\n— what the dictation actually says —");
@@ -1113,12 +1114,12 @@ const ready = await g.textContent("#home-summary");
 check("the welcome says what is ready today", /ready|due/i.test(ready), ready);
 await g.click("#btn-grownup");
 await g.waitForSelector("#screen-grownup.on");
-await g.fill("#opt-name", "  Beatrix Example ");
+await g.fill("#opt-name", "  Zinnia Example ");
 await g.click("#opt-name-save");
 await g.click("#gu-home");
 await g.waitForSelector("#screen-home.on");
 check("the welcome calls her by her first name",
-      (await g.textContent("#home-hello")) === "Hi Beatrix!");
+      (await g.textContent("#home-hello")) === "Hi Zinnia!");
 check("this week's theme is on the welcome page",
       !liveWeek || (await g.textContent("#home-week-theme")) === liveWeek.theme,
       liveWeek ? liveWeek.theme : "no term week today");
@@ -1263,6 +1264,8 @@ if (!liveWeek) {
     }
     let sortRight = 0, first = true, quietRight = true;
     const runSounds = [];
+    const animals = () => g.locator('#sort-scene g.layer[data-kind="animal"]').count();
+    const animalsSeen = {};
     for (let i = 0; i < 10; i++) {
       const card = await cardShown();
       if (!card) break;
@@ -1294,6 +1297,7 @@ if (!liveWeek) {
         await g.click(`#sort-bins button[data-key="${card.answer}"]`);
         const tones = await g.evaluate((n) => window.__tones.slice(n), before);
         if ((await g.textContent("#sort-feedback")).trim() !== "+5") quietRight = false;
+        if (sortRight <= 2) animalsSeen[sortRight] = await animals();
         // A run's climb is the only sound in the app that reaches top C, 1046.5 Hz.
         if (tones.includes(1047)) runSounds.push(sortRight);
       }
@@ -1310,9 +1314,12 @@ if (!liveWeek) {
     check("right answers in a row at the first go sound at 3, 5, 7 and 9, and only then",
           runSounds.join() === milestones.join(), `heard at ${runSounds.join(", ") || "none"}`);
     const layers = await g.locator("#sort-scene svg > g.layer").count();
+    const maxLevel = await g.evaluate(async () => (await import("./js/scene.js")).MAX);
     check("the background gains a layer for each right answer at the first go",
-          (await level()) === String(Math.min(14, sortRight)) && layers === Math.min(14, sortRight),
+          (await level()) === String(Math.min(maxLevel, sortRight)) && layers === Math.min(maxLevel, sortRight),
           `level ${await level()}, ${layers} layers`);
+    check("the first animal arrives with her second right answer, and not before",
+          animalsSeen[1] === 0 && animalsSeen[2] === 1, JSON.stringify(animalsSeen));
     const poly = await g.evaluate(async () => {
       const sfx = await import("./js/sfx.js");
       const notes = (n) => {
@@ -1333,6 +1340,18 @@ if (!liveWeek) {
           sortLog && sortLog.items[0].support === "etymology say" && sortLog.items[0].said === null
           && sortLog.items.slice(1).every((x) => x.support === null),
           sortLog ? JSON.stringify(sortLog.items[0]) : "no entry");
+
+    // "Another round" is the same sitting, so the background stays; a miss in it takes
+    // back ONE layer. The first build took two, which kept the page near empty at a
+    // realistic hit rate (docs/11, 6 October 2026).
+    await g.click("#sort-again");
+    const second = await cardShown();
+    const before = Number(await level());
+    check("another round keeps the background it had", before === Math.min(maxLevel, sortRight),
+          `level ${before}`);
+    await g.click(`#sort-bins button[data-key="${wrongFor(second)}"]`);
+    check("a miss takes back one layer, not two", before > 1 && Number(await level()) === before - 1,
+          `${before} then ${await level()}`);
 
     // Leaving during a pause, or just after a right answer, and coming straight back
     // must start a clean round: no bins left resting, no old timer moving it on.
@@ -1611,46 +1630,629 @@ if (!liveWeek) {
   }
   await g.click("#hunt-quit");
 
-  // --- the bonus round: open, answer every square, one wrong on purpose
+  // --- 6 October 2026: four more games (docs/15). All typed or tapped, none leaves a
+  // misspelling on screen, and the three that answer a card at a time grow the background.
+  await g.waitForSelector("#screen-games.on");
+  check("the hub offers the four new games, all open this week",
+        (await Promise.all(["gap", "lcw", "tiles", "cross"].map((n) => g.locator(`#game-${n}`).isDisabled())))
+          .every((off) => !off));
+  const sentenceData = (await (await fetch(new URL("data/sentences.json", BASE))).json()).sentences;
+  const levelOf = (scene) => g.getAttribute(scene, "data-level");
+  // A layer taken back fades for under a second before it leaves the page, so the ones still
+  // fading do not count.
+  const animalsIn = (scene) => g.locator(`${scene} g.layer:not(.going)[data-kind="animal"]`).count();
+  const lastRound = async (game) => {
+    for (let n = 0; n < 20; n++) {
+      const row = ((await readKV(g, "game_log")) || []).filter((r) => r.game === game).pop();
+      if (row) return row;
+      await g.waitForTimeout(100);
+    }
+    return null;
+  };
+
+  // --- fill the gap: five sentences, one missed on purpose
+  const beforeGap = await readPoints();
+  await g.click("#game-gap");
+  await g.waitForSelector("#screen-gap.on");
+  check("fill the gap starts on a plain background", (await levelOf("#gap-scene")) === "0");
+  let gapRight = 0, gapMiss = null, gapOk = true;
+  for (let i = 0; i < 5; i++) {
+    const shown = await g.textContent("#gap-sentence");
+    const word = liveWeek.words.find((w) => { const b = blank(sentenceData[w] || "", w); return b && b.before + b.after === shown; });
+    if (!word) { gapOk = false; break; }
+    if (i === 0) {
+      const screenText = (await g.innerText("#screen-gap")).toLowerCase();
+      check("the sentence has a gap, its meaning, and the first letter and length, and never the word",
+            (await g.locator("#gap-sentence .gap-blank").count()) === 1
+            && (await g.textContent("#gap-hint")).includes(`Starts with "${word[0]}"`)
+            && (await g.textContent("#gap-meaning")).includes(gameData.words[word].meaning)
+            && !screenText.includes(word.toLowerCase()), word);
+    }
+    if (i === 2) {
+      gapMiss = word;
+      await g.fill("#gap-answer input", word.slice(0, -1));
+      await g.keyboard.press("Enter");
+      await g.waitForSelector("#gap-next:not([hidden])");
+      check("a wrong answer shows her attempt against the word, with the why and the word's support",
+            /\S/.test(await g.textContent("#gap-answer .marked")) && (await g.textContent("#gap-answer .verdict")).length > 0
+            && (await g.textContent("#gap-answer .muted")).startsWith(word)
+            && (await g.locator("#gap-answer .support").count()) === 1, await g.textContent("#gap-answer .muted"));
+      check("and the sentence is filled with the right spelling, never hers",
+            (await g.textContent("#gap-sentence .gap-filled")).toLowerCase() === word
+            && (await g.locator("#gap-sentence .gap-filled.wrong").count()) === 1);
+    } else {
+      await g.fill("#gap-answer input", word);
+      await g.click("#gap-answer button.primary");
+      await g.waitForSelector("#gap-next:not([hidden])");
+      if (/Correct!\s+\+10/.test(await g.textContent("#gap-answer .verdict"))) gapRight += 1;
+    }
+    await g.click("#gap-next");
+  }
+  await g.waitForSelector("#gap-end:not([hidden])", { timeout: 5000 }).catch(() => {});
+  const afterGap = await readPoints();
+  check("fill the gap earns 10 a sentence right at the first go",
+        gapOk && gapRight === 4 && afterGap.earned - beforeGap.earned === 40, `+${afterGap.earned - beforeGap.earned}`);
+  check("its round ends with the score and the one worth another look",
+        /^4 of 5 right at the first go/.test(await g.textContent("#gap-end-text"))
+        && (await g.textContent("#gap-end-words")).includes(gapMiss));
+  // right, right, MISS, right, right: 1, 2, 1, 2, 3
+  check("the background grew with each right answer and took back one layer on the miss",
+        (await levelOf("#gap-scene")) === "3" && (await animalsIn("#gap-scene")) === 1,
+        `level ${await levelOf("#gap-scene")}`);
+  const gapLog = await lastRound("gap");
+  check("the round is logged: five words, the first go of each, and the points",
+        gapLog && gapLog.items.length === 5 && gapLog.items.filter((x) => x.first_try).length === 4
+        && gapLog.points === 40, gapLog ? JSON.stringify(gapLog.items[2]) : "no entry");
+  await g.click("#gap-again");
+  check("another round is the same sitting, so the background stays", (await levelOf("#gap-scene")) === "3");
+  await g.click("#gap-quit");
+  await g.waitForSelector("#screen-games.on");
+
+  // --- look, cover, write: the word goes under a cover, and a miss comes round once more
+  const beforeLcw = await readPoints();
+  await g.click("#game-lcw");
+  await g.waitForSelector("#screen-lcw.on");
+  let lcwRight = 0, lcwMissWord = null, lcwNext = "", lcwSteps = [];
+  for (let i = 0; i < 5; i++) {
+    const word = (await g.textContent("#lcw-word")).replace(/\s+/g, "");
+    if (i === 0) {
+      check("looking: the word is on screen in its coloured parts, and there is nothing to type into yet",
+            (await g.locator("#lcw-word .part").count()) >= 1 && await g.locator("#lcw-answer").isHidden()
+            && (await g.textContent("#lcw-tab")) === "Look");
+    }
+    await g.click("#lcw-cover");
+    if (i === 0) {
+      const lookText = (await g.innerText("#screen-lcw")).toLowerCase();
+      check("covering: the word is gone from the screen and a box to write it in has appeared",
+            !lookText.includes(word.toLowerCase()) && await g.locator("#lcw-answer input").isVisible()
+            && await g.locator("#lcw-word .lcw-cover").count() === 1, word);
+    }
+    if (i === 1) {
+      lcwMissWord = word;
+      await g.fill("#lcw-answer input", word.slice(0, -1));
+    } else {
+      await g.fill("#lcw-answer input", word);
+    }
+    await g.keyboard.press("Enter");
+    await g.waitForSelector("#lcw-next:not([hidden])");
+    if (i === 1) {
+      check("a miss shows her attempt against the word, and the word comes out from under the cover",
+            (await g.textContent("#lcw-answer .muted")).startsWith(word) && (await g.textContent("#lcw-tab")) === "Check"
+            && (await g.textContent("#lcw-word")).replace(/\s+/g, "") === word);
+    } else if (/Correct!\s+\+10/.test(await g.textContent("#lcw-answer .verdict"))) {
+      lcwRight += 1;
+    }
+    lcwNext = (await g.textContent("#lcw-next")).trim();
+    lcwSteps.push(lcwNext);
+    await g.click("#lcw-next");
+  }
+  check("the last word of the round offers another look at the one she missed",
+        lcwSteps[4] === "Another look" && /Another look: word 1 of 1/.test(await g.textContent("#lcw-count"))
+        && (await g.textContent("#lcw-tab")) === "Look again"
+        && (await g.textContent("#lcw-word")).replace(/\s+/g, "") === lcwMissWord, lcwSteps.join(", "));
+  await g.click("#lcw-cover");
+  await g.fill("#lcw-answer input", lcwMissWord);
+  await g.keyboard.press("Enter");
+  await g.waitForSelector("#lcw-next:not([hidden])");
+  check("the second look earns nothing and says only that it is right",
+        /^Correct!$/.test((await g.textContent("#lcw-answer .verdict")).trim()));
+  await g.click("#lcw-next");
+  await g.waitForSelector("#lcw-end:not([hidden])", { timeout: 5000 }).catch(() => {});
+  const afterLcw = await readPoints();
+  check("look cover write earns 10 a word right at the first go, and nothing for the second look",
+        lcwRight === 4 && afterLcw.earned - beforeLcw.earned === 40, `+${afterLcw.earned - beforeLcw.earned}`);
+  // right, MISS, right, right, right: 1, 0, 1, 2, 3. The second look leaves the background alone.
+  check("the background took the miss, grew with the rights, and ignored the second look",
+        (await levelOf("#lcw-scene")) === "3", `level ${await levelOf("#lcw-scene")}`);
+  const lcwLog = await lastRound("lcw");
+  check("the round is logged with the second look marked as such",
+        lcwLog && lcwLog.items.length === 6 && lcwLog.items.filter((x) => x.again).length === 1
+        && lcwLog.items.filter((x) => x.first_try).length === 4, lcwLog ? `${lcwLog.items.length} items` : "no entry");
+  await g.click("#lcw-quit");
+  await g.waitForSelector("#screen-games.on");
+
+  // --- letter tiles: jumbled letters, a spare hyphen, locks after a miss, and a reveal after three
+  const beforeTiles = await readPoints();
+  await g.click("#game-tiles");
+  await g.waitForSelector("#screen-tiles.on");
+  const wordForMeaning = (m) => Object.keys(gameData.words).find((w) => gameData.words[w].meaning === m);
+  const firstOpen = () => g.evaluate(() => [...document.querySelectorAll("#tiles-slots .slot")]
+    .findIndex((s) => !s.classList.contains("locked") && !s.querySelector(".tile")));
+  const tapTile = (ch) => g.locator(`#tiles-tray .tile[aria-label="${ch === "-" ? "hyphen" : ch}"]`).first().click();
+  // Fill every open slot: right letters, or (wrong) one decoy hyphen in the first open slot.
+  const fill = async (word, wrong) => {
+    let used = false;
+    for (let k = await firstOpen(); k >= 0; k = await firstOpen()) {
+      if (wrong && !used && !word.includes("-")) { used = true; await tapTile("-"); } else await tapTile(word[k]);
+    }
+  };
+  let tilesFirst = 0, revealed = false, locksOk = null, trayOk = null, tilesPlayed = [];
+  for (let i = 0; i < 5; i++) {
+    const word = wordForMeaning(await g.textContent("#tiles-clue"));
+    tilesPlayed.push(word);
+    if (i === 0) {
+      const tray = (await g.$$eval("#tiles-tray .tile", (ts) => ts.map((t) => t.textContent))).sort().join("");
+      const want = [...word, ...(word.includes("-") ? [] : ["-"])].sort().join("");
+      trayOk = tray === want && (await g.locator("#tiles-slots .slot").count()) === word.length;
+    }
+    if (i === 1 && !word.includes("-")) {
+      // a wrong go: the decoy hyphen in the first slot, everything else right
+      await fill(word, true);
+      await g.click("#tiles-check");
+      const locked = await g.locator("#tiles-slots .slot.locked").count();
+      const placed = await g.locator("#tiles-slots .tile").count();
+      locksOk = locked === word.length - 1 && placed === locked
+        && new RegExp(`^${word.length - 1} of ${word.length} are in the right place`).test(await g.textContent("#tiles-feedback"))
+        && (await g.locator("#tiles-support .support").count()) === 1;
+      await fill(word, false);
+    } else if (i === 3 && !word.includes("-")) {
+      // three wrong goes, and the word is shown
+      for (let m = 0; m < 3; m++) { await fill(word, true); await g.click("#tiles-check"); }
+      revealed = /^Here it is/.test(await g.textContent("#tiles-feedback"))
+        && (await g.locator("#tiles-slots.shown").count()) === 1;
+      await g.waitForSelector("#tiles-next:not([hidden])");
+      await g.click("#tiles-next");
+      continue;
+    } else {
+      await fill(word, false);
+    }
+    await g.click("#tiles-check");
+    await g.waitForSelector("#tiles-next:not([hidden])");
+    if (/\+10/.test(await g.textContent("#tiles-feedback"))) tilesFirst += 1;
+    await g.click("#tiles-next");
+  }
+  await g.waitForSelector("#tiles-end:not([hidden])", { timeout: 5000 }).catch(() => {});
+  check("the tray holds the word's own letters and a hyphen, which every word has so it never gives one away",
+        trayOk === true);
+  if (locksOk === null) console.log("  skip  no plain word came second this round, so the locks were not tried");
+  else check("a wrong go keeps what is right, sends the rest back, and leaves no misspelling on screen", locksOk);
+  if (!revealed && tilesPlayed.every((w, i) => i !== 3 || w.includes("-"))) {
+    console.log("  skip  the fourth word has a hyphen, so three misses could not be forced");
+  } else {
+    check("after three wrong goes the word is shown whole, with its rule", revealed);
+  }
+  const afterTiles = await readPoints();
+  check("letter tiles earns 10 a word at the first go, and nothing once it has gone wrong",
+        afterTiles.earned - beforeTiles.earned === 10 * tilesFirst, `+${afterTiles.earned - beforeTiles.earned}, ${tilesFirst} first go`);
+  const tilesLog = await lastRound("tiles");
+  check("the round is logged with the misses and whether the word had to be shown",
+        tilesLog && tilesLog.items.length === 5 && tilesLog.items.every((x) => "misses" in x && "revealed" in x),
+        tilesLog ? JSON.stringify(tilesLog.items[3]) : "no entry");
+  await g.click("#tiles-quit");
+  await g.waitForSelector("#screen-games.on");
+
+  // --- the mini crossword: whole answers typed, crossing letters as the hint, no growing background
+  const beforeCross = await readPoints();
+  await g.click("#game-cross");
+  await g.waitForSelector("#screen-cross.on");
+  const puzzles = gameData.weeks[liveWeek.id].crosswords;
+  const letterCells = await g.locator("#cross-grid .xw-cell").count();
+  const wantCells = puzzles[0].grid.join("").replace(/\./g, "").length;
+  check("the crossword draws the first puzzle of the week, with every square empty",
+        letterCells === wantCells && (await g.$$eval("#cross-grid .xw-l", (xs) => xs.every((x) => x.textContent === ""))),
+        `${letterCells} squares`);
+  check("it has no growing background, because it is a grid and not a card at a time",
+        (await g.locator("#screen-cross .scene").count()) === 0);
+  const entryFor = (clue) => puzzles[0].entries.find((e) => e.clue === clue);
+  let crossRight = 0, sawHint = false, missed = null, crossDone = [];
+  for (let i = 0; i < 7; i++) {
+    const clue = await g.textContent("#cross-clue");
+    const e = entryFor(clue);
+    if (!e) break;
+    const pattern = await g.textContent("#cross-pattern");
+    if (i > 0 && /[a-z]/.test(pattern.replace(/letters/, ""))) sawHint = true;
+    if (i === 0) {
+      check("the clue says how many letters, and an answer is typed whole",
+            new RegExp(`^${e.word.length} letters:`).test(pattern) && await g.locator("#cross-answer input").isVisible()
+            && !pattern.includes(e.word));
+    }
+    if (i === 2) {
+      missed = e;
+      await g.fill("#cross-answer input", e.word.slice(0, -1));
+      await g.keyboard.press("Enter");
+      await g.waitForSelector("#cross-next:not([hidden])");
+      const cells = e.dir === "a"
+        ? Array.from({ length: e.word.length }, (_, k) => [e.row, e.col + k])
+        : Array.from({ length: e.word.length }, (_, k) => [e.row + k, e.col]);
+      const shown = [];
+      for (const [r, c] of cells) shown.push(await g.textContent(`#cross-grid .xw-cell[data-r="${r}"][data-c="${c}"] .xw-l`));
+      check("a wrong answer is marked against the word, and the grid is filled with the RIGHT letters",
+            shown.join("") === e.word && (await g.textContent("#cross-answer .muted")).startsWith(e.word)
+            && (await g.locator("#cross-answer .support").count()) === 1, shown.join(""));
+    } else {
+      await g.fill("#cross-answer input", e.word);
+      await g.keyboard.press("Enter");
+      await g.waitForSelector("#cross-next:not([hidden])");
+      if (/Correct!\s+\+10/.test(await g.textContent("#cross-answer .verdict"))) crossRight += 1;
+    }
+    crossDone.push(e.word);
+    await g.click("#cross-next");
+  }
+  await g.waitForSelector("#cross-end:not([hidden])", { timeout: 5000 }).catch(() => {});
+  const afterCross = await readPoints();
+  check("a letter she already has shows in the pattern for the next answer that crosses it", sawHint);
+  check("the crossword earns 10 an answer right at the first go",
+        crossRight === 6 && afterCross.earned - beforeCross.earned === 60, `+${afterCross.earned - beforeCross.earned}`);
+  check("its puzzle ends with the score and the one worth another look",
+        /^6 of 7 right at the first go/.test(await g.textContent("#cross-end-text"))
+        && (await g.textContent("#cross-end-words")).includes(missed.word));
+  const crossLog = await lastRound("cross");
+  check("the puzzle is logged, one item for each answer",
+        crossLog && crossLog.items.length === 7 && crossLog.points === 60 && new Set(crossDone).size === 7,
+        crossLog ? `${crossLog.items.length} items` : "no entry");
+  await g.click("#cross-again");
+  await g.waitForSelector("#cross-end", { state: "hidden" });
+  check("another puzzle is the next of the week's three",
+        /^Puzzle 2 of 3/.test(await g.textContent("#cross-count")));
+  await g.click("#cross-quit");
+  await g.waitForSelector("#screen-games.on");
+
+  // --- the bonus round (docs/15, 6 October 2026): four games, one at random, none kept
   await g.waitForSelector("#screen-games.on");
   const beforeBonus = await readPoints();
   const canPlay = Math.floor(beforeBonus.earned / 50) - beforeBonus.rounds > 0;
   check("enough points open the bonus round", canPlay === !(await g.locator("#game-bonus").isDisabled()),
         `${beforeBonus.earned} points`);
+  const BONUS = { detective: "#screen-detective", race: "#screen-race", chests: "#screen-chests", snake: "#screen-snake" };
+  const QUIT = { detective: "#det-quit", race: "#race-quit", chests: "#chest-quit", snake: "#snk-quit" };
+  const bonusOn = () => g.evaluate((m) => Object.entries(m).find(([, sel]) => document.querySelector(sel).classList.contains("on"))?.[0] ?? null, BONUS);
   if (canPlay) {
+    // Through the hub, as she would: one of the four turns up, and it uses the ticket.
     await g.click("#game-bonus");
-    await g.waitForSelector("#screen-bonus.on");
-    const tiles = await g.locator("#bonus-board button").count();
-    let right = 0, typedWrong = false;
-    for (let t = 0; t < tiles; t++) {
-      await g.click(`#bonus-board button >> nth=${t}`);
-      const clue = await g.textContent("#bonus-clue-text");
-      const word = Object.keys(gameData.words).find((w) => gameData.words[w].meaning === clue);
-      await g.fill("#bonus-input", typedWrong ? word : "zzz");
-      await g.click("#bonus-check");
-      if (!typedWrong) {
-        typedWrong = true;
-        check("a wrong answer shows her attempt against the word, with the why",
-              (await g.textContent("#bonus-marked")) === "zzz"
-              && (await g.textContent("#bonus-why")).startsWith(word),
-              await g.textContent("#bonus-why"));
-        check("and the word's support", (await g.locator("#bonus-support .support").count()) === 1
-              && await g.locator("#bonus-support").isVisible());
-      } else if (/Correct/.test(await g.textContent("#bonus-verdict"))) {
-        right += 1;
-      }
-      await g.click("#bonus-back");
-    }
-    await g.waitForSelector("#bonus-end:not([hidden])", { timeout: 5000 }).catch(() => {});
-    const end = await g.textContent("#bonus-end-text");
-    const after = await readPoints();
-    check("the bonus round is typed recall, marked by the real classifier",
-          tiles === 9 && /You scored \d+/.test(end), end);
-    check("playing the bonus round uses it up", after.rounds === beforeBonus.rounds + 1,
-          `${after.rounds} played`);
-    check("every word typed right is marked right", right === tiles - 1, `${right} of ${tiles - 1}`);
-    await g.click("#bonus-quit");
+    await g.waitForFunction((m) => Object.values(m).some((sel) => document.querySelector(sel).classList.contains("on")), BONUS);
+    const turnedUp = await bonusOn();
+    const afterOpen = await readPoints();
+    check("the bonus round opens one of the four games, and uses up the ticket",
+          !!turnedUp && afterOpen.rounds === beforeBonus.rounds + 1, `${turnedUp}, ${afterOpen.rounds} played`);
+    await g.click(QUIT[turnedUp]);
+    await g.waitForSelector("#screen-games.on");
   }
+  // From here on the ticket count is ours: plenty, and the same for every game.
+  await g.evaluate(async () => {
+    const store = await import("./js/store.js");
+    const now = await store.getKV("game_points", { earned: 0, rounds: 0 });
+    await store.setKV("game_points", { ...now, earned: now.earned + 1000 });
+  });
+  const bonusLog = async (kind) => {
+    for (let n = 0; n < 20; n++) {
+      const row = ((await readKV(g, "game_log")) || []).filter((r) => r.game === "bonus" && r.kind === kind).pop();
+      if (row) return row;
+      await g.waitForTimeout(100);
+    }
+    return null;
+  };
+  const startBonus = (kind) => g.evaluate(async (k) => (await import("./js/games.js")).startBonus(k), kind);
+
+  // which game, and which words
+  const rot = await g.evaluate(async () => {
+    const store = await import("./js/store.js");
+    const bonus = await import("./js/bonus.js");
+    await store.setKV("bonus_last", "snake");
+    const seen = new Set();
+    for (let i = 0; i < 40; i++) seen.add(await bonus.pickKind());
+    const words = bonus.pickWords(6);
+    return { seen: [...seen].sort(), words };
+  });
+  check("it never picks the game it picked last, and picks each of the others",
+        rot.seen.join() === "chests,detective,race", rot.seen.join());
+  const lastThree = termData.weeks.filter((w) => w.set_on <= todayISO).slice(-3);
+  const eligible = new Set(lastThree.flatMap((w) => w.words));
+  check("a round's six words are this week's and the two before, none twice, about half from this week",
+        rot.words.length === 6 && new Set(rot.words).size === 6 && rot.words.every((w) => eligible.has(w))
+        && rot.words.filter((w) => liveWeek.words.includes(w)).length >= 3, rot.words.join(" "));
+
+  // --- the word detective: one case solved at once, one after a wrong guess, one after asking,
+  // one lost, one at once
+  let beforeGame = await readPoints();
+  await startBonus("detective");
+  await g.waitForSelector("#screen-detective.on");
+  check("the detective starts on a plain background", (await g.getAttribute("#det-scene", "data-level")) === "0");
+  for (let i = 0; i < 5; i++) {
+    const first = (await g.textContent("#det-clues li:first-child")).replace(/^It means: /, "");
+    const word = wordForMeaning(first);
+    if (i === 0) {
+      const screenText = (await g.innerText("#screen-detective")).toLowerCase();
+      check("a case opens with one clue, the meaning, worth 15, and never the word",
+            (await g.locator("#det-clues li").count()) === 1 && /Worth 15 now, 10 after another clue/.test(await g.textContent("#det-worth"))
+            && !screenText.includes(word.toLowerCase()), word);
+      await g.fill("#det-input", word);
+      await g.keyboard.press("Enter");
+    } else if (i === 1) {
+      const typo = word.slice(0, -1);
+      await g.fill("#det-input", typo);
+      await g.keyboard.press("Enter");
+      check("a wrong guess is cleared at once, never left on screen, and the next clue opens by itself",
+            (await g.inputValue("#det-input")) === "" && !(await g.innerText("#screen-detective")).includes(typo + "\n")
+            && (await g.locator("#det-clues li").count()) === 2
+            && /^Where it comes from: .+, a word meaning/.test(await g.textContent("#det-clues li:nth-child(2)"))
+            && /Worth 10 now/.test(await g.textContent("#det-worth")));
+      await g.fill("#det-input", word);
+      await g.keyboard.press("Enter");
+    } else if (i === 2) {
+      await g.click("#det-more");
+      await g.click("#det-more");
+      check("asking twice opens the third clue, the first letter and the length, worth 5, and no more to ask for",
+            (await g.locator("#det-clues li").count()) === 3
+            && new RegExp(`^It has ${word.replace(/-/g, "").length} letters and starts with .${word[0]}.`).test(await g.textContent("#det-clues li:nth-child(3)"))
+            && await g.locator("#det-more").isHidden() && /Worth 5 now\.$/.test((await g.textContent("#det-worth")).trim()));
+      await g.fill("#det-input", word);
+      await g.keyboard.press("Enter");
+    } else if (i === 3) {
+      for (let k = 0; k < 3; k++) { await g.fill("#det-input", k === 2 ? word.slice(0, -1) : "zzz"); await g.keyboard.press("Enter"); }
+    } else {
+      await g.fill("#det-input", word);
+      await g.keyboard.press("Enter");
+    }
+    await g.waitForSelector("#det-next:not([hidden])");
+    const verdict = (await g.textContent("#det-verdict")).trim();
+    if (i === 3) {
+      check("a case lost shows her last guess against the word, the rule and the word's support",
+            (await g.textContent("#det-marked")).startsWith(word.slice(0, -1)) && (await g.textContent("#det-why")).startsWith(word)
+            && (await g.locator("#det-support .support").count()) === 1 && !/\+\d/.test(verdict), verdict);
+    } else {
+      check(`case ${i + 1} is worth what its clues cost`, new RegExp(`^Case solved!\\s+\\+${[15, 10, 5, 0, 15][i]}$`).test(verdict), verdict);
+    }
+    await g.click("#det-next");
+  }
+  await g.waitForSelector("#det-end:not([hidden])", { timeout: 5000 }).catch(() => {});
+  let afterGame = await readPoints();
+  check("the detective pays 15, 10 or 5 by the clues it took, and nothing for a lost case",
+        afterGame.earned - beforeGame.earned === 45 && /You scored 45/.test(await g.textContent("#det-end-text"))
+        && /4 of 5 cases solved/.test(await g.textContent("#det-end-words")), `+${afterGame.earned - beforeGame.earned}`);
+  // right at once (1), a wrong guess (0), at once after asking (1), lost (0), at once (1)
+  check("the background took the misses and grew with the cases right at the first guess",
+        (await g.getAttribute("#det-scene", "data-level")) === "1");
+  const detLog = await bonusLog("detective");
+  check("the round is logged as a bonus round of this kind, with the clues each case took",
+        detLog && detLog.items.length === 5 && detLog.items.map((x) => x.clues).join() === "1,2,3,3,1", detLog ? detLog.items.map((x) => x.clues).join() : "none");
+  await g.click("#det-quit");
+  await g.waitForSelector("#screen-games.on");
+
+  // --- race the paper snail: five right and she crosses first; four wrong and the snail does
+  beforeGame = await readPoints();
+  await startBonus("race");
+  await g.waitForSelector("#screen-race.on");
+  let finishedOn = 0;
+  for (let i = 0; i < 6; i++) {
+    if (await g.locator("#race-end").isVisible()) break;
+    const word = wordForMeaning(await g.textContent("#race-clue"));
+    if (i === 0) {
+      check("a card shows the meaning, the first letter and the length, and both tokens are at the start",
+            (await g.textContent("#race-hint")).includes(`Starts with "${word[0]}"`) && (await g.getAttribute("#race-track", "data-her")) === "0"
+            && (await g.getAttribute("#race-track", "data-snail")) === "0");
+    }
+    await g.fill("#race-answer input", word);
+    await g.keyboard.press("Enter");
+    await g.waitForSelector("#race-next:not([hidden])");
+    const her = Number(await g.getAttribute("#race-track", "data-her")), snail = Number(await g.getAttribute("#race-track", "data-snail"));
+    if (i === 0) check("a right answer moves her two squares and the snail one", her === 2 && snail === 1, `${her}, ${snail}`);
+    finishedOn = i + 1;
+    await g.click("#race-next");
+  }
+  await g.waitForSelector("#race-end:not([hidden])", { timeout: 5000 }).catch(() => {});
+  afterGame = await readPoints();
+  check("five right in a row crosses the line on the fifth card, and the race stops there",
+        finishedOn === 5 && /You crossed the line first!/.test(await g.textContent("#race-end-text"))
+        && afterGame.earned - beforeGame.earned === 50, `${finishedOn} cards, +${afterGame.earned - beforeGame.earned}`);
+  check("the background grew with every right card", (await g.getAttribute("#race-scene", "data-level")) === "5");
+  const raceLog = await bonusLog("race");
+  check("the race is logged with where she and the snail ended",
+        raceLog && raceLog.her === 10 && raceLog.snail === 5 && raceLog.items.length === 5, raceLog ? `${raceLog.her}, ${raceLog.snail}` : "none");
+  await g.click("#race-quit");
+  await g.waitForSelector("#screen-games.on");
+  beforeGame = await readPoints();
+  await startBonus("race");
+  await g.waitForSelector("#screen-race.on");
+  for (let i = 0; i < 6; i++) {
+    const word = wordForMeaning(await g.textContent("#race-clue"));
+    await g.fill("#race-answer input", i < 4 ? word.slice(0, -1) : word);
+    await g.keyboard.press("Enter");
+    await g.waitForSelector("#race-next:not([hidden])");
+    if (i === 0) {
+      check("a wrong answer leaves her where she is, shows it against the word, and the snail still moves",
+            (await g.getAttribute("#race-track", "data-her")) === "0" && (await g.getAttribute("#race-track", "data-snail")) === "1"
+            && (await g.textContent("#race-answer .muted")).startsWith(word) && (await g.locator("#race-answer .support").count()) === 1);
+    }
+    await g.click("#race-next");
+  }
+  await g.waitForSelector("#race-end:not([hidden])", { timeout: 5000 }).catch(() => {});
+  afterGame = await readPoints();
+  check("losing is said kindly, and the points are only for the words spelt",
+        /The snail got there first this time\. It always takes the slow way, and it never stops\./.test(await g.textContent("#race-end-text"))
+        && afterGame.earned - beforeGame.earned === 20, `+${afterGame.earned - beforeGame.earned}`);
+  await g.click("#race-quit");
+  await g.waitForSelector("#screen-games.on");
+
+  // --- treasure chests: six, in order, one missed on purpose
+  beforeGame = await readPoints();
+  await startBonus("chests");
+  await g.waitForSelector("#screen-chests.on");
+  check("six chests, all locked, the first one current",
+        (await g.locator("#chest-grid .chest").count()) === 6 && (await g.locator("#chest-grid .chest.current").count()) === 1
+        && (await g.locator("#chest-grid .chest[data-state='locked']").count()) === 6);
+  for (let i = 0; i < 6; i++) {
+    const word = wordForMeaning(await g.textContent("#chest-clue"));
+    await g.fill("#chest-answer input", i === 3 ? word.slice(0, -1) : word);
+    await g.keyboard.press("Enter");
+    await g.waitForSelector("#chest-next:not([hidden])");
+    if (i === 3) {
+      check("a chest that is missed stays shut, and the word is marked against what she typed",
+            (await g.locator("#chest-grid .chest[data-state='missed']").count()) === 1
+            && (await g.textContent("#chest-answer .muted")).startsWith(word) && (await g.locator("#chest-answer .support").count()) === 1);
+    }
+    await g.click("#chest-next");
+  }
+  await g.waitForSelector("#chest-end:not([hidden])", { timeout: 5000 }).catch(() => {});
+  afterGame = await readPoints();
+  check("five chests open, each with a paper animal in it, for 10 each",
+        (await g.locator("#chest-grid .chest[data-state='open']").count()) === 5
+        && (await g.locator("#chest-grid .chest[data-state='open'] svg path, #chest-grid .chest[data-state='open'] svg circle, #chest-grid .chest[data-state='open'] svg ellipse").count()) > 5 * 2
+        && afterGame.earned - beforeGame.earned === 50 && /5 of 6 chests opened/.test(await g.textContent("#chest-end-words")),
+        `+${afterGame.earned - beforeGame.earned}`);
+  // right x3, MISS, right x2: 1, 2, 3, 2, 3, 4
+  check("the background grew with the chests opened and took back one layer for the one missed",
+        (await g.getAttribute("#chest-scene", "data-level")) === "4");
+  check("nothing is kept: the animals are not stored anywhere",
+        !JSON.stringify(await readKV(g, "game_log")).includes("animal") && (await readKV(g, "collection")) === null);
+  await g.click("#chest-quit");
+  await g.waitForSelector("#screen-games.on");
+
+  // --- the letter snake, in a step a tap so a test can steer it; one word clean, one with a wrong
+  // letter eaten, one typed, one with a wrong typed guess and a hint, one clean
+  beforeGame = await readPoints();
+  await startBonus("snake");
+  await g.waitForSelector("#screen-snake.on");
+  if ((await g.textContent("#snk-mode")).includes("on its own")) await g.click("#snk-mode");
+  const DIRS = { up: [0, -1], down: [0, 1], left: [-1, 0], right: [1, 0] };
+  const KEYS = { up: "ArrowUp", down: "ArrowDown", left: "ArrowLeft", right: "ArrowRight" };
+  const board = () => g.evaluate(() => {
+    const b = document.querySelector("#snk-board");
+    const css = getComputedStyle(b);
+    return { head: b.dataset.head.split(",").map(Number), next: Number(b.dataset.next), done: b.dataset.done === "true",
+             cols: Number(css.getPropertyValue("--cols")), rows: Number(css.getPropertyValue("--rows")),
+             letters: [...b.querySelectorAll(".snk-letter")].map((l) => [Number(l.dataset.x), Number(l.dataset.y), l.dataset.letter]),
+             length: b.querySelectorAll(".snk-seg").length };
+  });
+  // The first move of a shortest path from the head to a square that holds `want`, round
+  // every other letter (unless `through`), across the wrapping edges.
+  const pathTo = (st, want, through = false, avoid = null) => {
+    const cells = new Map(st.letters.map(([x, y, l]) => [`${x},${y}`, l]));
+    const seen = new Set([`${st.head}`]);
+    let frontier = [{ x: st.head[0], y: st.head[1], first: null }];
+    while (frontier.length) {
+      const next = [];
+      for (const f of frontier) for (const [name, [dx, dy]] of Object.entries(DIRS)) {
+        const nx = (f.x + dx + st.cols) % st.cols, ny = (f.y + dy + st.rows) % st.rows;
+        const there = cells.get(`${nx},${ny}`);
+        const first = f.first || name;
+        if (there === want) return first;
+        if (there !== undefined && (!through || there === avoid)) continue;
+        if (!seen.has(`${nx},${ny}`)) { seen.add(`${nx},${ny}`); next.push({ x: nx, y: ny, first }); }
+      }
+      frontier = next;
+    }
+    return null;
+  };
+  const eatWord = async (word) => {
+    for (let guard = 0; guard < 300; guard++) {
+      const st = await board();
+      if (st.done) return true;
+      const go = pathTo(st, [...word][st.next]);
+      if (!go) return false;
+      await g.keyboard.press(KEYS[go]);
+    }
+    return false;
+  };
+  for (let w = 0; w < 5; w++) {
+    const word = wordForMeaning(await g.textContent("#snk-clue"));
+    if (w === 0) {
+      const st = await board();
+      const have = st.letters.map((l) => l[2]).sort().join("");
+      const needs = [...word, ...(word.includes("-") ? [] : ["-"])].sort();
+      let ok = true, rest = have.split("");
+      for (const ch of needs) { const k = rest.indexOf(ch); if (k < 0) ok = false; else rest.splice(k, 1); }
+      check("the board holds the word's letters and a hyphen, plus a few spares, and the snake waits in the middle",
+            ok && rest.length >= 3 && st.head.join() === "4,4" && st.length === 3 && st.next === 0, have);
+      check("the word so far is blanks, one for each letter, and the word is nowhere on screen",
+            (await g.locator("#snk-slots .snk-slot").count()) === word.length && (await g.locator("#snk-slots .snk-slot.on").count()) === 0
+            && !(await g.innerText("#screen-snake")).toLowerCase().includes(word.toLowerCase()), word);
+    }
+    if (w === 0 || w === 4) {
+      check(`word ${w + 1} can be eaten in order`, await eatWord(word), word);
+    } else if (w === 1) {
+      // find a letter that is not the next one, walk into it, and see what it costs
+      const st = await board();
+      const want = [...word][st.next];
+      const wrong = st.letters.find((l) => l[2] !== want);
+      const before = st.letters.filter((l) => l[2] === wrong[2]).length;
+      let go;
+      for (let guard = 0; guard < 80 && (go = pathTo(await board(), wrong[2], true, want)); guard++) {
+        await g.keyboard.press(KEYS[go]);
+        if (/Not that letter/.test(await g.textContent("#snk-feedback"))) break;
+      }
+      const st2 = await board();
+      check("eating a wrong letter says so, shrinks the snake, and the letter goes back on the board",
+            /Not that letter\. It goes back on the board\./.test(await g.textContent("#snk-feedback"))
+            && st2.letters.length === st.letters.length && st2.letters.filter((l) => l[2] === wrong[2]).length >= 1
+            && st2.next === 0 && st2.length === 3, `${st2.length} long, ${before} of ${wrong[2]}`);
+      // word 1 was clean (a layer), and this miss takes it back
+      check("and the background takes back a layer", (await g.getAttribute("#snk-scene", "data-level")) === "0");
+      await eatWord(word);
+    } else if (w === 2) {
+      await g.fill("#snk-input", word);
+      await g.keyboard.press("Enter");
+    } else if (w === 3) {
+      await g.fill("#snk-input", "zzz");
+      await g.keyboard.press("Enter");
+      check("a wrong typed guess is cleared at once and says to keep going",
+            (await g.inputValue("#snk-input")) === "" && /That is not it\. Keep going\./.test(await g.textContent("#snk-feedback")));
+      await g.click("#snk-hint");
+      const st = await board();
+      const want = [...word][st.next];
+      const lit = await g.$$eval("#snk-board .snk-letter.hint", (xs) => xs.map((x) => x.dataset.letter));
+      check("the hint lights every square with the letter she needs next, once",
+            lit.length >= 1 && lit.every((l) => l === want) && await g.locator("#snk-hint").isDisabled(), `${lit.join("")} for ${want}`);
+      await eatWord(word);
+    }
+    await g.waitForSelector("#snk-next:not([hidden])", { timeout: 5000 });
+    const verdict = (await g.textContent("#snk-verdict")).trim();
+    const want = { 0: /^You ate it!\s+\+10$/, 1: /^You ate it!\s+\+5$/, 2: /^You knew it!\s+\+10$/, 3: /^You ate it!\s+\+5$/, 4: /^You ate it!\s+\+10$/ }[w];
+    check(`word ${w + 1} earns what its misses and hints leave`, want.test(verdict), verdict);
+    if (w === 0) {
+      check("a finished word shows its parts and its rule, and the whole word was eaten in order",
+            (await g.textContent("#snk-whole")).replace(/\s+/g, "") === word && (await g.textContent("#snk-why")).length > 0);
+    }
+    await g.click("#snk-next");
+  }
+  await g.waitForSelector("#snk-end:not([hidden])", { timeout: 5000 }).catch(() => {});
+  afterGame = await readPoints();
+  check("the snake's round pays 10 for a clean word and 5 for one with a wrong letter or a hint",
+        afterGame.earned - beforeGame.earned === 40 && /You scored 40/.test(await g.textContent("#snk-end-text")), `+${afterGame.earned - beforeGame.earned}`);
+  const snakeLog = await bonusLog("snake");
+  check("the round is logged with each word's misses, hint and whether it was typed",
+        snakeLog && snakeLog.items.length === 5 && snakeLog.items[1].misses >= 1 && snakeLog.items[2].typed === true && snakeLog.items[3].hint === true,
+        snakeLog ? JSON.stringify(snakeLog.items[1]) : "none");
+
+  // on its own: it waits until she turns, then moves, and Pause stops it
+  await g.click("#snk-quit");
+  await g.waitForSelector("#screen-games.on");
+  await startBonus("snake");
+  await g.waitForSelector("#screen-snake.on");
+  if ((await g.textContent("#snk-mode")).includes("a step a tap")) await g.click("#snk-mode");
+  await g.waitForTimeout(900);
+  const idle = await board();
+  check("on its own the snake still waits in the middle until she turns", idle.head.join() === "4,4");
+  await g.keyboard.press("ArrowDown");
+  await g.waitForTimeout(1500);
+  const moved = await board();
+  check("once she has turned it moves by itself", moved.head[1] !== 4 || moved.head[0] !== 4, moved.head.join());
+  await g.click("#snk-pause");
+  const frozen = await board();
+  await g.waitForTimeout(900);
+  check("Pause stops it, and the button says how to go on",
+        (await board()).head.join() === frozen.head.join() && (await g.textContent("#snk-pause")) === "Carry on");
+  await g.click("#snk-quit");
+  await g.waitForSelector("#screen-games.on");
 
   // --- none of it reaches the practice screens
   await g.click("#games-home");
@@ -1671,6 +2273,7 @@ if (!liveWeek) {
   await g.waitForSelector("#screen-grownup.on");
   check("the grown-up view reports the games against dictation",
         /jigsaw/.test(await g.textContent("#gu-games-summary"))
+        && /1 fill the gap, 1 look cover write, 1 letter tiles, 1 crosswords/.test(await g.textContent("#gu-games-summary"))
         && /dictation sessions/.test(await g.textContent("#gu-games-summary")));
   check("before it starts, the experiment card says so, with no table",
         /^Not started/.test(await g.textContent("#gu-exp-state")) && await g.locator("#gu-exp-table").isHidden());
@@ -1680,12 +2283,23 @@ if (!liveWeek) {
   const [download] = await Promise.all([g.waitForEvent("download"), g.click("#gu-export")]);
   const exported = readFileSync(await download.path(), "utf8");
   check("the export carries the games but never her name",
-        exported.includes("game_points") && !/Beatrix/.test(exported));
+        exported.includes("game_points") && !/Zinnia/.test(exported));
 
   // --- sharing: the address, and nothing about her
   await g.click("#gu-home");
   await g.waitForSelector("#screen-home.on");
   check("with sync off, the welcome page has no note about totals", await g.locator("#home-sync-note").isHidden());
+  // The device's share sheet and clipboard are stubbed, to see exactly what would leave.
+  await g.evaluate(() => {
+    window.__shared = [];
+    window.__copied = [];
+    navigator.share = async (d) => { window.__shared.push(d); };
+    Object.defineProperty(navigator, "clipboard", { configurable: true,
+      value: { writeText: async (t) => { window.__copied.push(t); } } });
+  });
+  check("the welcome page has one Share button, labelled for a child, and no second link",
+        (await g.locator("#btn-share").count()) === 1
+        && (await g.textContent("#btn-share")).trim() === "Share this with your friends");
   await g.click("#btn-share");
   await g.waitForSelector("#screen-share.on");
   const qr = await g.waitForFunction(() => {
@@ -1700,13 +2314,48 @@ if (!liveWeek) {
   check("the share screen links a notice for grown-ups, and it is served",
         (await g.locator('#screen-share a[href="privacy.html"]').count()) === 1
         && /stays on your tablet/.test(notice) && /never a word your child/.test(notice));
+  const ADDRESS = "https://www.tsttalent.com/Spelling";
+  check("where the device can share, Send the link is offered", await g.locator("#share-send").isVisible());
+  await g.click("#share-send");
+  const sent = await g.evaluate(() => window.__shared);
+  check("Send the link hands over a title, a plain sentence and the address, and nothing else",
+        sent.length === 1 && Object.keys(sent[0]).sort().join() === "text,title,url"
+        && sent[0].url === ADDRESS && /^A spelling game for Year 5 and 6/.test(sent[0].text)
+        && !/[?#]/.test(sent[0].url) && !/Zinnia|Example/.test(JSON.stringify(sent[0])), JSON.stringify(sent[0]));
+  await g.click("#share-copy");
+  await g.waitForFunction(() => document.querySelector("#share-note").textContent.length > 0);
+  const copied = await g.evaluate(() => window.__copied);
+  check("Copy the link puts the same sentence and the address on the clipboard, and says so",
+        copied.length === 1 && copied[0] === `${sent[0].text}\n${ADDRESS}`
+        && /^Copied/.test(await g.textContent("#share-note")), JSON.stringify(copied));
   await g.click("#share-back");
+  await g.waitForSelector("#screen-home.on");
+
+  // --- the grown-up's message for other parents
+  await g.click("#btn-grownup");
+  await g.waitForSelector("#screen-grownup.on");
+  const parentText = await g.textContent("#gu-share-text");
+  check("the grown-up view has a message for other parents: what it is, what it keeps, the address",
+        /A spelling game for Years 5 and 6/.test(parentText) && /keeps what a child types on their own device/.test(parentText)
+        && parentText.includes(ADDRESS) && parentText.includes("/privacy.html")
+        && !/Zinnia|Example/.test(parentText));
+  await g.click("#gu-share-copy");
+  await g.waitForFunction(() => document.querySelector("#gu-share-note").textContent.length > 0);
+  const copiedParents = await g.evaluate(() => window.__copied.at(-1));
+  check("copying it puts exactly that message on the clipboard",
+        copiedParents.replace(/\s+/g, " ") === parentText.replace(/\s+/g, " "), copiedParents.slice(0, 60));
+  await g.click("#gu-share-send");
+  const sentParents = await g.evaluate(() => window.__shared.at(-1));
+  check("sending it hands over only a title, the message and the address",
+        Object.keys(sentParents).sort().join() === "text,title,url" && sentParents.url === ADDRESS
+        && !/[?#]/.test(sentParents.url), JSON.stringify(sentParents).slice(0, 80));
+  await g.click("#gu-home");
   await g.waitForSelector("#screen-home.on");
 
   // --- the new screens fit an iPad
   for (const [name, vw, vh] of [["iPad portrait", 820, 1180], ["iPad landscape", 1180, 820]]) {
     await g.setViewportSize({ width: vw, height: vh });
-    for (const s of ["games", "jigsaw", "match", "sort", "hangman", "hunt", "bonus", "share", "week"]) {
+    for (const s of ["games", "jigsaw", "match", "sort", "hangman", "hunt", "gap", "lcw", "tiles", "cross", "detective", "race", "chests", "snake", "share", "week"]) {
       const res = await g.evaluate((id) => {
         for (const x of document.querySelectorAll(".screen")) x.classList.toggle("on", x.id === `screen-${id}`);
         const over = document.documentElement.scrollWidth > document.documentElement.clientWidth + 1;
