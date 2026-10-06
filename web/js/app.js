@@ -381,8 +381,46 @@ function showWeek() {
   $("#week-input").value = weekText(app.week);
   $("#week-test").value = app.week ? app.week.test_on : weekly.nextTestDay();
   paintParsed();
+  paintWeekSource();
   $("#week-note").textContent = "";
   show("week");
+}
+
+// Which list is in use, said plainly, with a way back to the school's own. "Clear it"
+// holds the school's list off until Monday (clearWeek), and a list pasted over it does
+// the same, so a device can be left without the week's words. Until this button the
+// only way back was typing all fifteen words in again. Found 6 October 2026, when the
+// school's list was in the app and live but a device was not showing it.
+const sameList = (a, b) => !!a && !!b && a.test_on === b.test_on
+  && a.words.length === b.words.length && a.words.every((w, i) => w === b.words[i]);
+
+function paintWeekSource() {
+  const school = weekly.scheduledWeek(app.term, today());
+  const note = $("#week-source");
+  const button = $("#week-school");
+  if (!school) {                      // before the term, or no term loaded
+    note.textContent = "";
+    button.hidden = true;
+    return;
+  }
+  const same = sameList(app.week, school);
+  note.textContent = same
+    ? "This is the school’s list for this week."
+    : app.week && app.week.cleared
+      ? "You cleared this week’s list. The school’s list is one tap away."
+      : "This is not the school’s list for this week.";
+  button.hidden = same;
+}
+
+async function useSchoolList() {
+  const school = weekly.scheduledWeek(app.term, today());
+  if (!school) return;
+  app.week = { ...school };
+  await store.setKV("weekly_list", app.week);
+  await rebuildScheduler();
+  await persistScheduler();
+  await refreshHome();
+  show("home");
 }
 
 function paintParsed() {
@@ -719,7 +757,7 @@ function showRule() {
   $("#rule-siblings").replaceChildren(...siblings.map((w) => el("span", { textContent: w.word })));
   const worked = entry.morph && entry.morph !== "-"
     ? `${entry.word}  =  ${entry.morph.replace(/\+/g, " + ")}` : entry.word;
-  $("#rule-worked").textContent = pair ? `${entry.word}  \u2014  the ${pair}` : worked;
+  $("#rule-worked").textContent = pair ? `${entry.word} (the ${pair})` : worked;
   $("#rule-why").textContent = pair
     ? `Its partner is the ${pair === "noun" ? "verb" : "noun"}, spelled the other way.`
     : (entry.why || "");
@@ -1140,6 +1178,7 @@ function wire() {
   $("#week-input").addEventListener("input", paintParsed);
   $("#week-save").onclick = saveWeek;
   $("#week-clear").onclick = clearWeek;
+  $("#week-school").onclick = useSchoolList;
   $("#week-back").onclick = async () => { await refreshHome(); show("home"); };
 
   $("#attempt-input").addEventListener("keydown", (e) => {

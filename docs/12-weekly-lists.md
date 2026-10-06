@@ -265,3 +265,28 @@ The 52 term words without a curated entry now have a written-up one in
 
 **42 new sentences, reviewed by Peter on 28 September.** Until they are rendered in
 Stephen's voice those items use the device voice (`docs/14`).
+
+## 6 October 2026: the term checked against the sheet, and a way back to it
+
+Peter sent the school's sheet again and asked for every word to be added and this week's
+programmed in. They already were. Checked that day, word for word against the photo, all
+six lists (the week of 7 September to the week of 19 October) match `engine/term.py`:
+15 words each, the five in bold being the statutory ones. Of the 88 distinct words (the
+school repeats *awkward* and *desperate*), every one has a written entry, a reviewed
+dictation sentence, a rendered recording, a game card and its help content. A fresh phone
+on the live site showed the week of 5 October: the theme, all 15 words, "Tested in 3
+days", and seven of ten practice words from the list.
+
+**What can still leave a device without the week: a saved list outranks the school's.** A
+list the adult saves for this week wins over the built-in one (`choose_week`), and "Clear
+it" saves an empty one, so that the school's list does not come back on the next reload.
+A device left like that showed no "This week" card, still showed none after the game was
+reopened, and the week screen had no way back except typing every word in again. Whether
+this is what happened on Peter's device is not known.
+
+The week screen now says which list is in use ("This is the school's list for this
+week", "You cleared this week's list", or "This is not the school's list for this
+week") and offers **Use the school's list** whenever it is not. It compares the list on
+the device with the one in the term file, words and test day, so it also catches a copy
+made before the school corrected a list: a device that has already loaded the week keeps
+its copy for that week, because a list stored for this week outranks the term file.

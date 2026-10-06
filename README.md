@@ -38,7 +38,11 @@ python3 serve.py --port 8137 &
 node tests/browser/run.mjs
 node tests/browser/phone.mjs      # the games by touch, on two Android phones
 node tests/browser/update.mjs     # a returning phone across three deploys
+TODAY=2026-10-12 node tests/browser/run.mjs    # play another week of the term, whatever the day
 ```
+
+The games follow the school's calendar, so each week has different content. CI plays
+today's; try next Monday's before it arrives (`TODAY=` takes any date in the term).
 
 `package.json` exists only for that harness. The app ships no dependencies: `web/` is
 vanilla JS and `engine/` is pure Python with an empty import list.
