@@ -207,9 +207,9 @@ of the effect that matters here, not the exact figure.
 - **It belongs to the card-by-card games.** Peter chose this scope: the pattern sort,
   the bonus round and any game where she answers one card at a time. That is the pattern
   sort and, from the games added that night, fill the gap, look cover write and letter
-  tiles (the crossword is a grid, so it has none). Hangman, hidden words, the jigsaw and
-  root match stay plain, in line with `docs/02`'s finding that decoration competes with
-  the task.
+  tiles (the crossword is a grid, so it has none), and the four bonus games that replaced
+  the game-show board. Hangman, hidden words, the jigsaw and root match stay plain, in line
+  with `docs/02`'s finding that decoration competes with the task.
 
 **What did not change.** It lasts for one sitting and starts again from nothing; a run
 that survived overnight would be a streak. Points never go down. The practice screens

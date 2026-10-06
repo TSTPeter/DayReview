@@ -23,8 +23,12 @@ browser's IndexedDB on that device.
 ## Run the tests
 
 ```bash
-python3 -m unittest discover -s tests -t .     # 92 tests, no dependencies
+python3 -m unittest discover -s tests -t .     # the engine, the games' content, the offline shell
 python3 engine/demo.py                          # classifier coverage over the corpus
+node tests/test_snake.mjs                       # the letter snake's rules, played without a screen
+node tests/test_gap.mjs                         # every word is in its sentence once, for fill the gap
+node tests/test_sync_shape.mjs                  # nothing a child wrote can leave the device
+node tests/test_supports.mjs                    # the support experiment does what it registered
 ```
 
 The browser suite drives the real app in Chromium and asserts the `docs/02`

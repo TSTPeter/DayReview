@@ -484,17 +484,6 @@ button.games-btn { background: var(--cut-mustard); color: #23201c; }
 .sort-result ul { list-style: none; margin: .4rem 0 0; padding: 0; }
 .sort-result li { margin: .2rem 0; font-size: 1.1rem; }
 
-/* The bonus round. A game-show board: categories across, values down. */
-.bonus-board { display: grid; grid-template-columns: repeat(3, 1fr); gap: .7rem; margin: 1rem 0; }
-.bonus-board .cat { background: var(--cut-plum); color: #fff; border-radius: 10px;
-                    padding: .6rem .7rem; font-weight: 800; font-size: .9rem; text-align: center;
-                    display: grid; place-items: center; min-height: 72px; }
-.bonus-board button { min-height: 76px; font-size: 1.6rem; font-weight: 800;
-                      background: var(--paper-2); }
-.bonus-board button.done { font-size: 1rem; font-weight: 700; }
-.bonus-board button.done.right { background: color-mix(in srgb, var(--cut-teal) 20%, var(--paper-1)); }
-.bonus-board button.done.wrong { background: color-mix(in srgb, var(--cut-coral) 16%, var(--paper-1)); }
-
 /* Hangman. A paper flower drops a petal for each wrong letter. The word is a row
  * of slots; the keys are the alphabet and a hyphen, and the hyphen key is there
  * every week, so its presence never gives a hyphen away. A wrong letter is only
@@ -635,8 +624,6 @@ textarea { font: inherit; font-size: .9rem; width: 100%; padding: .6rem .7rem;
   .hang-stage { grid-template-columns: 110px 1fr; gap: .8rem; }
   .hang-keys { gap: .3rem; grid-template-columns: repeat(7, 1fr); }
   .hang-keys button { min-height: 48px; font-size: 1.1rem; }
-  .bonus-board { gap: .4rem; }
-  .bonus-board .cat { font-size: .75rem; }
 }
 
 /* ---------------------------------------------------------------- 6 October 2026: four more games
@@ -717,3 +704,67 @@ textarea { font: inherit; font-size: .9rem; width: 100%; padding: .6rem .7rem;
 .xw-clue.right { background: color-mix(in srgb, var(--cut-teal) 16%, var(--paper-1)); }
 .xw-clue.missed { background: color-mix(in srgb, var(--cut-coral) 14%, var(--paper-1)); }
 .xw-clue:disabled { opacity: .75; }
+
+/* ---------------------------------------------------------------- the bonus round: four games
+ * Word detective, race the paper snail, treasure chests and the letter snake (docs/15-games.md),
+ * which replace the game-show board. One turns up at random each time. */
+
+.det-clues { margin: .4rem 0 .8rem; padding-left: 1.3rem; }
+.det-clues li { margin: .5rem 0; font-size: 1.1rem; font-weight: 600; }
+.det-clues li:first-child { font-size: 1.3rem; font-weight: 700; }
+
+.race-track { background: var(--paper-1); border-radius: var(--radius); box-shadow: var(--lift-1);
+              padding: .8rem 1rem; margin: 1rem 0; }
+.race-lane { position: relative; height: 56px; border-bottom: 3px dashed color-mix(in srgb, var(--ink) 22%, transparent); }
+.race-lane + .race-lane { margin-top: .5rem; }
+.race-flag { position: absolute; right: 0; top: 6px; bottom: 6px; width: 10px; border-radius: 2px;
+             background: repeating-conic-gradient(var(--ink) 0 25%, var(--paper-1) 0 50%) 0 0 / 10px 10px; }
+.race-token { position: absolute; bottom: 3px; width: 48px; height: 48px;
+              left: calc(var(--pos, 0) * (100% - 48px - 14px) / 10); transition: left .6s ease; }
+.race-token svg { width: 100%; height: 100%; display: block; }
+@media (prefers-reduced-motion: reduce) { .race-token { transition: none; } }
+
+.chest-grid { display: grid; grid-template-columns: repeat(3, 1fr); gap: .7rem; margin: 1rem 0; }
+.chest { display: grid; place-items: center; padding: .4rem; aspect-ratio: 1.15; border-radius: 12px;
+         background: var(--paper-1); box-shadow: var(--lift-1); }
+.chest svg { width: 100%; height: 100%; display: block; }
+.chest.current { box-shadow: 0 0 0 3px var(--cut-mustard), var(--lift-1); }
+.chest.open { background: color-mix(in srgb, var(--cut-teal) 12%, var(--paper-1)); }
+.chest.missed { background: color-mix(in srgb, var(--cut-coral) 12%, var(--paper-1)); }
+
+/* The letter snake. A board of letters, a paper snake, and the word so far above it. */
+.snk-slots { display: flex; flex-wrap: wrap; justify-content: center; gap: .3rem; margin: .6rem 0;
+             min-height: 2.6rem; }
+.snk-slot { min-width: 1.7rem; height: 2.4rem; display: grid; place-items: center; font-size: 1.5rem;
+            font-weight: 800; border-bottom: 4px solid color-mix(in srgb, var(--ink) 22%, transparent); }
+.snk-slot.on { border-bottom-color: var(--cut-teal); }
+.snk-board { --cell: min(52px, calc((100vw - 2.6rem) / var(--cols, 8)));
+             position: relative; margin: .6rem auto; overflow: hidden; border-radius: 12px;
+             width: calc(var(--cols, 8) * var(--cell)); height: calc(var(--rows, 9) * var(--cell));
+             background-color: var(--paper-1); box-shadow: var(--lift-2);
+             background-image: linear-gradient(color-mix(in srgb, var(--ink) 6%, transparent) 1px, transparent 1px),
+                               linear-gradient(90deg, color-mix(in srgb, var(--ink) 6%, transparent) 1px, transparent 1px);
+             background-size: var(--cell) var(--cell);
+             touch-action: none; user-select: none; -webkit-user-select: none; }
+.snk-letter, .snk-seg { position: absolute; width: var(--cell); height: var(--cell);
+                        left: calc(var(--x) * var(--cell)); top: calc(var(--y) * var(--cell));
+                        display: grid; place-items: center; }
+.snk-letter { font-size: calc(var(--cell) * .5); font-weight: 800; isolation: isolate; }
+.snk-letter::before { content: ""; position: absolute; inset: 11%; z-index: -1; border-radius: 9px;
+                      background: var(--paper-2); box-shadow: var(--lift-1); }
+.snk-letter.hint::before { box-shadow: 0 0 0 3px var(--cut-plum), var(--lift-1); }
+.snk-seg::before { content: ""; position: absolute; inset: 14%; border-radius: 50%; background: var(--cut-teal);
+                   box-shadow: var(--lift-1); }
+.snk-seg.head::before { inset: 6%; background: var(--cut-coral);
+  background-image: radial-gradient(circle at 34% 40%, #fff 0 13%, transparent 14%),
+                    radial-gradient(circle at 66% 40%, #fff 0 13%, transparent 14%),
+                    radial-gradient(circle at 34% 42%, var(--ink) 0 6%, transparent 7%),
+                    radial-gradient(circle at 66% 42%, var(--ink) 0 6%, transparent 7%); }
+.snk-pad { display: grid; grid-template-columns: repeat(4, 1fr); gap: .5rem; margin: .6rem 0; }
+.snk-pad button { min-height: 56px; padding: 0; font-size: 1.5rem; }
+button.small-btn { font-size: .9rem; min-height: 48px; padding: .4rem 1rem; }
+#snk-whole { font-size: 1.6rem; font-weight: 800; letter-spacing: .04em; margin: 0 0 .3rem; }
+#snk-play .clue-sheet { padding: .9rem 1.1rem 1rem; margin: .6rem 0 .4rem; }
+#snk-play .clue { font-size: 1.1rem; }
+#screen-snake .game-feedback { min-height: 1.6em; margin: .4rem 0; }
+

@@ -23,12 +23,13 @@ import * as gap from "./gap.js";
 import * as lcw from "./lcw.js";
 import * as tiles from "./tiles.js";
 import * as crossword from "./crossword.js";
+import * as bonus from "./bonus.js";
 
 export const TICKET = 50;                      // points that open one bonus round
 const ROUND = { jigsaw: 5, match: 5, sort: 10, hangman: 5 };
 const POINTS = { jigsaw: 10, match: 5, sort: 5, hangman: 10, hunt: 10,
-                 gap: 10, lcw: 10, tiles: 10, cross: 10 };
-const BONUS_VALUES = [5, 10, 15];
+                 gap: 10, lcw: 10, tiles: 10, cross: 10,
+                 race: 10, chests: 10, snake: 10 };   // the detective pays 15, 10 or 5 by clue
 const PAIR_COLOURS = ["var(--cut-teal)", "var(--cut-coral)", "var(--cut-plum)",
                       "var(--cut-mustard)", "var(--cut-sage)"];
 
@@ -42,8 +43,8 @@ export function init(context) {
   // What the newer games are handed: the app's context and the shared parts of this file,
   // so each is a small module of its own and none repeats points, logging or the marking.
   const kit = { ctx, $, shuffle, plural, POINTS, scene, award, logRound, paintPoints, say,
-                partSpans, openHub };
-  for (const game of [gap, lcw, tiles, crossword]) game.init(kit);
+                partSpans, openHub, tickets: () => tickets(), startBonus };
+  for (const game of [gap, lcw, tiles, crossword, bonus]) game.init(kit);
 }
 
 const $ = (sel) => document.querySelector(sel);
@@ -77,16 +78,16 @@ async function award(n) {
 }
 
 function paintPoints() {
-  // Every game's chip, but not the bonus round's, which shows that round's own score.
-  for (const chip of document.querySelectorAll(".points-chip:not(#bonus-score)")) {
+  // Every game's chip, but not the bonus rounds', which show that round's own score.
+  for (const chip of document.querySelectorAll(".points-chip:not(.round-score)")) {
     chip.textContent = `Points: ${points.earned}`;
   }
 }
 
-async function logRound(game, items, gained) {
+async function logRound(game, items, gained, extra = {}) {
   const log = await ctx.store.getKV("game_log", []);
   log.push({ at: new Date().toISOString(), game, week: ctx.week()?.id || null,
-             items, points: gained });
+             items, points: gained, ...extra });
   await ctx.store.setKV("game_log", log);
 }
 
@@ -1136,118 +1137,14 @@ function huntEnd(word) {
 
 // ------------------------------------------------------------------ bonus round
 
-const bonus = { tiles: [], open: null, score: 0 };
-
-export async function startBonus() {
+// Points open it, every 50. Which of four games turns up is picked in bonus.js, and the points
+// earned inside count too, so a good round can earn the next one.
+export async function startBonus(forced) {
   await loadPoints();
   if (tickets() <= 0) return openHub();
   points.rounds += 1;
   await ctx.store.setKV("game_points", points);
-  // This week, last week, the week before: older words are worth the same, so a
-  // round is spaced retrieval of the term so far, not just of this week's list.
-  const weeks = ctx.weeksSoFar().slice(-3).reverse();
-  const cats = [];
-  for (const w of weeks) {
-    const words = shuffle(w.words.filter((x) => ctx.data().words[x])).slice(0, 3)
-      .sort((x, y) => x.length - y.length);
-    if (words.length === 3) cats.push({ name: w.theme || "This week", words });
-  }
-  // A short term so far: make up three columns from this week alone.
-  while (cats.length < 3) {
-    const pool = shuffle(weeks[0].words.filter((x) => ctx.data().words[x]
-      && !cats.some((c) => c.words.includes(x))));
-    if (pool.length < 3) break;
-    cats.push({ name: weeks[0].theme || "This week", words: pool.slice(0, 3)
-      .sort((x, y) => x.length - y.length) });
-  }
-  bonus.tiles = [];
-  bonus.score = 0;
-  const board = $("#bonus-board");
-  // Non-breaking hyphens, so "-ant, -ance and -ancy" never wraps at a hyphen.
-  board.replaceChildren(...cats.map((c) => ctx.el("div", { className: "cat",
-    textContent: c.name.replace(/-/g, "\u2011") })));
-  for (let row = 0; row < 3; row++) {
-    for (const c of cats) {
-      const tile = { word: c.words[row], value: BONUS_VALUES[row], cat: c.name, done: false };
-      tile.btn = ctx.el("button", { textContent: String(tile.value) });
-      tile.btn.setAttribute("aria-label", `${c.name}, ${tile.value}`);
-      tile.btn.onclick = () => bonusOpen(tile);
-      bonus.tiles.push(tile);
-      board.append(tile.btn);
-    }
-  }
-  board.style.gridTemplateColumns = `repeat(${cats.length}, 1fr)`;
-  $("#bonus-clue").hidden = true;
-  $("#bonus-end").hidden = true;
-  $("#bonus-board").hidden = false;
-  $("#bonus-score").textContent = "Score: 0";
-  ctx.show("bonus");
-}
-
-function bonusOpen(tile) {
-  if (tile.done) return;
-  bonus.open = tile;
-  const c = ctx.data().words[tile.word];
-  const letters = tile.word.replace(/-/g, "").length;
-  $("#bonus-clue-tab").textContent = `${tile.cat}, ${tile.value}`;
-  $("#bonus-clue-text").textContent = c.meaning;
-  // First letter and length: enough to make the clue fair, no more.
-  $("#bonus-clue-hint").textContent = `Starts with "${tile.word[0]}". ${letters} letters.`;
-  $("#bonus-input").value = "";
-  $("#bonus-check").disabled = true;
-  $("#bonus-result").hidden = true;
-  $("#bonus-check").hidden = false;
-  $("#bonus-input").disabled = false;
-  $("#bonus-board").hidden = true;
-  $("#bonus-clue").hidden = false;
-  $("#bonus-input").focus();
-}
-
-async function bonusCheck() {
-  const tile = bonus.open;
-  const raw = $("#bonus-input").value;
-  if (!raw.trim()) return;
-  const entry = ctx.entryFor(tile.word);
-  const d = classify(raw, entry);
-  tile.done = true;
-  tile.correct = d.correct;
-  tile.type = d.type;
-  if (d.correct) bonus.score += tile.value;
-  $("#bonus-input").disabled = true;
-  $("#bonus-check").hidden = true;
-  $("#bonus-result").hidden = false;
-  const v = $("#bonus-verdict");
-  v.className = `verdict ${d.correct ? "right" : "wrong"}`;
-  v.textContent = d.correct ? `Correct! +${tile.value}` : feedback(d, entry).headline;
-  $("#bonus-marked").replaceChildren(ctx.markedUp(tile.word, d));
-  $("#bonus-why").textContent = d.correct ? (entry.why || "") : `${tile.word}. ${entry.why || ""}`;
-  $("#bonus-support").replaceChildren();
-  $("#bonus-support").hidden = true;
-  if (!d.correct) showSupport(tile.word, "#bonus-support", "bonus");
-  tile.btn.classList.add("done", d.correct ? "right" : "wrong");
-  tile.btn.textContent = tile.word;
-  $("#bonus-score").textContent = `Score: ${bonus.score}`;
-  ctx.sfx.play(d.correct ? "correct" : "notyet");
-  if (d.correct) await award(tile.value);
-  $("#bonus-back").focus();
-}
-
-async function bonusBack() {
-  $("#bonus-clue").hidden = true;
-  $("#bonus-board").hidden = false;
-  if (bonus.tiles.every((t) => t.done)) await bonusEnd();
-}
-
-async function bonusEnd() {
-  const right = bonus.tiles.filter((t) => t.correct);
-  await logRound("bonus", bonus.tiles.map((t) => ({ word: t.word, correct: !!t.correct,
-                                                     error_type: t.type })), bonus.score);
-  ctx.sfx.play("complete");
-  $("#bonus-end-text").textContent = `You scored ${bonus.score} in the bonus round.`;
-  const wrong = bonus.tiles.filter((t) => !t.correct).map((t) => t.word);
-  $("#bonus-end-words").textContent = `${right.length} of ${bonus.tiles.length} spelled right.`
-    + (wrong.length ? ` Worth another look: ${wrong.join(", ")}.` : "");
-  $("#bonus-end").hidden = false;
+  await bonus.start(forced);
 }
 
 // ------------------------------------------------------------------ wiring
@@ -1256,14 +1153,14 @@ export function wire() {
   $("#game-jigsaw").onclick = startJigsaw;
   $("#game-match").onclick = startMatch;
   $("#game-sort").onclick = () => startSort({ fresh: true });
-  $("#game-bonus").onclick = startBonus;
+  $("#game-bonus").onclick = () => startBonus();
   $("#game-hangman").onclick = startHangman;
   $("#game-hunt").onclick = startHunt;
   $("#game-gap").onclick = () => gap.start();
   $("#game-lcw").onclick = () => lcw.start();
   $("#game-tiles").onclick = () => tiles.start();
   $("#game-cross").onclick = () => crossword.start();
-  for (const game of [gap, lcw, tiles, crossword]) game.wire();
+  for (const game of [gap, lcw, tiles, crossword, bonus]) game.wire();
   $("#hang-hint").onclick = hangHint;
   $("#hang-solve").onclick = hangSolve;
   $("#hang-input").addEventListener("input", (e) => {
@@ -1288,15 +1185,6 @@ export function wire() {
   $("#jig-next").onclick = jigNext;
   $("#match-again").onclick = startMatch;
   $("#sort-again").onclick = () => startSort({ fresh: false });
-  $("#bonus-input").addEventListener("input", (e) => {
-    $("#bonus-check").disabled = !e.target.value.trim();
-  });
-  $("#bonus-input").addEventListener("keydown", (e) => {
-    if (e.key === "Enter") { e.preventDefault(); bonusCheck(); }
-  });
-  $("#bonus-check").onclick = bonusCheck;
-  $("#bonus-back").onclick = bonusBack;
-  for (const id of ["#jig-quit", "#match-quit", "#bonus-quit", "#hang-quit",
-                    "#hunt-quit"]) $(id).onclick = openHub;
+  for (const id of ["#jig-quit", "#match-quit", "#hang-quit", "#hunt-quit"]) $(id).onclick = openHub;
   $("#sort-quit").onclick = leaveSort;
 }

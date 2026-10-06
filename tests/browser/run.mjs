@@ -1907,46 +1907,352 @@ if (!liveWeek) {
   await g.click("#cross-quit");
   await g.waitForSelector("#screen-games.on");
 
-  // --- the bonus round: open, answer every square, one wrong on purpose
+  // --- the bonus round (docs/15, 6 October 2026): four games, one at random, none kept
   await g.waitForSelector("#screen-games.on");
   const beforeBonus = await readPoints();
   const canPlay = Math.floor(beforeBonus.earned / 50) - beforeBonus.rounds > 0;
   check("enough points open the bonus round", canPlay === !(await g.locator("#game-bonus").isDisabled()),
         `${beforeBonus.earned} points`);
+  const BONUS = { detective: "#screen-detective", race: "#screen-race", chests: "#screen-chests", snake: "#screen-snake" };
+  const QUIT = { detective: "#det-quit", race: "#race-quit", chests: "#chest-quit", snake: "#snk-quit" };
+  const bonusOn = () => g.evaluate((m) => Object.entries(m).find(([, sel]) => document.querySelector(sel).classList.contains("on"))?.[0] ?? null, BONUS);
   if (canPlay) {
+    // Through the hub, as she would: one of the four turns up, and it uses the ticket.
     await g.click("#game-bonus");
-    await g.waitForSelector("#screen-bonus.on");
-    const tiles = await g.locator("#bonus-board button").count();
-    let right = 0, typedWrong = false;
-    for (let t = 0; t < tiles; t++) {
-      await g.click(`#bonus-board button >> nth=${t}`);
-      const clue = await g.textContent("#bonus-clue-text");
-      const word = Object.keys(gameData.words).find((w) => gameData.words[w].meaning === clue);
-      await g.fill("#bonus-input", typedWrong ? word : "zzz");
-      await g.click("#bonus-check");
-      if (!typedWrong) {
-        typedWrong = true;
-        check("a wrong answer shows her attempt against the word, with the why",
-              (await g.textContent("#bonus-marked")) === "zzz"
-              && (await g.textContent("#bonus-why")).startsWith(word),
-              await g.textContent("#bonus-why"));
-        check("and the word's support", (await g.locator("#bonus-support .support").count()) === 1
-              && await g.locator("#bonus-support").isVisible());
-      } else if (/Correct/.test(await g.textContent("#bonus-verdict"))) {
-        right += 1;
-      }
-      await g.click("#bonus-back");
-    }
-    await g.waitForSelector("#bonus-end:not([hidden])", { timeout: 5000 }).catch(() => {});
-    const end = await g.textContent("#bonus-end-text");
-    const after = await readPoints();
-    check("the bonus round is typed recall, marked by the real classifier",
-          tiles === 9 && /You scored \d+/.test(end), end);
-    check("playing the bonus round uses it up", after.rounds === beforeBonus.rounds + 1,
-          `${after.rounds} played`);
-    check("every word typed right is marked right", right === tiles - 1, `${right} of ${tiles - 1}`);
-    await g.click("#bonus-quit");
+    await g.waitForFunction((m) => Object.values(m).some((sel) => document.querySelector(sel).classList.contains("on")), BONUS);
+    const turnedUp = await bonusOn();
+    const afterOpen = await readPoints();
+    check("the bonus round opens one of the four games, and uses up the ticket",
+          !!turnedUp && afterOpen.rounds === beforeBonus.rounds + 1, `${turnedUp}, ${afterOpen.rounds} played`);
+    await g.click(QUIT[turnedUp]);
+    await g.waitForSelector("#screen-games.on");
   }
+  // From here on the ticket count is ours: plenty, and the same for every game.
+  await g.evaluate(async () => {
+    const store = await import("./js/store.js");
+    const now = await store.getKV("game_points", { earned: 0, rounds: 0 });
+    await store.setKV("game_points", { ...now, earned: now.earned + 1000 });
+  });
+  const bonusLog = async (kind) => {
+    for (let n = 0; n < 20; n++) {
+      const row = ((await readKV(g, "game_log")) || []).filter((r) => r.game === "bonus" && r.kind === kind).pop();
+      if (row) return row;
+      await g.waitForTimeout(100);
+    }
+    return null;
+  };
+  const startBonus = (kind) => g.evaluate(async (k) => (await import("./js/games.js")).startBonus(k), kind);
+
+  // which game, and which words
+  const rot = await g.evaluate(async () => {
+    const store = await import("./js/store.js");
+    const bonus = await import("./js/bonus.js");
+    await store.setKV("bonus_last", "snake");
+    const seen = new Set();
+    for (let i = 0; i < 40; i++) seen.add(await bonus.pickKind());
+    const words = bonus.pickWords(6);
+    return { seen: [...seen].sort(), words };
+  });
+  check("it never picks the game it picked last, and picks each of the others",
+        rot.seen.join() === "chests,detective,race", rot.seen.join());
+  const lastThree = termData.weeks.filter((w) => w.set_on <= todayISO).slice(-3);
+  const eligible = new Set(lastThree.flatMap((w) => w.words));
+  check("a round's six words are this week's and the two before, none twice, about half from this week",
+        rot.words.length === 6 && new Set(rot.words).size === 6 && rot.words.every((w) => eligible.has(w))
+        && rot.words.filter((w) => liveWeek.words.includes(w)).length >= 3, rot.words.join(" "));
+
+  // --- the word detective: one case solved at once, one after a wrong guess, one after asking,
+  // one lost, one at once
+  let beforeGame = await readPoints();
+  await startBonus("detective");
+  await g.waitForSelector("#screen-detective.on");
+  check("the detective starts on a plain background", (await g.getAttribute("#det-scene", "data-level")) === "0");
+  for (let i = 0; i < 5; i++) {
+    const first = (await g.textContent("#det-clues li:first-child")).replace(/^It means: /, "");
+    const word = wordForMeaning(first);
+    if (i === 0) {
+      const screenText = (await g.innerText("#screen-detective")).toLowerCase();
+      check("a case opens with one clue, the meaning, worth 15, and never the word",
+            (await g.locator("#det-clues li").count()) === 1 && /Worth 15 now, 10 after another clue/.test(await g.textContent("#det-worth"))
+            && !screenText.includes(word.toLowerCase()), word);
+      await g.fill("#det-input", word);
+      await g.keyboard.press("Enter");
+    } else if (i === 1) {
+      const typo = word.slice(0, -1);
+      await g.fill("#det-input", typo);
+      await g.keyboard.press("Enter");
+      check("a wrong guess is cleared at once, never left on screen, and the next clue opens by itself",
+            (await g.inputValue("#det-input")) === "" && !(await g.innerText("#screen-detective")).includes(typo + "\n")
+            && (await g.locator("#det-clues li").count()) === 2
+            && /^Where it comes from: .+, a word meaning/.test(await g.textContent("#det-clues li:nth-child(2)"))
+            && /Worth 10 now/.test(await g.textContent("#det-worth")));
+      await g.fill("#det-input", word);
+      await g.keyboard.press("Enter");
+    } else if (i === 2) {
+      await g.click("#det-more");
+      await g.click("#det-more");
+      check("asking twice opens the third clue, the first letter and the length, worth 5, and no more to ask for",
+            (await g.locator("#det-clues li").count()) === 3
+            && new RegExp(`^It has ${word.replace(/-/g, "").length} letters and starts with .${word[0]}.`).test(await g.textContent("#det-clues li:nth-child(3)"))
+            && await g.locator("#det-more").isHidden() && /Worth 5 now\.$/.test((await g.textContent("#det-worth")).trim()));
+      await g.fill("#det-input", word);
+      await g.keyboard.press("Enter");
+    } else if (i === 3) {
+      for (let k = 0; k < 3; k++) { await g.fill("#det-input", k === 2 ? word.slice(0, -1) : "zzz"); await g.keyboard.press("Enter"); }
+    } else {
+      await g.fill("#det-input", word);
+      await g.keyboard.press("Enter");
+    }
+    await g.waitForSelector("#det-next:not([hidden])");
+    const verdict = (await g.textContent("#det-verdict")).trim();
+    if (i === 3) {
+      check("a case lost shows her last guess against the word, the rule and the word's support",
+            (await g.textContent("#det-marked")).startsWith(word.slice(0, -1)) && (await g.textContent("#det-why")).startsWith(word)
+            && (await g.locator("#det-support .support").count()) === 1 && !/\+\d/.test(verdict), verdict);
+    } else {
+      check(`case ${i + 1} is worth what its clues cost`, new RegExp(`^Case solved!\\s+\\+${[15, 10, 5, 0, 15][i]}$`).test(verdict), verdict);
+    }
+    await g.click("#det-next");
+  }
+  await g.waitForSelector("#det-end:not([hidden])", { timeout: 5000 }).catch(() => {});
+  let afterGame = await readPoints();
+  check("the detective pays 15, 10 or 5 by the clues it took, and nothing for a lost case",
+        afterGame.earned - beforeGame.earned === 45 && /You scored 45/.test(await g.textContent("#det-end-text"))
+        && /4 of 5 cases solved/.test(await g.textContent("#det-end-words")), `+${afterGame.earned - beforeGame.earned}`);
+  // right at once (1), a wrong guess (0), at once after asking (1), lost (0), at once (1)
+  check("the background took the misses and grew with the cases right at the first guess",
+        (await g.getAttribute("#det-scene", "data-level")) === "1");
+  const detLog = await bonusLog("detective");
+  check("the round is logged as a bonus round of this kind, with the clues each case took",
+        detLog && detLog.items.length === 5 && detLog.items.map((x) => x.clues).join() === "1,2,3,3,1", detLog ? detLog.items.map((x) => x.clues).join() : "none");
+  await g.click("#det-quit");
+  await g.waitForSelector("#screen-games.on");
+
+  // --- race the paper snail: five right and she crosses first; four wrong and the snail does
+  beforeGame = await readPoints();
+  await startBonus("race");
+  await g.waitForSelector("#screen-race.on");
+  let finishedOn = 0;
+  for (let i = 0; i < 6; i++) {
+    if (await g.locator("#race-end").isVisible()) break;
+    const word = wordForMeaning(await g.textContent("#race-clue"));
+    if (i === 0) {
+      check("a card shows the meaning, the first letter and the length, and both tokens are at the start",
+            (await g.textContent("#race-hint")).includes(`Starts with "${word[0]}"`) && (await g.getAttribute("#race-track", "data-her")) === "0"
+            && (await g.getAttribute("#race-track", "data-snail")) === "0");
+    }
+    await g.fill("#race-answer input", word);
+    await g.keyboard.press("Enter");
+    await g.waitForSelector("#race-next:not([hidden])");
+    const her = Number(await g.getAttribute("#race-track", "data-her")), snail = Number(await g.getAttribute("#race-track", "data-snail"));
+    if (i === 0) check("a right answer moves her two squares and the snail one", her === 2 && snail === 1, `${her}, ${snail}`);
+    finishedOn = i + 1;
+    await g.click("#race-next");
+  }
+  await g.waitForSelector("#race-end:not([hidden])", { timeout: 5000 }).catch(() => {});
+  afterGame = await readPoints();
+  check("five right in a row crosses the line on the fifth card, and the race stops there",
+        finishedOn === 5 && /You crossed the line first!/.test(await g.textContent("#race-end-text"))
+        && afterGame.earned - beforeGame.earned === 50, `${finishedOn} cards, +${afterGame.earned - beforeGame.earned}`);
+  check("the background grew with every right card", (await g.getAttribute("#race-scene", "data-level")) === "5");
+  const raceLog = await bonusLog("race");
+  check("the race is logged with where she and the snail ended",
+        raceLog && raceLog.her === 10 && raceLog.snail === 5 && raceLog.items.length === 5, raceLog ? `${raceLog.her}, ${raceLog.snail}` : "none");
+  await g.click("#race-quit");
+  await g.waitForSelector("#screen-games.on");
+  beforeGame = await readPoints();
+  await startBonus("race");
+  await g.waitForSelector("#screen-race.on");
+  for (let i = 0; i < 6; i++) {
+    const word = wordForMeaning(await g.textContent("#race-clue"));
+    await g.fill("#race-answer input", i < 4 ? word.slice(0, -1) : word);
+    await g.keyboard.press("Enter");
+    await g.waitForSelector("#race-next:not([hidden])");
+    if (i === 0) {
+      check("a wrong answer leaves her where she is, shows it against the word, and the snail still moves",
+            (await g.getAttribute("#race-track", "data-her")) === "0" && (await g.getAttribute("#race-track", "data-snail")) === "1"
+            && (await g.textContent("#race-answer .muted")).startsWith(word) && (await g.locator("#race-answer .support").count()) === 1);
+    }
+    await g.click("#race-next");
+  }
+  await g.waitForSelector("#race-end:not([hidden])", { timeout: 5000 }).catch(() => {});
+  afterGame = await readPoints();
+  check("losing is said kindly, and the points are only for the words spelt",
+        /The snail got there first this time\. It always takes the slow way, and it never stops\./.test(await g.textContent("#race-end-text"))
+        && afterGame.earned - beforeGame.earned === 20, `+${afterGame.earned - beforeGame.earned}`);
+  await g.click("#race-quit");
+  await g.waitForSelector("#screen-games.on");
+
+  // --- treasure chests: six, in order, one missed on purpose
+  beforeGame = await readPoints();
+  await startBonus("chests");
+  await g.waitForSelector("#screen-chests.on");
+  check("six chests, all locked, the first one current",
+        (await g.locator("#chest-grid .chest").count()) === 6 && (await g.locator("#chest-grid .chest.current").count()) === 1
+        && (await g.locator("#chest-grid .chest[data-state='locked']").count()) === 6);
+  for (let i = 0; i < 6; i++) {
+    const word = wordForMeaning(await g.textContent("#chest-clue"));
+    await g.fill("#chest-answer input", i === 3 ? word.slice(0, -1) : word);
+    await g.keyboard.press("Enter");
+    await g.waitForSelector("#chest-next:not([hidden])");
+    if (i === 3) {
+      check("a chest that is missed stays shut, and the word is marked against what she typed",
+            (await g.locator("#chest-grid .chest[data-state='missed']").count()) === 1
+            && (await g.textContent("#chest-answer .muted")).startsWith(word) && (await g.locator("#chest-answer .support").count()) === 1);
+    }
+    await g.click("#chest-next");
+  }
+  await g.waitForSelector("#chest-end:not([hidden])", { timeout: 5000 }).catch(() => {});
+  afterGame = await readPoints();
+  check("five chests open, each with a paper animal in it, for 10 each",
+        (await g.locator("#chest-grid .chest[data-state='open']").count()) === 5
+        && (await g.locator("#chest-grid .chest[data-state='open'] svg path, #chest-grid .chest[data-state='open'] svg circle, #chest-grid .chest[data-state='open'] svg ellipse").count()) > 5 * 2
+        && afterGame.earned - beforeGame.earned === 50 && /5 of 6 chests opened/.test(await g.textContent("#chest-end-words")),
+        `+${afterGame.earned - beforeGame.earned}`);
+  // right x3, MISS, right x2: 1, 2, 3, 2, 3, 4
+  check("the background grew with the chests opened and took back one layer for the one missed",
+        (await g.getAttribute("#chest-scene", "data-level")) === "4");
+  check("nothing is kept: the animals are not stored anywhere",
+        !JSON.stringify(await readKV(g, "game_log")).includes("animal") && (await readKV(g, "collection")) === null);
+  await g.click("#chest-quit");
+  await g.waitForSelector("#screen-games.on");
+
+  // --- the letter snake, in a step a tap so a test can steer it; one word clean, one with a wrong
+  // letter eaten, one typed, one with a wrong typed guess and a hint, one clean
+  beforeGame = await readPoints();
+  await startBonus("snake");
+  await g.waitForSelector("#screen-snake.on");
+  if ((await g.textContent("#snk-mode")).includes("on its own")) await g.click("#snk-mode");
+  const DIRS = { up: [0, -1], down: [0, 1], left: [-1, 0], right: [1, 0] };
+  const KEYS = { up: "ArrowUp", down: "ArrowDown", left: "ArrowLeft", right: "ArrowRight" };
+  const board = () => g.evaluate(() => {
+    const b = document.querySelector("#snk-board");
+    const css = getComputedStyle(b);
+    return { head: b.dataset.head.split(",").map(Number), next: Number(b.dataset.next), done: b.dataset.done === "true",
+             cols: Number(css.getPropertyValue("--cols")), rows: Number(css.getPropertyValue("--rows")),
+             letters: [...b.querySelectorAll(".snk-letter")].map((l) => [Number(l.dataset.x), Number(l.dataset.y), l.dataset.letter]),
+             length: b.querySelectorAll(".snk-seg").length };
+  });
+  // The first move of a shortest path from the head to a square that holds `want`, round
+  // every other letter (unless `through`), across the wrapping edges.
+  const pathTo = (st, want, through = false, avoid = null) => {
+    const cells = new Map(st.letters.map(([x, y, l]) => [`${x},${y}`, l]));
+    const seen = new Set([`${st.head}`]);
+    let frontier = [{ x: st.head[0], y: st.head[1], first: null }];
+    while (frontier.length) {
+      const next = [];
+      for (const f of frontier) for (const [name, [dx, dy]] of Object.entries(DIRS)) {
+        const nx = (f.x + dx + st.cols) % st.cols, ny = (f.y + dy + st.rows) % st.rows;
+        const there = cells.get(`${nx},${ny}`);
+        const first = f.first || name;
+        if (there === want) return first;
+        if (there !== undefined && (!through || there === avoid)) continue;
+        if (!seen.has(`${nx},${ny}`)) { seen.add(`${nx},${ny}`); next.push({ x: nx, y: ny, first }); }
+      }
+      frontier = next;
+    }
+    return null;
+  };
+  const eatWord = async (word) => {
+    for (let guard = 0; guard < 300; guard++) {
+      const st = await board();
+      if (st.done) return true;
+      const go = pathTo(st, [...word][st.next]);
+      if (!go) return false;
+      await g.keyboard.press(KEYS[go]);
+    }
+    return false;
+  };
+  for (let w = 0; w < 5; w++) {
+    const word = wordForMeaning(await g.textContent("#snk-clue"));
+    if (w === 0) {
+      const st = await board();
+      const have = st.letters.map((l) => l[2]).sort().join("");
+      const needs = [...word, ...(word.includes("-") ? [] : ["-"])].sort();
+      let ok = true, rest = have.split("");
+      for (const ch of needs) { const k = rest.indexOf(ch); if (k < 0) ok = false; else rest.splice(k, 1); }
+      check("the board holds the word's letters and a hyphen, plus a few spares, and the snake waits in the middle",
+            ok && rest.length >= 3 && st.head.join() === "4,4" && st.length === 3 && st.next === 0, have);
+      check("the word so far is blanks, one for each letter, and the word is nowhere on screen",
+            (await g.locator("#snk-slots .snk-slot").count()) === word.length && (await g.locator("#snk-slots .snk-slot.on").count()) === 0
+            && !(await g.innerText("#screen-snake")).toLowerCase().includes(word.toLowerCase()), word);
+    }
+    if (w === 0 || w === 4) {
+      check(`word ${w + 1} can be eaten in order`, await eatWord(word), word);
+    } else if (w === 1) {
+      // find a letter that is not the next one, walk into it, and see what it costs
+      const st = await board();
+      const want = [...word][st.next];
+      const wrong = st.letters.find((l) => l[2] !== want);
+      const before = st.letters.filter((l) => l[2] === wrong[2]).length;
+      let go;
+      for (let guard = 0; guard < 80 && (go = pathTo(await board(), wrong[2], true, want)); guard++) {
+        await g.keyboard.press(KEYS[go]);
+        if (/Not that letter/.test(await g.textContent("#snk-feedback"))) break;
+      }
+      const st2 = await board();
+      check("eating a wrong letter says so, shrinks the snake, and the letter goes back on the board",
+            /Not that letter\. It goes back on the board\./.test(await g.textContent("#snk-feedback"))
+            && st2.letters.length === st.letters.length && st2.letters.filter((l) => l[2] === wrong[2]).length >= 1
+            && st2.next === 0 && st2.length === 3, `${st2.length} long, ${before} of ${wrong[2]}`);
+      // word 1 was clean (a layer), and this miss takes it back
+      check("and the background takes back a layer", (await g.getAttribute("#snk-scene", "data-level")) === "0");
+      await eatWord(word);
+    } else if (w === 2) {
+      await g.fill("#snk-input", word);
+      await g.keyboard.press("Enter");
+    } else if (w === 3) {
+      await g.fill("#snk-input", "zzz");
+      await g.keyboard.press("Enter");
+      check("a wrong typed guess is cleared at once and says to keep going",
+            (await g.inputValue("#snk-input")) === "" && /That is not it\. Keep going\./.test(await g.textContent("#snk-feedback")));
+      await g.click("#snk-hint");
+      const st = await board();
+      const want = [...word][st.next];
+      const lit = await g.$$eval("#snk-board .snk-letter.hint", (xs) => xs.map((x) => x.dataset.letter));
+      check("the hint lights every square with the letter she needs next, once",
+            lit.length >= 1 && lit.every((l) => l === want) && await g.locator("#snk-hint").isDisabled(), `${lit.join("")} for ${want}`);
+      await eatWord(word);
+    }
+    await g.waitForSelector("#snk-next:not([hidden])", { timeout: 5000 });
+    const verdict = (await g.textContent("#snk-verdict")).trim();
+    const want = { 0: /^You ate it!\s+\+10$/, 1: /^You ate it!\s+\+5$/, 2: /^You knew it!\s+\+10$/, 3: /^You ate it!\s+\+5$/, 4: /^You ate it!\s+\+10$/ }[w];
+    check(`word ${w + 1} earns what its misses and hints leave`, want.test(verdict), verdict);
+    if (w === 0) {
+      check("a finished word shows its parts and its rule, and the whole word was eaten in order",
+            (await g.textContent("#snk-whole")).replace(/\s+/g, "") === word && (await g.textContent("#snk-why")).length > 0);
+    }
+    await g.click("#snk-next");
+  }
+  await g.waitForSelector("#snk-end:not([hidden])", { timeout: 5000 }).catch(() => {});
+  afterGame = await readPoints();
+  check("the snake's round pays 10 for a clean word and 5 for one with a wrong letter or a hint",
+        afterGame.earned - beforeGame.earned === 40 && /You scored 40/.test(await g.textContent("#snk-end-text")), `+${afterGame.earned - beforeGame.earned}`);
+  const snakeLog = await bonusLog("snake");
+  check("the round is logged with each word's misses, hint and whether it was typed",
+        snakeLog && snakeLog.items.length === 5 && snakeLog.items[1].misses >= 1 && snakeLog.items[2].typed === true && snakeLog.items[3].hint === true,
+        snakeLog ? JSON.stringify(snakeLog.items[1]) : "none");
+
+  // on its own: it waits until she turns, then moves, and Pause stops it
+  await g.click("#snk-quit");
+  await g.waitForSelector("#screen-games.on");
+  await startBonus("snake");
+  await g.waitForSelector("#screen-snake.on");
+  if ((await g.textContent("#snk-mode")).includes("a step a tap")) await g.click("#snk-mode");
+  await g.waitForTimeout(900);
+  const idle = await board();
+  check("on its own the snake still waits in the middle until she turns", idle.head.join() === "4,4");
+  await g.keyboard.press("ArrowDown");
+  await g.waitForTimeout(1500);
+  const moved = await board();
+  check("once she has turned it moves by itself", moved.head[1] !== 4 || moved.head[0] !== 4, moved.head.join());
+  await g.click("#snk-pause");
+  const frozen = await board();
+  await g.waitForTimeout(900);
+  check("Pause stops it, and the button says how to go on",
+        (await board()).head.join() === frozen.head.join() && (await g.textContent("#snk-pause")) === "Carry on");
+  await g.click("#snk-quit");
+  await g.waitForSelector("#screen-games.on");
 
   // --- none of it reaches the practice screens
   await g.click("#games-home");
@@ -2049,7 +2355,7 @@ if (!liveWeek) {
   // --- the new screens fit an iPad
   for (const [name, vw, vh] of [["iPad portrait", 820, 1180], ["iPad landscape", 1180, 820]]) {
     await g.setViewportSize({ width: vw, height: vh });
-    for (const s of ["games", "jigsaw", "match", "sort", "hangman", "hunt", "gap", "lcw", "tiles", "cross", "bonus", "share", "week"]) {
+    for (const s of ["games", "jigsaw", "match", "sort", "hangman", "hunt", "gap", "lcw", "tiles", "cross", "detective", "race", "chests", "snake", "share", "week"]) {
       const res = await g.evaluate((id) => {
         for (const x of document.querySelectorAll(".screen")) x.classList.toggle("on", x.id === `screen-${id}`);
         const over = document.documentElement.scrollWidth > document.documentElement.clientWidth + 1;

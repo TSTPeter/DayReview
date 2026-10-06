@@ -281,6 +281,84 @@ for (const phone of ["Pixel 7", "Galaxy S8"]) {
   await page.tap("#cross-quit");
   await page.waitForSelector("#screen-games.on");
 
+  // the bonus round's four games, by touch (6 October 2026). They are opened by points, so
+  // the points are granted here, and each game is started the way the hub starts it.
+  await page.evaluate(async () => {
+    const store = await import("./js/store.js");
+    const now = await store.getKV("game_points", { earned: 0, rounds: 0 });
+    await store.setKV("game_points", { ...now, earned: now.earned + 1000 });
+  });
+  const startBonus = (kind) => page.evaluate(async (k) => (await import("./js/games.js")).startBonus(k), kind);
+  const byMeaning = (m) => Object.keys(games.words).find((w) => games.words[w].meaning === m);
+
+  // detective: a typed guess, and a clue asked for by tap
+  await startBonus("detective");
+  await page.waitForSelector("#screen-detective.on");
+  const detWord = byMeaning((await page.textContent("#det-clues li:first-child")).replace(/^It means: /, ""));
+  await page.tap("#det-more");
+  check("the detective fits the width, and asking for a clue answers a tap",
+        await fits() && (await page.locator("#det-clues li").count()) === 2, detWord);
+  await page.fill("#det-input", detWord);
+  await page.tap("#det-go");
+  await page.waitForSelector("#det-next:not([hidden])");
+  check("a guess is made by a tap, and a clue asked for first is worth 10",
+        /^Case solved!\s+\+10$/.test((await page.textContent("#det-verdict")).trim()));
+  await page.tap("#det-quit");
+
+  // race: the tokens move along the track
+  await startBonus("race");
+  await page.waitForSelector("#screen-race.on");
+  const raceWord = byMeaning(await page.textContent("#race-clue"));
+  await page.fill("#race-answer input", raceWord);
+  await page.tap("#race-answer button.primary");
+  await page.waitForSelector("#race-next:not([hidden])");
+  check("the race fits the width, and a right answer moves her two squares",
+        await fits() && (await page.getAttribute("#race-track", "data-her")) === "2");
+  await page.tap("#race-quit");
+
+  // chests
+  await startBonus("chests");
+  await page.waitForSelector("#screen-chests.on");
+  const chestWord = byMeaning(await page.textContent("#chest-clue"));
+  await page.fill("#chest-answer input", chestWord);
+  await page.tap("#chest-answer button.primary");
+  await page.waitForSelector("#chest-next:not([hidden])");
+  check("the chests fit the width, and a right answer opens one",
+        await fits() && (await page.locator("#chest-grid .chest[data-state='open']").count()) === 1);
+  await page.tap("#chest-quit");
+
+  // the letter snake: swipe and tap steer it, the pad is big enough to touch, and it fits
+  await startBonus("snake");
+  await page.waitForSelector("#screen-snake.on");
+  const snk = await page.evaluate(() => {
+    const b = document.querySelector("#snk-board").getBoundingClientRect();
+    const pad = [...document.querySelectorAll("#snk-pad button")].map((x) => Math.min(x.offsetWidth, x.offsetHeight));
+    return { w: Math.round(b.width), h: Math.round(b.height), top: Math.round(b.top), pad: Math.min(...pad), vh: innerHeight };
+  });
+  check("the snake's board fits the width, is at least 36 px a square, and the arrows are big enough to touch",
+        await fits() && snk.w / 8 >= 36 && snk.pad >= 44, JSON.stringify(snk));
+  check("the board starts on the first screen, so she can see it without scrolling past the clue",
+        snk.top < snk.vh * 0.6, `${snk.top} of ${snk.vh}`);
+  await page.tap("#snk-mode");                       // a step a tap, so the tests can count
+  // The button is below the board, so tapping it scrolled the page; the board is steered from the top.
+  await page.evaluate(() => scrollTo(0, 0));
+  const box = await page.$eval("#snk-board", (b) => { const r = b.getBoundingClientRect(); return { x: r.left, y: r.top, w: r.width, h: r.height }; });
+  const head = () => page.$eval("#snk-board", (b) => b.dataset.head);
+  const h0 = await head();
+  // a tap well above the head turns it up, and in a step a tap that moves one square
+  await page.touchscreen.tap(box.x + box.w / 2, box.y + box.h * 0.08);
+  check("a tap on the board turns the snake towards it", (await head()) !== h0 && (await page.$eval("#snk-board", (b) => b.dataset.facing)) === "up");
+  // a swipe to the right turns it right
+  const cx = box.x + box.w / 2, cy = box.y + box.h / 2;
+  await touch("touchStart", cx - 40, cy);
+  await touch("touchMove", cx, cy);
+  await touch("touchMove", cx + 40, cy);
+  await touch("touchEnd");
+  await page.waitForTimeout(150);
+  check("a swipe to the right turns it right, and the page does not scroll",
+        (await page.$eval("#snk-board", (b) => b.dataset.facing)) === "right" && (await page.evaluate(() => scrollY)) === 0);
+  await page.tap("#snk-quit");
+
   check("no page errors", errors.length === 0, errors.join(" | "));
   await ctx.close();
 }

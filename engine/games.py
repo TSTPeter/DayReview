@@ -8,7 +8,8 @@ WHAT IS HERE, AND WHAT IT RESTS ON.
             the reveal screen can show "How it is built" for a school word instead
             of hiding the card (docs/12 hid it because a GUESSED root told to a child
             is worse than none; these are not guessed, see SOURCES).
-  MEANINGS  one plain definition per word, for the jigsaw and the game-show clues.
+  MEANINGS  one plain definition per word: the jigsaw's clue, and the clue in fill the
+            gap, the crossword and the bonus-round games.
             None contains the word, or its root spelled out, or the definition
             would hand over the spelling.
   CLUES     the national curriculum's rule for each pattern word, quoted where the

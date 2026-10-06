@@ -23,7 +23,7 @@ section of that date below.
 | A syllable jigsaw | **A word-part jigsaw** | Syllables hide the decision these lists turn on. *ob-ser-vant* splits the *-ant*; *observ + ant* puts the choice on its own piece |
 | Etymology matching with swirly lines | **As asked: root match** | Rests on less than it looks (below). Built as a meaning game and labelled as one |
 | Hangman, Wheel of Fortune | **Not built** on 28 September. Hangman **built on 30 September**, when Peter asked for it again | Guessing a letter at a time practises guessing letters, not recalling spellings. That was judgement, not a finding, so his second ask wins, and the design below meets the objection part way |
-| Jeopardy | **The bonus round** | Every square is a typed spelling, marked by the real classifier |
+| Jeopardy | **The bonus round** (replaced on 6 October by four games, because it "just isn't fun") | Every square was a typed spelling, marked by the real classifier |
 | Coloured bits of words making a pattern | **The pattern sort**, and one colour code in every game | See below |
 | Points that unlock a daily quiz | **Points open the bonus round** | Locking the dictation behind games would mean a games-only day had no dictation at all, and dictation is the part with the strongest evidence behind it |
 
@@ -81,6 +81,9 @@ plus judgement.
 
 ### Bonus round
 
+*Replaced on 6 October 2026 by four games, one at random: see the last section. What
+follows is what the game-show board was.*
+
 A game-show board: this week's list, last week's and the week before's, worth 5, 10
 and 15. The clue is the meaning, the first letter and the length. She **types** the
 word, the real classifier marks it, and a miss shows her attempt against the word with
@@ -98,13 +101,15 @@ Older weeks are on the board on purpose: a round is spaced retrieval of the term
   for turning up, finishing, or time spent.
 - **Every 50 opens one bonus round.** A jigsaw word is 10, a match or a sort card 5,
   a bonus square 5, 10 or 15, a hangman or hidden word 10, and a fill-the-gap sentence,
-  a look-cover-write word, a letter-tiles word or a crossword answer 10. The number 50,
-  about one game's worth, is a guess.
+  a look-cover-write word, a letter-tiles word or a crossword answer 10, and in the
+  bonus round a race card, a chest or a snake word 10 and a detective case 15, 10 or 5.
+  The number 50, about one game's worth, is a guess.
 - **Hangman and hidden words pay for the word, not the first go.** Misses are part of
   hangman and searching is the whole of hidden words, so a word solved or found earns
   10, and a hint halves it to 5. Still performance-contingent.
 - **Bonus-round points count too.** A good bonus round can earn the next one. The
-  loop points at typed recall, the most useful practice after dictation. Judgement.
+  loop points at typed recall, the most useful practice after dictation. Judgement. That
+  was true of the board and is true of the four games that replaced it.
 - **Points never go down.** A wrong answer earns nothing and costs nothing.
 - **They live on the games screens only.** The browser suite sweeps every practice
   screen for points language, and does it again after she has earned some.
@@ -134,7 +139,7 @@ made by Peter. See the note added there.
 
 `engine/games.py` holds all of it and `tests/test_games.py` holds it to its own rules:
 every piece joins back into its word, no meaning contains its word or a long piece of
-it, no two words share a meaning (a game-show clue would have two right answers), and
+it, no two words share a meaning (a clue would have two right answers), and
 every sort card completes to exactly its full text.
 
 It also gives the 52 term words that have no curated entry a written-up one: parts,
@@ -383,4 +388,54 @@ spelling (judgement).
   (`docs/15`, "Still open"), and ten games is a lot to choose from. Judge them at eight weeks.
 - **The meanings the clues use are unreviewed,** as the rest of the games' content is.
   The sentences Fill the gap uses were reviewed by Peter.
+
+## 6 October 2026: the bonus round, four games at random
+
+Peter: the game-show board "just isn't fun". Asked what should replace it, he chose the
+word detective, the race against a paper snail and the treasure chests, wanted one of them to
+turn up at random each time, and asked for something crazier, "like some kind of game where
+you have to eat letters as though you were pacman or snake or something". So there are four.
+
+**How it works.** Points open it, every 50, as before, and the points earned inside count
+too, so a good round can earn the next one. Which of the four turns up is picked at random and
+is never the one before it (the last kind is kept on the device). Nothing about which one
+comes depends on how she did or says anything is coming, so it is variety and not a reward.
+The words are about half from this week and the rest from the two weeks before, so a round is
+still spaced retrieval of the term so far, as the board was.
+
+| Game | What she does | Points | Rests on |
+|---|---|---|---|
+| **Word detective** | A mystery word. The first clue is its meaning. She types a guess; a wrong one is cleared at once and the next clue opens by itself, and she can ask for the next whenever she likes: where it comes from, then its first letter and length. Five cases a round | 15, 10 or 5 by the clue she was on; nothing for a lost case | Judgement: graded cues for retrieval, typed, with the last wrong guess marked against the word. Costed help because learners often use on-demand help poorly ([Aleven et al. 2003](https://journals.sagepub.com/doi/10.3102/00346543073003277), a review of tutoring systems). That the cost should be points is judgement |
+| **Race the paper snail** | Six typed cards, each the meaning, the first letter and the length. A card right at the first go moves her two squares along a track of ten; the snail moves one after every card whatever happens. Five right crosses the line first; there is no timer | 10 a card at the first go | Judgement. A rival that crawls at a fixed pace is a familiar frame, and nothing here compares her with another child (`docs/16`). The typed recall inside is what `docs/01` supports |
+| **Treasure chests** | Six locked chests, one after another. The word is typed; a right answer opens the chest to show a paper animal. A missed chest stays shut and the word is marked against what she typed | 10 a chest at the first go | Judgement. It comes one chest at a time, with nothing to choose and no board to find her way round, which is what the old board had. The animals are not kept: nothing is collected from one day to the next (`docs/11`) |
+| **Letter snake** | The crazy one. A board of letters, a paper snake, and a word to eat in order: the word's own letters, a spare hyphen, and a few spares (the letters of the near miss, two from the word, a vowel). She steers by swipe, by tapping where she wants to go, by the arrows, or in a step a tap. The wrong letter is a miss, goes back on the board, and shrinks the snake a little. She can type the whole word at any time. Five words a round | 10 for a word with no wrong letter and no hint; 5 with a hint or one or two wrong letters; nothing beyond | Judgement, and it is the weakest of the games for learning. Choosing the next letter from a board is closer to hangman than to recall, so, as in hangman, typing the whole word is always there, and that is the way to finish early and the one part of it with evidence behind it (`docs/01`) |
+
+**What the snake does so that steering is not the game.** The edges wrap round, so there is no
+wall to hit. The body is paper and can pass over itself, so there is nothing to collide with, and
+it may turn straight back, so a head boxed in by letters can always get out. No letter ever has a
+letter on all four sides, so none is out of reach without eating another first. Nothing counts
+down, and it waits in the middle until she first turns. It pauses when the page is hidden. With
+the device set to reduce motion it moves one square a tap and not on its own, and anyone can
+switch to that. The rules are in `web/js/snakecore.js`, which has no screen in it, so
+`tests/test_snake.mjs` plays it: the board holds exactly the right letters, a wrong letter always
+comes back, and each of the term's 88 words can be eaten in order with no wrong letter.
+
+**Where it does not belong.** It is a bonus round only, one in four, opened by points. It has no
+run sounds. Like every card-by-card game it has the growing background, one layer for a word with
+no wrong letter and one taken back at the first miss.
+
+**What is logged** (`game_log`, game `bonus`, with the kind): each word, whether it was right,
+and, for the detective, how many clues the case took; for the snake, the misses, the hint and
+whether the word was typed; for the race, where she and the snail ended.
+
+**Still open.**
+
+- **Nobody has played any of these on a phone or an iPad.** The browser suite plays all four with
+  a mouse, and the phone suite steers the snake by tap and by swipe on a Pixel 7 and a Galaxy S8,
+  but a child's thumbs are different. The snake is the one most likely to need changing.
+- **Whether the snake is fun, and whether it is too slow or too fast,** is for the child playing it to say.
+  A square every 0.42 seconds is a guess.
+- **The race is easy to win,** by design: four right in six leaves her ahead. If it stops
+  mattering, the snail's pace is one constant.
+- **Novelty,** as for all of them. Judge them at eight weeks.
 

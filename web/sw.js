@@ -27,6 +27,7 @@ const SHELL = [
   "js/engine/derive.js", "js/engine/weekly.js", "js/games.js",
   "js/supports.js", "js/voice.js", "js/scene.js",
   "js/answer.js", "js/gap.js", "js/lcw.js", "js/tiles.js", "js/crossword.js",
+  "js/bonus.js", "js/detective.js", "js/race.js", "js/chests.js", "js/snake.js", "js/snakecore.js",
   "data/words.json", "data/sentences.json", "data/audio.json", "data/term.json",
   "data/games.json", "data/supports.json", "data/version.json", "img/share-qr.svg",
 ];

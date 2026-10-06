@@ -70,7 +70,8 @@ class TestEveryWord(unittest.TestCase):
         self.assertEqual([d["text"] for d in SHIPPED["words"]["innocence"]["decoys"]], ["ance"])
 
     def test_no_meaning_gives_its_word_away(self):
-        # The meaning is the clue in the jigsaw and the game show. If it contains
+        # The meaning is the clue in the jigsaw, fill the gap, the crossword and the
+        # bonus-round games. If it contains
         # the word, or a long piece of it, it has handed over the spelling.
         for w, c in SHIPPED["words"].items():
             text = c["meaning"].lower()
@@ -81,9 +82,21 @@ class TestEveryWord(unittest.TestCase):
                     if len(p["text"]) >= 5:
                         self.assertNotRegex(text, rf"\b{re.escape(p['text'])}")
 
+    def test_no_origin_clue_gives_its_word_away(self):
+        # The word detective's second clue is where the word comes from: the language and
+        # what the root means. Neither may spell the word, or any long piece of it.
+        for word, c in SHIPPED["words"].items():
+            plain = word.replace("-", "")
+            gloss = c["origin"]["gloss"].lower().replace("-", "")
+            with self.subTest(word=word):
+                self.assertNotIn(plain, gloss)
+                for n in range(5, len(plain) + 1):
+                    for i in range(len(plain) - n + 1):
+                        self.assertNotIn(plain[i:i + n], gloss, f"{word}: {gloss!r}")
+
     def test_no_two_words_share_a_meaning(self):
-        # The game-show clue is the meaning: two words with one meaning make a clue
-        # with two right answers, one of which would be marked wrong.
+        # A clue is the meaning: two words with one meaning make a clue with two right
+        # answers, one of which would be marked wrong.
         meanings = [c["meaning"] for c in SHIPPED["words"].values()]
         self.assertEqual(len(set(meanings)), len(meanings))
 

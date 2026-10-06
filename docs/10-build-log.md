@@ -420,3 +420,50 @@ What to distrust:
   guesses. So is the choice to let a missed look-cover-write word come round once more.
 - **The clues are the games' meanings,** which are unreviewed. The sentences were reviewed.
 
+## 6 October 2026, later: the bonus round is four games
+
+Peter said the game-show board "just isn't fun", chose a word detective, a race against a paper
+snail and treasure chests, wanted one at random each time, and asked for something crazier, "like
+some kind of game where you have to eat letters as though you were pacman or snake". The board is
+gone. Points still open the round, and one of four games turns up, never the same one twice
+running (`docs/15`).
+
+- **Built.** `bonus.js` picks the game and the words (about half from this week, the rest from the
+  two weeks before). `detective.js`, `race.js` and `chests.js` are typed recall with the same
+  answer box as the other games; `snake.js` is the arcade one. The snake's rules are in
+  `snakecore.js`, a module with no screen in it, so `tests/test_snake.mjs` can play it: every one of
+  the term's 88 words can be eaten in order with no wrong letter, a wrong letter always comes back
+  on the board, and no letter is ever shut in by four others.
+- **Tests.** The browser suite plays each kind (the snake steered by key presses in a step-a-tap
+  mode so it is not a race against a clock, then on its own, then paused), checks that the pick never
+  repeats the last kind, and that a round's words are this week's and the two before. The phone
+  suite steers the snake by tap and by swipe on a Pixel 7 and a Galaxy S8. A Python test holds the
+  detective's second clue, where a word comes from, to never giving the word away.
+
+Found on the way:
+
+- **The snake's first rule made some boards unfair.** It could not turn straight back, as in the
+  arcade original, and the first random board put a letter she needed with a letter on every
+  side. Reaching it meant eating another first, which would have been a miss that is not a
+  spelling mistake. A head boxed in by letters could not turn round either. The snake may now turn
+  back, because its body is paper and nothing collides, and a board is never made with a letter
+  shut in on all four sides; a wrong letter that comes back is placed so that it does not shut one
+  in either.
+- **Making every game's points chip one class would have overwritten the bonus rounds' own
+  score.** Those chips are marked as a round's score and left alone.
+
+What to distrust:
+
+- **Nobody has played any of these on a phone or an iPad.** The snake is the one most likely to
+  need changing: its speed (a square every 0.42 seconds), its board (8 by 9) and how swiping and
+  tapping feel under a child's thumb are all guesses.
+- **The suites run Chromium only.** An iPad runs Safari, and its touch handling and SVG drawing
+  differ from Chrome's in small ways that no test here can show. The snake's swipes, which stop
+  the page scrolling with `touch-action: none` on the board, and the chests' paper animals, which
+  are drawn from SVG strings, are the two places that would show it.
+- **The snake is the weakest game for learning.** Choosing the next letter from a board is closer
+  to hangman than to recall, which is why typing the whole word is always there and is the way to
+  finish early. It is in because Peter asked for something crazier.
+- **The race is easy to win by design:** four right in six leaves her ahead.
+- **The detective's origin clue is the games' own, unreviewed,** like the meanings.
+
