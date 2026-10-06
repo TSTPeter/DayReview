@@ -36,7 +36,8 @@ const check = (name, ok, detail = "") => {
 // The real term and game content, whatever week it is, as run.mjs reads them.
 const games = await (await fetch(new URL("data/games.json", BASE))).json();
 const term = await (await fetch(new URL("data/term.json", BASE))).json();
-const today = new Date().toISOString().slice(0, 10);
+// TODAY=2026-10-12 plays the week of 12 October on any day (the browser's clock too).
+const today = process.env.TODAY || new Date().toISOString().slice(0, 10);
 const week = term.weeks.filter((w) => w.set_on <= today).pop();
 if (!week) {
   console.log("  skip  no term week today");
@@ -51,6 +52,7 @@ for (const phone of ["Pixel 7", "Galaxy S8"]) {
   console.log(`\n: ${phone}, ${width} px wide`);
   // No service worker: this is about touch and layout. update.mjs covers the worker.
   const ctx = await browser.newContext({ ...devices[phone], serviceWorkers: "block" });
+  if (process.env.TODAY) await ctx.clock.setFixedTime(new Date(`${today}T12:00:00Z`));
   await ctx.route("**/data/audio.json", (r) => r.fulfill({
     contentType: "application/json", body: JSON.stringify({ voice_id: null, model_id: null, clips: {} }) }));
   const page = await ctx.newPage();
@@ -65,6 +67,26 @@ for (const phone of ["Pixel 7", "Galaxy S8"]) {
   await page.goto(BASE, { waitUntil: "networkidle" });
   await page.waitForSelector("#screen-home.on");
   check("the welcome page fits the width", await fits());
+  // The school's list for the week, and the way back to it if a device loses it.
+  await page.tap("#btn-week");
+  await page.waitForSelector("#screen-week.on");
+  check("the week screen fits the width, and says the school's list is in use",
+        await fits() && /school.s list for this week/.test(await page.textContent("#week-source")),
+        (await page.textContent("#week-source")).trim());
+  await page.tap("#week-clear");
+  await page.waitForSelector("#screen-home.on");
+  await page.tap("#btn-week");
+  await page.waitForSelector("#screen-week.on");
+  const school = await page.$eval("#week-school", (b) => {
+    const r = b.getBoundingClientRect();
+    return { shown: b.offsetParent !== null, h: Math.round(r.height), w: Math.round(r.width) };
+  });
+  check("once cleared, the school's list is one tap away, big enough to touch",
+        school.shown && Math.min(school.h, school.w) >= 44 && await fits(), JSON.stringify(school));
+  await page.tap("#week-school");
+  await page.waitForSelector("#screen-home.on");
+  check("and one tap brings this week's list back",
+        await page.locator("#home-week").isVisible() && (await page.textContent("#home-week-words")).length > 20);
   await page.tap("#btn-games");
   await page.waitForSelector("#screen-games.on");
   check("hangman and hidden words are both open to play",
@@ -128,15 +150,26 @@ for (const phone of ["Pixel 7", "Galaxy S8"]) {
     await page.tap("#game-sort");
     await page.waitForSelector("#screen-sort.on");
     check("the pattern sort fits the width", await fits());
+    // Waits for a fresh card, which has an open gap. A card answered "no hyphen" reads
+    // exactly as it did before, so the text alone cannot tell the old card from the next.
     const card = async () => {
+      const open = await page.waitForSelector("#sort-card .gap:not(.filled)", { timeout: 3000 })
+        .then(() => true).catch(() => false);
+      if (!open) return undefined;
       const shown = await page.textContent("#sort-card");
-      return content.sort.cards.find((c) => c.show[0] + c.show[1] === shown);
+      return content.sort.cards.find((x) => x.show[0] + x.show[1] === shown);
     };
     let c = await card();
     await page.tap(`#sort-bins button[data-key="${c.answer}"]`);
     check("a right answer shows its points and nothing else", (await page.textContent("#sort-feedback")).trim() === "+5");
-    await page.waitForTimeout(900);
+    // A miss shows help only for a card that is one of the school's words. The deck can
+    // also hold contrast cards (return beside re-enter), so those are answered right and
+    // the first card with a word is the one missed.
     c = await card();
+    for (let k = 0; k < 10 && c && !c.word; k++) {
+      await page.tap(`#sort-bins button[data-key="${c.answer}"]`);
+      c = await card();
+    }
     await page.tap(`#sort-bins button[data-key="${content.sort.bins.find((b) => b.key !== c.answer).key}"]`);
     check("a miss shows the rule and the word's help, and rests the bins",
           /Not this time/.test(await page.textContent("#sort-feedback"))

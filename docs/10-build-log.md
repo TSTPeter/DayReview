@@ -306,3 +306,37 @@ What to distrust:
 - **Hidden-word letters are 36 px across on a 360 px phone**, below the 44 px the iPad
   checks require. They worked by tap and by slide in emulation, but may feel tight to a
   child on a small phone.
+
+## 6 October 2026: the school's sheet again, and what playing the whole term found
+
+Peter sent the sheet and asked for the words to be added and this week's programmed in.
+They were in, live and complete (`docs/12`), so what changed is what proving it turned up.
+
+- **A way to lose the week.** "Clear it" leaves an empty list that outranks the school's
+  until Monday, and nothing on the screen brought the school's list back. The week screen
+  now says which list is in use and offers "Use the school's list". It is a guess that
+  this is what Peter saw: the cause on his device is not confirmed.
+- **The browser suite failed on a date, not on a change.** It was written and passed
+  during the week of 28 September. In the week of 5 October one check in hidden words
+  failed, because it compared the ringed cells in page order with a route that runs 41
+  then 40. CI would have been red on any run since Monday. The check now compares the
+  same two cells without assuming an order.
+- **The suite can now play any week.** `TODAY=2026-10-12 node tests/browser/run.mjs`
+  sets the day for the node side and for every browser context. All six weeks pass,
+  and so does the phone test. Playing the hyphen weeks (12 and 19 October) showed two
+  more wrong assumptions of my own: that every sort card has help (the hyphen weeks
+  have contrast cards such as *return* beside *re-enter*, which have no word of their
+  own), and that the text of a card says whether it is a new one (a card answered "no
+  hyphen" reads the same before and after). The tests now look for an open gap.
+- **Two em dashes had reached the live site**, against ProductionSite's rule: an HTML
+  entity in the week screen's text and a JavaScript escape in the rule card's "licence
+  (the noun)" line. The deploy script only looked for the character. It now sees all
+  three forms, and a test covers everything served.
+
+What to distrust:
+
+- CI plays only today's week. Each Monday's content has to be tried before it arrives:
+  run the next week with `TODAY=` as above. Making CI play all six weeks every time would
+  cost about six times the CI minutes; that is Peter's call.
+- A device keeps its copy of the week it has loaded. A mid-week correction to
+  `engine/term.py` reaches it only through "Use the school's list".

@@ -425,6 +425,10 @@
   <h1>This week&rsquo;s spellings</h1>
   <p class="muted">Paste the list, or type one word per line. Numbers and
      punctuation are ignored.</p>
+  <p id="week-source" class="small" aria-live="polite"></p>
+  <!-- Beside the line that mentions it, not in the row at the bottom, which on a phone
+       is a long scroll away past the text box. -->
+  <button id="week-school" hidden style="margin:0 0 1rem">Use the school&rsquo;s list</button>
 
   <div class="sheet torn">
     <span class="tab">The words</span>
@@ -440,7 +444,7 @@
     </div>
     <p class="small muted" style="margin:.6rem 0 0">Until then, about two words
        in three each session come from this list. After it they don&rsquo;t
-       disappear &mdash; they join the normal rotation and come back a day, then
+       disappear. They join the normal rotation and come back a day, then
        two, then four, then eight and sixteen days later. That later part is
        what makes them stick for the writing, rather than just for Friday.</p>
   </div>

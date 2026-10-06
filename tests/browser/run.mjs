@@ -5,6 +5,7 @@
  *   python3 serve.py --port 8137 &
  *   node tests/browser/run.mjs
  *   CHROME=/path/to/chrome node tests/browser/run.mjs   (to point at another build)
+ *   TODAY=2026-10-12 node tests/browser/run.mjs         (to play another week of the term)
  *
  * The Python suite proves the engine is right. This proves the app in front of a child
  * actually behaves the way docs/02 says it must, which is a different claim: that the
@@ -879,6 +880,94 @@ console.log("\n— the school term —");
     await c.close();
   }
   {
+    // "Clear it" holds the school's list off until next Monday, and a list pasted over
+    // it does the same. On 6 October 2026 a device could be left with no list for the
+    // week and no way back but typing all the words in again. The week screen now
+    // says which list is in use and brings the school's back in one tap.
+    const { c, w } = await termCtx();
+    const source = async () => (await w.textContent("#week-source")).trim();
+    const openWeek = async () => {
+      await w.click("#btn-week");
+      await w.waitForSelector("#screen-week.on");
+    };
+    const reopen = async () => {
+      await w.reload({ waitUntil: "networkidle" });
+      await w.waitForSelector("#screen-home.on");
+    };
+    await openWeek();
+    check("the week screen says when the school's own list is in use, and offers nothing to restore",
+          /^This is the school.s list for this week\.$/.test(await source())
+          && await w.locator("#week-school").isHidden(), await source());
+
+    await w.click("#week-clear");
+    await w.waitForSelector("#screen-home.on");
+    await reopen();
+    check("a cleared week stays cleared when the game is reopened",
+          await w.locator("#home-week").isHidden());
+    await openWeek();
+    check("the week screen then says so, and offers the school's list",
+          /^You cleared this week.s list\./.test(await source())
+          && await w.locator("#week-school").isVisible(), await source());
+    await w.click("#week-school");
+    await w.waitForSelector("#screen-home.on");
+    const back = await w.textContent("#home-week-words");
+    check("one tap brings the school's list back, with its theme and its test day",
+          back.includes("co-operate") && back.includes("man-eating")
+          && (await w.textContent("#home-week-theme")).includes("Hyphens")
+          && /^Tested/.test((await w.textContent("#home-week-state")).trim()), back);
+    await reopen();
+    check("and it is still there after the game is reopened",
+          (await w.textContent("#home-week-words")).includes("re-enter"));
+
+    // A list of her own, pasted over the school's: it says so, and the way back is there.
+    await openWeek();
+    await w.fill("#week-input", "obstinate\ncalamitous");
+    await w.click("#week-save");
+    await w.waitForSelector("#screen-home.on");
+    await openWeek();
+    check("a list pasted over the school's is called what it is, with the way back",
+          /^This is not the school.s list for this week\.$/.test(await source())
+          && await w.locator("#week-school").isVisible(), await source());
+    await w.click("#week-school");
+    await w.waitForSelector("#screen-home.on");
+    check("and the school's list replaces it",
+          !(await w.textContent("#home-week-words")).includes("obstinate")
+          && (await w.textContent("#home-week-words")).includes("co-operate"));
+
+    // The restored list is the real thing for practice: this week's words get asked.
+    await w.click("#btn-practise");
+    await w.waitForSelector("#screen-attempt.on");
+    const asked = [];
+    for (let i = 0; i < 6; i++) {
+      await w.waitForSelector("#screen-attempt.on");
+      await w.fill("#attempt-input", "zzz");
+      await w.click("#attempt-submit");
+      await w.waitForSelector("#screen-reveal.on");
+      asked.push((await w.textContent("#reveal-target")).trim());
+      if (!(await w.locator("#reveal-strategy").isHidden())) {
+        await w.locator("#strategy-options button").first().click();
+      }
+      await w.click("#reveal-next");
+    }
+    check("practice then draws this week's words", asked.some((x) => thisWeek.words.includes(x)),
+          asked.join(", "));
+    await c.close();
+  }
+  {
+    // Before the term there is no school list to go back to, so no promise of one.
+    const c = await browser.newContext({ viewport: { width: 820, height: 1180 } });
+    await noClips(c);
+    await noTerm(c);
+    const w = await c.newPage();
+    await w.goto(BASE, { waitUntil: "networkidle" });
+    await w.waitForSelector("#screen-home.on");
+    await w.click("#btn-week");
+    await w.waitForSelector("#screen-week.on");
+    check("with no school list for today, the week screen promises none",
+          (await w.textContent("#week-source")).trim() === "" && await w.locator("#week-school").isHidden());
+    await c.close();
+  }
+  {
     // She practised 'tomorrow' last week and it is due again today. It is in the saved
     // state but not on this week's list. That once crashed the session outright.
     const { c, w, errs } = await termCtx({
@@ -985,9 +1074,15 @@ check("before the experiment starts, nothing is assigned or logged, even after m
 console.log("\n— the welcome page —");
 const gameData = await (await fetch(new URL("data/games.json", BASE))).json();
 const termData = await (await fetch(new URL("data/term.json", BASE))).json();
-const todayISO = new Date().toISOString().slice(0, 10);
+// The games follow the term's calendar, so which week they play depends on the day.
+// TODAY=2026-10-12 plays the week of 12 October on any day (the browser's clock too),
+// which is how a week's content is tried before its Monday arrives. Unset: the real day.
+const todayISO = process.env.TODAY || new Date().toISOString().slice(0, 10);
 const liveWeek = termData.weeks.filter((w) => w.set_on <= todayISO).pop();
+// Every context that plays the real term needs the same day, or it plays another week.
+const fixClock = (c) => (process.env.TODAY ? c.clock.setFixedTime(new Date(`${todayISO}T12:00:00Z`)) : null);
 const gctx = await browser.newContext({ viewport: { width: 820, height: 1180 }, acceptDownloads: true });
+await fixClock(gctx);
 await noClips(gctx);
 // Every tone the sound module starts, by its pitch, so a headless browser can tell
 // which sound played; and every request for the microphone, which nothing here
@@ -1133,11 +1228,39 @@ if (!liveWeek) {
     await g.click("#game-sort");
     await g.waitForSelector("#screen-sort.on");
     const level = () => g.getAttribute("#sort-scene", "data-level");
+    // Waits for a fresh card. A fresh card has an open gap; an answered one has the gap
+    // filled or, for "no hyphen", gone, and that card then reads exactly as it did before,
+    // so the text alone cannot tell the old card from the next. Undefined: the round is over.
     const cardShown = async () => {
+      const open = await g.waitForSelector("#sort-card .gap:not(.filled)", { timeout: 3000 })
+        .then(() => true).catch(() => false);
+      if (!open) return undefined;
       const shown = await g.textContent("#sort-card");
       return content.sort.cards.find((c) => c.show[0] + c.show[1] === shown);
     };
     const wrongFor = (card) => content.sort.bins.find((b) => b.key !== card.answer).key;
+    // The deck can hold contrast cards that are not one of the school's words (return
+    // beside re-enter, 'a man eating chips' beside man-eating). A miss on one shows the
+    // rule and no help card, because there is no word to help with. The checks below are
+    // about help, so they need an opening card that has a word. A round that opens on a
+    // contrast card is used to check that contract, then left and started again.
+    let opening = await cardShown();
+    let contrastChecked = false;
+    for (let tries = 0; tries < 12 && opening && !opening.word; tries++) {
+      if (!contrastChecked) {
+        contrastChecked = true;
+        await g.click(`#sort-bins button[data-key="${wrongFor(opening)}"]`);
+        check("a miss on a contrast card shows the rule and no help card, and the bins rest then return",
+              /Not this time/.test(await g.textContent("#sort-feedback"))
+              && (await g.locator("#sort-support .support").count()) === 0
+              && (await g.locator("#sort-bins.resting").count()) === 1);
+        await g.waitForSelector("#sort-bins:not(.resting)", { timeout: 8000 });
+      }
+      await g.click("#sort-quit");
+      await g.click("#game-sort");
+      await g.waitForSelector("#screen-sort.on");
+      opening = await cardShown();
+    }
     let sortRight = 0, first = true, quietRight = true;
     const runSounds = [];
     for (let i = 0; i < 10; i++) {
@@ -1388,8 +1511,13 @@ if (!liveWeek) {
   const ring1 = await g.$$eval("#hunt-grid .hunt-cell.hint", (xs) => xs.map((x) => Number(x.dataset.i)));
   await g.click("#hunt-hint");
   const ring2 = await g.$$eval("#hunt-grid .hunt-cell.hint", (xs) => xs.map((x) => Number(x.dataset.i)));
+  // The page lists ringed cells in page order, which cannot say which was rung first,
+  // and a route can run either way along a row (this week's first block starts at 41 and
+  // goes to 40). So the second ring is compared as the same two cells, not in order.
+  const cellsOf = (xs) => [...xs].sort((x, y) => x - y).join();
   check("a hint rings where a word starts, and asking again rings its next letter",
-        ring1.join() === String(own(block, 0)[0]) && ring2.join() === own(block, 0).slice(0, 2).join(),
+        ring1.join() === String(own(block, 0)[0])
+        && cellsOf(ring2) === cellsOf(own(block, 0).slice(0, 2)),
         `${ring1} then ${ring2}`);
   const r1 = own(block, 1);
   await tap(r1.slice(0, 2));
@@ -1578,7 +1706,7 @@ if (!liveWeek) {
   // --- the new screens fit an iPad
   for (const [name, vw, vh] of [["iPad portrait", 820, 1180], ["iPad landscape", 1180, 820]]) {
     await g.setViewportSize({ width: vw, height: vh });
-    for (const s of ["games", "jigsaw", "match", "sort", "hangman", "hunt", "bonus", "share"]) {
+    for (const s of ["games", "jigsaw", "match", "sort", "hangman", "hunt", "bonus", "share", "week"]) {
       const res = await g.evaluate((id) => {
         for (const x of document.querySelectorAll(".screen")) x.classList.toggle("on", x.id === `screen-${id}`);
         const over = document.documentElement.scrollWidth > document.documentElement.clientWidth + 1;
@@ -1605,6 +1733,7 @@ const supportData = await (await fetch(new URL("data/supports.json", BASE))).jso
 check("the shipped quotations are not yet reviewed, so the experiment is off", supportData.reviewed === false);
 const SHOWS = { etymology: "etymology", story: "story", say: "say", blend: "etymology story say" };
 const xctx = await browser.newContext({ viewport: { width: 820, height: 1180 }, acceptDownloads: true });
+await fixClock(xctx);
 await noClips(xctx);
 await xctx.route("**/data/supports.json", (r) => r.fulfill({
   contentType: "application/json", body: JSON.stringify({ ...supportData, reviewed: true }) }));
@@ -1748,6 +1877,7 @@ await xctx.close();
 // app cannot tell it from a real one.
 console.log("\n— saying it aloud —");
 const mctx = await browser.newContext({ viewport: { width: 820, height: 1180 } });
+await fixClock(mctx);
 await noClips(mctx);
 await mctx.addInitScript(() => {
   window.__mic = { opened: 0, stopped: 0, gain: null };
@@ -1781,7 +1911,13 @@ if (!liveWeek || !gameData.weeks[liveWeek.id].sort) {
   console.log("  skip  no pattern sort this week");
 } else {
   const deck = gameData.weeks[liveWeek.id].sort;
+  // Waits for a fresh card (an open gap) rather than guessing how long it takes: a card
+  // answered "no hyphen" reads exactly as it did before, so the text cannot say whether
+  // the next card has been drawn. Undefined: the round is over.
   const cardNow = async () => {
+    const open = await m.waitForSelector("#sort-card .gap:not(.filled)", { timeout: 5000 })
+      .then(() => true).catch(() => false);
+    if (!open) return undefined;
     const shown = await m.textContent("#sort-card");
     return deck.cards.find((c) => c.show[0] + c.show[1] === shown);
   };
@@ -1798,38 +1934,40 @@ if (!liveWeek || !gameData.weeks[liveWeek.id].sort) {
   await m.waitForSelector("#screen-sort.on");
   check("with the microphone switched on, the sort opens it", (await m.evaluate(() => window.__mic.opened)) === 1);
 
-  // Card 1: missed, then said aloud.
-  let c = await cardNow();
-  await m.click(`#sort-bins button[data-key="${missBin(c)}"]`);
-  const t0 = Date.now();
-  check("a miss whose support says it aloud shows that it is listening",
-        await m.locator("#sort-support .listen").isVisible());
-  await m.waitForTimeout(700);              // the room's own level is measured first
-  await speak(0.3);
-  await m.waitForSelector("#sort-bins:not(.resting)", { timeout: 4000 }).catch(() => {});
-  const early = Date.now() - t0;
-  await speak(0);
-  check("saying it ends the pause early, and she is told she was heard",
-        early < 2500 && /I heard you/.test(await m.textContent("#sort-support")), `${early} ms`);
-  await m.click(`#sort-bins button[data-key="${c.answer}"]`);
-  await m.waitForTimeout(1100);
-
-  // Card 2: missed, and she stays quiet.
-  c = await cardNow();
-  await m.click(`#sort-bins button[data-key="${missBin(c)}"]`);
-  const t1 = Date.now();
-  await m.waitForSelector("#sort-bins:not(.resting)", { timeout: 6000 }).catch(() => {});
-  const quietFor = Date.now() - t1;
-  check("staying quiet is fine: the bins come back at the usual time", quietFor > 2500 && quietFor < 5000,
-        `${quietFor} ms`);
-  await m.click(`#sort-bins button[data-key="${c.answer}"]`);
-  await m.waitForTimeout(1100);
-
-  // The rest of the round, right at the first go.
-  for (let i = 2; i < 10; i++) {
-    c = await cardNow();
+  // Which cards are missed, and how, is decided by the card in front of her, not by its
+  // place in the round: the deck is shuffled, and a contrast card (return beside
+  // re-enter) has no word and so no help to say aloud. The first card with a word is
+  // missed and said aloud, the second is missed and met with silence, the rest are right.
+  const missed = { said: null, quiet: null };
+  for (let i = 0; i < 10; i++) {
+    const c = await cardNow();
     if (!c) break;
-    await m.click(`#sort-bins button[data-key="${c.answer}"]`);
+    if (c.word && !missed.said) {
+      missed.said = c.word;
+      await m.click(`#sort-bins button[data-key="${missBin(c)}"]`);
+      const t0 = Date.now();
+      check("a miss whose support says it aloud shows that it is listening",
+            await m.locator("#sort-support .listen").isVisible());
+      await m.waitForTimeout(700);              // the room's own level is measured first
+      await speak(0.3);
+      await m.waitForSelector("#sort-bins:not(.resting)", { timeout: 4000 }).catch(() => {});
+      const early = Date.now() - t0;
+      await speak(0);
+      check("saying it ends the pause early, and she is told she was heard",
+            early < 2500 && /I heard you/.test(await m.textContent("#sort-support")), `${early} ms`);
+      await m.click(`#sort-bins button[data-key="${c.answer}"]`);
+    } else if (c.word && !missed.quiet) {
+      missed.quiet = c.word;
+      await m.click(`#sort-bins button[data-key="${missBin(c)}"]`);
+      const t1 = Date.now();
+      await m.waitForSelector("#sort-bins:not(.resting)", { timeout: 6000 }).catch(() => {});
+      const quietFor = Date.now() - t1;
+      check("staying quiet is fine: the bins come back at the usual time", quietFor > 2500 && quietFor < 5000,
+            `${quietFor} ms`);
+      await m.click(`#sort-bins button[data-key="${c.answer}"]`);
+    } else {
+      await m.click(`#sort-bins button[data-key="${c.answer}"]`);
+    }
     await m.waitForTimeout(900);
   }
   let mLog = null;
@@ -1837,10 +1975,13 @@ if (!liveWeek || !gameData.weeks[liveWeek.id].sort) {
     mLog = ((await readKV(m, "game_log")) || []).filter((r) => r.game === "sort").pop();
     if (!mLog) await m.waitForTimeout(100);
   }
+  const sayOf = (w) => (mLog ? mLog.items.find((i) => i.word === w) : null);
   check("the round records whether each word was said, and nothing else about her voice",
-        mLog && mLog.items[0].said === true && mLog.items[1].said === false
-        && mLog.items.slice(2).every((i) => i.said === null),
-        mLog ? mLog.items.map((i) => i.said).join() : "no entry");
+        mLog && missed.said && missed.quiet
+        && sayOf(missed.said).said === true && sayOf(missed.quiet).said === false
+        && mLog.items.filter((i) => i.word !== missed.said && i.word !== missed.quiet)
+             .every((i) => i.said === null),
+        mLog ? mLog.items.map((i) => `${i.word}:${i.said}`).join() : "no entry");
   const kept = await m.evaluate(async () => {
     const db = await new Promise((res) => { const r = indexedDB.open("spelling", 1); r.onsuccess = () => res(r.result); });
     const all = await new Promise((res) => {

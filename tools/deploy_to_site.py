@@ -60,6 +60,26 @@ def short_head(repo):
 # Written after the stamp, so they cannot be part of what it hashes.
 UNHASHED = ("sw.js", "README.md", "version.json")
 
+# ProductionSite's CLAUDE.md bans em and en dashes in every file, UI copy included. A
+# dash reaches a reader three ways: the character itself, an HTML entity (the one named
+# mdash), or a JavaScript escape (backslash, u, 2014). The rule is about what a person
+# reads, so all three are refused. The first check looked only for the character, and on
+# 6 October 2026 an entity in the week screen and an escape in the rule card had both
+# got through to the live site.
+TEXT = {".html", ".js", ".css", ".json", ".md", ".svg"}
+DASH = re.compile(
+    r"[\u2013\u2014]"                               # the characters
+    r"|&(?:mdash|ndash);|&#(?:0*8211|0*8212|x0*201[34]);"   # HTML entities
+    r"|\\u201[34]|\\u\{201[34]\}",                    # JavaScript escapes
+    re.IGNORECASE)
+
+
+def dash_offenders(root):
+    """Every text file under root that has an em or en dash in any of those forms."""
+    return sorted(
+        str(f.relative_to(root)) for f in pathlib.Path(root).rglob("*")
+        if f.is_file() and f.suffix in TEXT and DASH.search(f.read_text(encoding="utf-8")))
+
 
 def stamp_cache_version(dest):
     digest = hashlib.sha256()
@@ -116,11 +136,7 @@ def main(argv):
     # ProductionSite's CLAUDE.md bans em-dashes and en-dashes in every file in
     # that repo, UI copy and code comments alike. This is a build step writing
     # into it, so the rule is enforced here rather than remembered.
-    TEXT = {".html", ".js", ".css", ".json", ".md"}
-    offenders = sorted(
-        str(f.relative_to(dest)) for f in dest.rglob("*")
-        if f.is_file() and f.suffix in TEXT
-        and any(c in f.read_text(encoding="utf-8") for c in "\u2014\u2013"))
+    offenders = dash_offenders(dest)
     if offenders:
         sys.exit("REFUSING: em/en dashes are banned on the target site "
                  f"(its CLAUDE.md). Fix in web/ and re-run: {offenders}")
