@@ -150,9 +150,10 @@ this document's rules, and what did not.
   layered one. That is performance-contingent (d = -0.28), the class already accepted
   for points on 28 September.
 - **Something can be lost now, a little.** A miss ends the run and steps the
-  background back two levels. This document said nothing should be losable, because
-  a losable reward becomes a pressure. Peter chose a mild loss deliberately. It is
-  kept small: two steps, never a wipe, and points never go down.
+  background back two levels (one layer since 6 October: see the last section). This
+  document said nothing should be losable, because a losable reward becomes a pressure.
+  Peter chose a mild loss deliberately. It is kept small: never a wipe, and points never
+  go down.
 
 **What did not change.**
 
@@ -165,3 +166,59 @@ this document's rules, and what did not.
 **How to tell if it was a mistake.** Watch whether she plays the sort for the run
 rather than the words: rounds getting faster while first-go accuracy falls would be
 the sign. The game log records every card's first go.
+
+## 6 October 2026: the background, one layer back
+
+Peter: "we seem to have lost the ever-more-complex background. That was ace." The
+code had not changed since 1 October; what he saw was how it behaved.
+
+**What was wrong.** The first build took two layers back on a miss. Peter had asked for
+"some very mild form of degradation", and two was my reading of that, which was too
+heavy: one miss undid two right answers, so she needed about two in three right at the
+first go just to stand still. The first animal came at level 6, and levels 1 and 2 were
+only faint dots. So at six right in ten, which is a realistic rate for a hard rule such
+as *-ant* or *-ent*, most rounds ended on a page of dots.
+
+`python3 tools/simulate_background.py` plays 40,000 ten-card rounds per row and says how
+often an animal is on the page after the tenth card:
+
+| Right at the first go, of 10 | First build: animal on the page | First build: dots or nothing | Now: animal on the page | Now: mean level |
+|---|---|---|---|---|
+| 5 | 3% | 81% | 55% | 2.1 |
+| 6 | 9% | 64% | 76% | 3.2 |
+| 7 | 22% | 42% | 91% | 4.7 |
+| 8 | 46% | 19% | 98% | 6.3 |
+| 9 | 79% | 4% | 100% | 8.1 |
+
+Hit rate is taken as independent from card to card, a simplification. It is the size
+of the effect that matters here, not the exact figure.
+
+**What changed.**
+
+- **A miss takes back one layer, not two** (`STEP_BACK` in `web/js/scene.js`). It is
+  the layer she has just earned that goes, so a miss still shows. A step back, never a
+  wipe, and never below nothing.
+- **Every layer adds something you can see, and the first animal arrives with her second
+  right answer.** The plan is dots, an animal, waves, rings, an animal, diamonds,
+  confetti, two animals, and so on up to 20 layers, so a long sitting keeps getting
+  richer. Each animal is used once per sitting, in an order that is new each time. The
+  early animals sit in the lower part of the screen, which is clear of content on every
+  game, so they are seen and not hidden under a card.
+- **It belongs to the card-by-card games.** Peter chose this scope: the pattern sort,
+  the bonus round and any game where she answers one card at a time. That is the pattern
+  sort and, from the games added that night, fill the gap, look cover write and letter
+  tiles (the crossword is a grid, so it has none), and the four bonus games that replaced
+  the game-show board. Hangman, hidden words, the jigsaw and root match stay plain, in line
+  with `docs/02`'s finding that decoration competes with the task.
+
+**What did not change.** It lasts for one sitting and starts again from nothing; a run
+that survived overnight would be a streak. Points never go down. The practice screens
+never see it. It stays white on white, a few percent of contrast.
+
+**What it rests on.** Judgement, and Peter's call. The size of the step back is a
+guess: one layer is the smallest step that is still visible. If it feels too gentle to
+nudge anything, the constant is one line.
+
+**How to tell if it was a mistake.** The same watch as on 1 October: rounds getting
+faster while first-go accuracy falls would mean she is playing for the page and not the
+words. The game log records every card's first go.

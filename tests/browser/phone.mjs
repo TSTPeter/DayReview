@@ -13,6 +13,7 @@
  */
 import { existsSync } from "node:fs";
 import { chromium, devices } from "playwright-core";
+import { blank } from "../../web/js/gap.js";
 
 const BASE = process.env.BASE || "http://localhost:8137/";
 
@@ -44,6 +45,7 @@ if (!week) {
   process.exit(0);
 }
 const content = games.weeks[week.id];
+const sentences = (await (await fetch(new URL("data/sentences.json", BASE))).json()).sentences;
 
 const browser = await chromium.launch(EXECUTABLE ? { executablePath: EXECUTABLE } : {});
 
@@ -67,6 +69,22 @@ for (const phone of ["Pixel 7", "Galaxy S8"]) {
   await page.goto(BASE, { waitUntil: "networkidle" });
   await page.waitForSelector("#screen-home.on");
   check("the welcome page fits the width", await fits());
+  // Share used to be a small link at the very foot of the page, below the fold on a phone
+  // (6 October 2026). It is a labelled button now, and must be on the first screen.
+  const share = await page.$eval("#btn-share", (b) => {
+    const r = b.getBoundingClientRect();
+    return { bottom: Math.round(r.bottom), h: Math.round(r.height), vh: innerHeight };
+  });
+  check("the Share button is on the first screen, without scrolling, and big enough to touch",
+        share.bottom <= share.vh && share.h >= 44, JSON.stringify(share));
+  await page.tap("#btn-share");
+  await page.waitForSelector("#screen-share.on");
+  await page.tap("#share-copy");
+  await page.waitForFunction(() => document.querySelector("#share-note").textContent.length > 0);
+  check("the share screen fits the width, and Copy the link answers a tap",
+        await fits() && /\S/.test(await page.textContent("#share-note")), (await page.textContent("#share-note")).trim());
+  await page.tap("#share-back");
+  await page.waitForSelector("#screen-home.on");
   // The school's list for the week, and the way back to it if a device loses it.
   await page.tap("#btn-week");
   await page.waitForSelector("#screen-week.on");
@@ -175,11 +193,172 @@ for (const phone of ["Pixel 7", "Galaxy S8"]) {
           /Not this time/.test(await page.textContent("#sort-feedback"))
           && (await page.locator("#sort-support .support").count()) === 1
           && (await page.locator("#sort-bins.resting").count()) === 1);
+    // Back on the bins after the pause, the missed card is answered (not at the first go),
+    // then two cards right at the first go bring the first animal onto the page. It sits
+    // in the lower part of the screen, so on a phone it is in view and not under a card.
+    await page.waitForSelector("#sort-bins:not(.resting)", { timeout: 8000 });
+    await page.tap(`#sort-bins button[data-key="${c.answer}"]`);
+    for (let k = 0; k < 2; k++) {
+      const next = await card();
+      await page.tap(`#sort-bins button[data-key="${next.answer}"]`);
+    }
+    await page.waitForTimeout(900);
+    const animal = await page.$eval('#sort-scene g.layer[data-kind="animal"]', (g) => {
+      const r = g.getBoundingClientRect();
+      return { x: Math.round(r.left), y: Math.round(r.top), w: Math.round(r.width), h: Math.round(r.height),
+               opacity: getComputedStyle(g).opacity, vw: innerWidth, vh: innerHeight };
+    }).catch(() => null);
+    check("two right answers at the first go bring the first animal into view",
+          !!animal && Number(animal.opacity) === 1 && animal.x >= 0 && animal.y >= 0
+          && animal.x + animal.w <= animal.vw + 1 && animal.y + animal.h <= animal.vh + 1,
+          JSON.stringify(animal));
     // The background is fixed to the window; the title bar must sit over it.
     check("the title bar sits above the background",
           await page.$eval("header.bar", (h) => getComputedStyle(h).position === "relative"
             && Number(getComputedStyle(h).zIndex) >= 1));
   }
+  // --- the four newer games, by touch (6 October 2026)
+  if (content.sort) await page.tap("#sort-quit");
+  await page.waitForSelector("#screen-games.on");
+  check("the games hub fits the width with the four new games on it",
+        await fits() && (await page.locator(".game-card:not([disabled])").count()) >= 8);
+
+  // fill the gap: a typed answer, checked by a tap
+  await page.tap("#game-gap");
+  await page.waitForSelector("#screen-gap.on");
+  check("fill the gap fits the width", await fits());
+  const shown = await page.textContent("#gap-sentence");
+  const gapWord = week.words.find((w) => { const b = blank(sentences[w] || "", w); return b && b.before + b.after === shown; });
+  await page.fill("#gap-answer input", gapWord || "");
+  await page.tap("#gap-answer button.primary");
+  check("a typed answer is checked by a tap, and the right one earns its points",
+        !!gapWord && /Correct!\s+\+10/.test(await page.textContent("#gap-answer .verdict")), gapWord || shown);
+  await page.tap("#gap-quit");
+  await page.waitForSelector("#screen-games.on");
+
+  // look, cover, write: the cover goes on when she taps it
+  await page.tap("#game-lcw");
+  await page.waitForSelector("#screen-lcw.on");
+  const lcwWord = (await page.textContent("#lcw-word")).replace(/\s+/g, "");
+  await page.tap("#lcw-cover");
+  check("look cover write fits the width, and the word is covered after one tap",
+        await fits() && !(await page.innerText("#screen-lcw")).toLowerCase().includes(lcwWord.toLowerCase()), lcwWord);
+  await page.tap("#lcw-quit");
+  await page.waitForSelector("#screen-games.on");
+
+  // letter tiles: tiles are tapped into place, and are big enough to touch
+  await page.tap("#game-tiles");
+  await page.waitForSelector("#screen-tiles.on");
+  const meaning = await page.textContent("#tiles-clue");
+  const tilesWord = Object.keys(games.words).find((w) => games.words[w].meaning === meaning);
+  const tile = await page.$eval("#tiles-tray .tile", (b) => {
+    const r = b.getBoundingClientRect();
+    return { w: Math.round(r.width), h: Math.round(r.height) };
+  });
+  check("letter tiles fit the width, and each tile is big enough to touch",
+        await fits() && Math.min(tile.w, tile.h) >= 44, JSON.stringify(tile));
+  const firstOpen = () => page.evaluate(() => [...document.querySelectorAll("#tiles-slots .slot")]
+    .findIndex((x) => !x.classList.contains("locked") && !x.querySelector(".tile")));
+  for (let k = await firstOpen(); k >= 0; k = await firstOpen()) {
+    await page.tap(`#tiles-tray .tile[aria-label="${tilesWord[k] === "-" ? "hyphen" : tilesWord[k]}"] >> nth=0`);
+  }
+  await page.tap("#tiles-check");
+  await page.waitForSelector("#tiles-next:not([hidden])");
+  check("tapping the tiles into order and checking earns the points",
+        /\+10/.test(await page.textContent("#tiles-feedback")), tilesWord);
+  await page.tap("#tiles-quit");
+  await page.waitForSelector("#screen-games.on");
+
+  // the crossword: a clue is chosen by tap, and the grid fits
+  await page.tap("#game-cross");
+  await page.waitForSelector("#screen-cross.on");
+  const cell = await page.$eval("#cross-grid .xw-cell", (b) => Math.round(b.getBoundingClientRect().width));
+  check("the crossword fits the width, with squares big enough to read", await fits() && cell >= 26, `${cell} px`);
+  const second = await page.locator("#cross-clues .xw-clue >> nth=1").textContent();
+  await page.tap("#cross-clues .xw-clue >> nth=1");
+  check("tapping a clue picks it, and its clue is the one to answer",
+        second.includes(await page.textContent("#cross-clue")), second.slice(0, 40));
+  await page.tap("#cross-quit");
+  await page.waitForSelector("#screen-games.on");
+
+  // the bonus round's four games, by touch (6 October 2026). They are opened by points, so
+  // the points are granted here, and each game is started the way the hub starts it.
+  await page.evaluate(async () => {
+    const store = await import("./js/store.js");
+    const now = await store.getKV("game_points", { earned: 0, rounds: 0 });
+    await store.setKV("game_points", { ...now, earned: now.earned + 1000 });
+  });
+  const startBonus = (kind) => page.evaluate(async (k) => (await import("./js/games.js")).startBonus(k), kind);
+  const byMeaning = (m) => Object.keys(games.words).find((w) => games.words[w].meaning === m);
+
+  // detective: a typed guess, and a clue asked for by tap
+  await startBonus("detective");
+  await page.waitForSelector("#screen-detective.on");
+  const detWord = byMeaning((await page.textContent("#det-clues li:first-child")).replace(/^It means: /, ""));
+  await page.tap("#det-more");
+  check("the detective fits the width, and asking for a clue answers a tap",
+        await fits() && (await page.locator("#det-clues li").count()) === 2, detWord);
+  await page.fill("#det-input", detWord);
+  await page.tap("#det-go");
+  await page.waitForSelector("#det-next:not([hidden])");
+  check("a guess is made by a tap, and a clue asked for first is worth 10",
+        /^Case solved!\s+\+10$/.test((await page.textContent("#det-verdict")).trim()));
+  await page.tap("#det-quit");
+
+  // race: the tokens move along the track
+  await startBonus("race");
+  await page.waitForSelector("#screen-race.on");
+  const raceWord = byMeaning(await page.textContent("#race-clue"));
+  await page.fill("#race-answer input", raceWord);
+  await page.tap("#race-answer button.primary");
+  await page.waitForSelector("#race-next:not([hidden])");
+  check("the race fits the width, and a right answer moves her two squares",
+        await fits() && (await page.getAttribute("#race-track", "data-her")) === "2");
+  await page.tap("#race-quit");
+
+  // chests
+  await startBonus("chests");
+  await page.waitForSelector("#screen-chests.on");
+  const chestWord = byMeaning(await page.textContent("#chest-clue"));
+  await page.fill("#chest-answer input", chestWord);
+  await page.tap("#chest-answer button.primary");
+  await page.waitForSelector("#chest-next:not([hidden])");
+  check("the chests fit the width, and a right answer opens one",
+        await fits() && (await page.locator("#chest-grid .chest[data-state='open']").count()) === 1);
+  await page.tap("#chest-quit");
+
+  // the letter snake: swipe and tap steer it, the pad is big enough to touch, and it fits
+  await startBonus("snake");
+  await page.waitForSelector("#screen-snake.on");
+  const snk = await page.evaluate(() => {
+    const b = document.querySelector("#snk-board").getBoundingClientRect();
+    const pad = [...document.querySelectorAll("#snk-pad button")].map((x) => Math.min(x.offsetWidth, x.offsetHeight));
+    return { w: Math.round(b.width), h: Math.round(b.height), top: Math.round(b.top), pad: Math.min(...pad), vh: innerHeight };
+  });
+  check("the snake's board fits the width, is at least 36 px a square, and the arrows are big enough to touch",
+        await fits() && snk.w / 8 >= 36 && snk.pad >= 44, JSON.stringify(snk));
+  check("the board starts on the first screen, so she can see it without scrolling past the clue",
+        snk.top < snk.vh * 0.6, `${snk.top} of ${snk.vh}`);
+  await page.tap("#snk-mode");                       // a step a tap, so the tests can count
+  // The button is below the board, so tapping it scrolled the page; the board is steered from the top.
+  await page.evaluate(() => scrollTo(0, 0));
+  const box = await page.$eval("#snk-board", (b) => { const r = b.getBoundingClientRect(); return { x: r.left, y: r.top, w: r.width, h: r.height }; });
+  const head = () => page.$eval("#snk-board", (b) => b.dataset.head);
+  const h0 = await head();
+  // a tap well above the head turns it up, and in a step a tap that moves one square
+  await page.touchscreen.tap(box.x + box.w / 2, box.y + box.h * 0.08);
+  check("a tap on the board turns the snake towards it", (await head()) !== h0 && (await page.$eval("#snk-board", (b) => b.dataset.facing)) === "up");
+  // a swipe to the right turns it right
+  const cx = box.x + box.w / 2, cy = box.y + box.h / 2;
+  await touch("touchStart", cx - 40, cy);
+  await touch("touchMove", cx, cy);
+  await touch("touchMove", cx + 40, cy);
+  await touch("touchEnd");
+  await page.waitForTimeout(150);
+  check("a swipe to the right turns it right, and the page does not scroll",
+        (await page.$eval("#snk-board", (b) => b.dataset.facing)) === "right" && (await page.evaluate(() => scrollY)) === 0);
+  await page.tap("#snk-quit");
+
   check("no page errors", errors.length === 0, errors.join(" | "));
   await ctx.close();
 }

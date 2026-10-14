@@ -37,6 +37,11 @@
     <button id="btn-practise" class="primary">Practise</button>
     <button id="btn-games" class="games-btn">Games</button>
     <button id="btn-probe">Take the challenge</button>
+    <!-- Sharing is one labelled button she has to choose to press: nothing prompts it,
+         counts it or rewards it (docs/16, standard 13). -->
+    <button id="btn-share" class="share-btn"><svg class="share-icon" viewBox="0 0 24 24"
+      width="22" height="22" aria-hidden="true"><path d="M8.7 10.8l6.6-3.6M8.7 13.2l6.6 3.6"/>
+      <circle cx="6" cy="12" r="3"/><circle cx="18" cy="6" r="3"/><circle cx="18" cy="18" r="3"/></svg>Share this with your friends</button>
   </div>
 
   <!-- Her garden. Self-referenced mastery made visible: a piece per rule
@@ -62,17 +67,21 @@
     <button id="btn-week" class="link">This week&rsquo;s spellings</button>
     &nbsp;&nbsp;
     <button id="btn-grownup" class="link">Grown-up view</button>
-    &nbsp;&nbsp;
-    <button id="btn-share" class="link">Share the game</button>
   </p>
 </section>
 
-<!-- Sharing is the game's address and nothing else (docs/16-dpia.md): no name, no
-     scores, no connection. A friend who scans it starts fresh, and nobody sees
-     anybody. -->
+<!-- Sharing is the game's address and a plain sentence, nothing else (docs/16-dpia.md):
+     no name, no scores, no connection, no tracking parameter. A friend who opens it starts
+     fresh, and nobody sees anybody. -->
 <section id="screen-share" class="screen">
-  <h1>Share the game</h1>
-  <p>Show this to a friend. It opens the spelling game on their tablet, starting fresh.</p>
+  <h1>Share this with your friends</h1>
+  <p>Send them the link, or show them this picture. It opens the spelling game on their
+     phone or tablet, starting fresh.</p>
+  <div class="row share-actions">
+    <button id="share-send" class="primary" hidden>Send the link</button>
+    <button id="share-copy">Copy the link</button>
+  </div>
+  <p id="share-note" class="small" aria-live="polite"></p>
   <div class="sheet share-card">
     <img src="img/share-qr.svg" alt="A QR code that opens the spelling game" width="264" height="264">
     <p class="share-url">www.tsttalent.com/Spelling</p>
@@ -80,10 +89,7 @@
   <p class="small muted">Nothing about you goes with it: not your name, not your words,
      not your garden. Your friend will not see you, and you will not see them.</p>
   <p class="small"><a href="privacy.html">For grown-ups: what the game keeps, and where</a></p>
-  <div class="row">
-    <button id="share-send" hidden>Send the link</button>
-    <button id="share-back" class="link">Back</button>
-  </div>
+  <button id="share-back" class="link">Back</button>
 </section>
 
 <!-- ============================================ 1. attempt
@@ -276,10 +282,31 @@
       <b>Hidden words</b>
       <span class="small muted">Find this week&rsquo;s words in a block of letters</span>
     </button>
+    <button id="game-gap" class="game-card">
+      <span class="game-icon" aria-hidden="true"></span>
+      <b>Fill the gap</b>
+      <span class="small muted">Type the missing word in a sentence</span>
+    </button>
+    <button id="game-lcw" class="game-card">
+      <span class="game-icon" aria-hidden="true"></span>
+      <b>Look, cover, write</b>
+      <span class="small muted">Look at a word, cover it, write it from memory</span>
+    </button>
+    <button id="game-tiles" class="game-card">
+      <span class="game-icon" aria-hidden="true"></span>
+      <b>Letter tiles</b>
+      <span class="small muted">Put the jumbled letters back in order</span>
+    </button>
+    <button id="game-cross" class="game-card">
+      <span class="game-icon" aria-hidden="true"></span>
+      <b>Mini crossword</b>
+      <span class="small muted">Clues are meanings; the answers are words from the term</span>
+    </button>
   </div>
   <div class="sheet torn bonus-card" id="games-bonus">
     <span class="tab plum">Bonus round</span>
-    <p id="games-bonus-state" style="margin:.2rem 0 .6rem"></p>
+    <p id="games-bonus-state" style="margin:.2rem 0 .3rem"></p>
+    <p class="small muted" style="margin:0 0 .6rem">A different game turns up each time.</p>
     <div class="progress-track"><i id="games-bonus-bar" class="bonus-bar"></i></div>
     <button id="game-bonus" class="primary" style="margin-top:1rem" disabled>Play the bonus round</button>
   </div>
@@ -387,34 +414,250 @@
   </div>
 </section>
 
-<section id="screen-bonus" class="screen">
-  <div class="game-head"><h1>Bonus round</h1><span class="points-chip" id="bonus-score"></span></div>
-  <p class="small muted">Pick a square, read the clue, type the word.</p>
-  <div id="bonus-board" class="bonus-board"></div>
-  <div class="sheet" id="bonus-clue" hidden>
-    <span class="tab plum" id="bonus-clue-tab"></span>
-    <p id="bonus-clue-text" class="clue"></p>
-    <p id="bonus-clue-hint" class="small muted"></p>
-    <input id="bonus-input" class="spell" type="text" autocomplete="off"
-           autocapitalize="none" autocorrect="off" spellcheck="false"
-           enterkeyhint="done" aria-label="Type the word">
-    <div class="row" style="margin-top:1rem">
-      <button id="bonus-check" class="primary" disabled>Check</button>
-    </div>
-    <div id="bonus-result" hidden>
-      <p id="bonus-verdict" class="verdict"></p>
-      <div id="bonus-marked" class="marked"></div>
-      <p id="bonus-why" class="muted"></p>
-      <div id="bonus-support" class="support-inline" hidden></div>
-      <button id="bonus-back" class="primary">Back to the board</button>
-    </div>
+<!-- ============================================ 6 October 2026: four more games
+     Fill the gap, look cover write and letter tiles answer one card at a time, so they have
+     the growing background; the crossword is a grid and does not. See docs/15-games.md. -->
+<section id="screen-gap" class="screen has-scene">
+  <div id="gap-scene" class="scene" aria-hidden="true"></div>
+  <div class="game-head"><h1>Fill the gap</h1><span class="points-chip"></span></div>
+  <p id="gap-count" class="small muted"></p>
+  <div id="gap-card" class="sheet clue-sheet">
+    <span class="tab">The sentence</span>
+    <p id="gap-sentence" class="clue gap-sentence" aria-live="polite"></p>
+    <p id="gap-meaning" class="small muted"></p>
+    <p id="gap-hint" class="small muted"></p>
   </div>
-  <div class="sheet torn" id="bonus-end" hidden>
+  <div id="gap-answer"></div>
+  <div class="sheet torn" id="gap-end" hidden>
     <span class="tab teal">Round over</span>
-    <p id="bonus-end-text" style="font-weight:800;font-size:1.3rem"></p>
-    <p id="bonus-end-words" class="muted"></p>
+    <p id="gap-end-text" class="end-text"></p>
+    <p id="gap-end-words" class="muted"></p>
   </div>
-  <button id="bonus-quit" class="link">Back to games</button>
+  <div class="row" style="margin-top:1rem">
+    <button id="gap-next" class="primary" hidden>Next sentence</button>
+    <button id="gap-again" class="primary" hidden>Another round</button>
+    <button id="gap-quit" class="link">Back to games</button>
+  </div>
+</section>
+
+<section id="screen-lcw" class="screen has-scene">
+  <div id="lcw-scene" class="scene" aria-hidden="true"></div>
+  <div class="game-head"><h1>Look, cover, write</h1><span class="points-chip"></span></div>
+  <p id="lcw-count" class="small muted"></p>
+  <div id="lcw-card" class="sheet clue-sheet">
+    <span class="tab" id="lcw-tab">Look</span>
+    <p id="lcw-word" class="lcw-word" aria-live="polite"></p>
+    <p id="lcw-meaning" class="small muted"></p>
+    <p id="lcw-prompt" class="lcw-prompt"></p>
+  </div>
+  <div class="row"><button id="lcw-cover" class="primary">Cover it</button></div>
+  <div id="lcw-answer" hidden></div>
+  <div class="sheet torn" id="lcw-end" hidden>
+    <span class="tab teal">Round over</span>
+    <p id="lcw-end-text" class="end-text"></p>
+    <p id="lcw-end-words" class="muted"></p>
+  </div>
+  <div class="row" style="margin-top:1rem">
+    <button id="lcw-next" class="primary" hidden>Next word</button>
+    <button id="lcw-again" class="primary" hidden>Another round</button>
+    <button id="lcw-quit" class="link">Back to games</button>
+  </div>
+</section>
+
+<section id="screen-tiles" class="screen has-scene">
+  <div id="tiles-scene" class="scene" aria-hidden="true"></div>
+  <div class="game-head"><h1>Letter tiles</h1><span class="points-chip"></span></div>
+  <p id="tiles-count" class="small muted"></p>
+  <div id="tiles-stage">
+    <div class="sheet kraft clue-sheet">
+      <span class="tab">The clue</span>
+      <p id="tiles-clue" class="clue"></p>
+    </div>
+    <div id="tiles-slots" class="tile-slots" aria-label="Your word" aria-live="polite"></div>
+    <div id="tiles-tray" class="tile-tray" aria-label="Letters"></div>
+    <div class="row">
+      <button id="tiles-check" class="primary" disabled>Check</button>
+      <button id="tiles-clear">Clear</button>
+      <button id="tiles-next" class="primary" hidden>Next word</button>
+    </div>
+    <p id="tiles-feedback" class="game-feedback" aria-live="polite"></p>
+    <div id="tiles-support" class="sheet support-sheet" hidden></div>
+  </div>
+  <div class="sheet torn" id="tiles-end" hidden>
+    <span class="tab teal">Round over</span>
+    <p id="tiles-end-text" class="end-text"></p>
+    <p id="tiles-end-words" class="muted"></p>
+  </div>
+  <div class="row">
+    <button id="tiles-again" class="primary" hidden>Another round</button>
+    <button id="tiles-quit" class="link">Back to games</button>
+  </div>
+</section>
+
+<section id="screen-cross" class="screen">
+  <div class="game-head"><h1>Mini crossword</h1><span class="points-chip"></span></div>
+  <p id="cross-count" class="small muted"></p>
+  <div id="cross-stage">
+    <div id="cross-current" class="sheet clue-sheet">
+      <span class="tab" id="cross-tab"></span>
+      <p id="cross-clue" class="clue"></p>
+      <p id="cross-pattern" class="small muted xw-pattern"></p>
+      <div id="cross-answer"></div>
+      <div class="row" style="margin-top:1rem"><button id="cross-next" class="primary" hidden>Next clue</button></div>
+    </div>
+    <div id="cross-grid" class="xw-grid" aria-label="The crossword"></div>
+    <div id="cross-clues" class="xw-clues"></div>
+  </div>
+  <div class="sheet torn" id="cross-end" hidden>
+    <span class="tab teal">Puzzle over</span>
+    <p id="cross-end-text" class="end-text"></p>
+    <p id="cross-end-words" class="muted"></p>
+  </div>
+  <div class="row" style="margin-top:1rem">
+    <button id="cross-again" class="primary" hidden>Another puzzle</button>
+    <button id="cross-quit" class="link">Back to games</button>
+  </div>
+</section>
+
+<!-- ============================================ the bonus round: four games, one at random
+     Peter, 6 October 2026: the game-show board was not fun. Points open the round; which of these
+     four turns up is picked at random and never repeats the last. Each answers with the spelling of
+     a word and has the growing background; none keeps anything. See docs/15-games.md. -->
+<section id="screen-detective" class="screen has-scene">
+  <div id="det-scene" class="scene" aria-hidden="true"></div>
+  <div class="game-head"><h1>Word detective</h1><span class="points-chip round-score" id="det-score"></span></div>
+  <p id="det-count" class="small muted"></p>
+  <div id="det-case">
+    <div class="sheet clue-sheet">
+      <span class="tab plum">The clues</span>
+      <ol id="det-clues" class="det-clues"></ol>
+      <p id="det-worth" class="small muted"></p>
+    </div>
+    <div id="det-guess">
+      <input id="det-input" class="spell" type="text" autocomplete="off" autocapitalize="none"
+             autocorrect="off" spellcheck="false" enterkeyhint="done" aria-label="Type your guess">
+      <div class="row" style="margin-top:1rem">
+        <button id="det-go" class="primary" disabled>Guess</button>
+        <button id="det-more">Another clue</button>
+      </div>
+    </div>
+    <p id="det-feedback" class="game-feedback" aria-live="polite"></p>
+  </div>
+  <div id="det-result" hidden>
+    <p id="det-verdict" class="verdict"></p>
+    <div id="det-marked" class="marked"></div>
+    <p id="det-why" class="muted"></p>
+    <div id="det-support" class="support-inline" hidden></div>
+  </div>
+  <div class="sheet torn" id="det-end" hidden>
+    <span class="tab teal">Round over</span>
+    <p id="det-end-text" class="end-text"></p>
+    <p id="det-end-words" class="muted"></p>
+  </div>
+  <div class="row" style="margin-top:1rem">
+    <button id="det-next" class="primary" hidden>Next case</button>
+    <button id="det-more-rounds" class="primary" hidden>Play another bonus round</button>
+    <button id="det-quit" class="link">Back to games</button>
+  </div>
+</section>
+
+<section id="screen-race" class="screen has-scene">
+  <div id="race-scene" class="scene" aria-hidden="true"></div>
+  <div class="game-head"><h1>Race the paper snail</h1><span class="points-chip round-score" id="race-score"></span></div>
+  <p id="race-count" class="small muted"></p>
+  <div id="race-track" class="race-track">
+    <div class="race-lane"><span class="race-flag" aria-hidden="true"></span><div id="race-her" class="race-token" role="img"></div></div>
+    <div class="race-lane"><span class="race-flag" aria-hidden="true"></span><div id="race-snail" class="race-token" role="img"></div></div>
+  </div>
+  <div id="race-card" class="sheet clue-sheet">
+    <span class="tab plum">The clue</span>
+    <p id="race-clue" class="clue"></p>
+    <p id="race-hint" class="small muted"></p>
+    <div id="race-answer"></div>
+  </div>
+  <p id="race-feedback" class="game-feedback" aria-live="polite"></p>
+  <div class="sheet torn" id="race-end" hidden>
+    <span class="tab teal">Round over</span>
+    <p id="race-end-text" class="end-text"></p>
+    <p id="race-end-words" class="muted"></p>
+  </div>
+  <div class="row">
+    <button id="race-next" class="primary" hidden>Next card</button>
+    <button id="race-more-rounds" class="primary" hidden>Play another bonus round</button>
+    <button id="race-quit" class="link">Back to games</button>
+  </div>
+</section>
+
+<section id="screen-chests" class="screen has-scene">
+  <div id="chest-scene" class="scene" aria-hidden="true"></div>
+  <div class="game-head"><h1>Treasure chests</h1><span class="points-chip round-score" id="chest-score"></span></div>
+  <p id="chest-count" class="small muted"></p>
+  <div id="chest-grid" class="chest-grid"></div>
+  <div id="chest-card" class="sheet clue-sheet">
+    <span class="tab plum">The lock</span>
+    <p id="chest-clue" class="clue"></p>
+    <p id="chest-hint" class="small muted"></p>
+    <div id="chest-answer"></div>
+  </div>
+  <div class="sheet torn" id="chest-end" hidden>
+    <span class="tab teal">Round over</span>
+    <p id="chest-end-text" class="end-text"></p>
+    <p id="chest-end-words" class="muted"></p>
+  </div>
+  <div class="row">
+    <button id="chest-next" class="primary" hidden>Next chest</button>
+    <button id="chest-more-rounds" class="primary" hidden>Play another bonus round</button>
+    <button id="chest-quit" class="link">Back to games</button>
+  </div>
+</section>
+
+<section id="screen-snake" class="screen has-scene">
+  <div id="snk-scene" class="scene" aria-hidden="true"></div>
+  <div class="game-head"><h1>Letter snake</h1><span class="points-chip round-score" id="snk-score"></span></div>
+  <p id="snk-count" class="small muted"></p>
+  <div id="snk-play">
+    <div class="sheet kraft clue-sheet">
+      <span class="tab plum">Eat this word</span>
+      <p id="snk-clue" class="clue"></p>
+    </div>
+    <div id="snk-slots" class="snk-slots" aria-live="polite" aria-label="The word so far"></div>
+    <div id="snk-board" class="snk-board" role="group" aria-label="The board of letters"></div>
+    <div id="snk-controls">
+      <div id="snk-pad" class="snk-pad">
+        <button data-dir="left" aria-label="Left">&larr;</button>
+        <button data-dir="up" aria-label="Up">&uarr;</button>
+        <button data-dir="down" aria-label="Down">&darr;</button>
+        <button data-dir="right" aria-label="Right">&rarr;</button>
+      </div>
+      <div class="row hang-solve">
+        <input id="snk-input" class="spell" type="text" autocomplete="off" autocapitalize="none"
+               autocorrect="off" spellcheck="false" enterkeyhint="done" aria-label="Type the whole word"
+               placeholder="Know it? Type it">
+        <button id="snk-solve" disabled>That&rsquo;s it</button>
+      </div>
+      <div class="row">
+        <button id="snk-hint">Hint</button>
+        <button id="snk-pause">Pause</button>
+        <button id="snk-mode" class="small-btn">Moving: on its own</button>
+      </div>
+    </div>
+    <p id="snk-feedback" class="game-feedback" aria-live="polite"></p>
+    <div id="snk-result" hidden>
+      <p id="snk-verdict" class="verdict"></p>
+      <p id="snk-whole" class="whole"></p>
+      <p id="snk-why" class="muted"></p>
+    </div>
+  </div>
+  <div class="sheet torn" id="snk-end" hidden>
+    <span class="tab teal">Round over</span>
+    <p id="snk-end-text" class="end-text"></p>
+    <p id="snk-end-words" class="muted"></p>
+  </div>
+  <div class="row">
+    <button id="snk-next" class="primary" hidden>Next word</button>
+    <button id="snk-more-rounds" class="primary" hidden>Play another bonus round</button>
+    <button id="snk-quit" class="link">Back to games</button>
+  </div>
 </section>
 
 <!-- ============================================ this week's spellings
@@ -623,6 +866,21 @@
       <button id="gu-export">Export everything</button>
       <button id="gu-delete" class="warm">Delete everything</button>
     </div>
+  </div>
+
+  <div class="sheet" id="gu-share">
+    <span class="tab teal">Share with other parents</span>
+    <p class="small muted">A message you can send to another parent. It says what the game
+       is and where to find it, and nothing about your child.</p>
+    <blockquote id="gu-share-text" class="share-msg"></blockquote>
+    <div class="row">
+      <button id="gu-share-send" class="primary" hidden>Send it</button>
+      <button id="gu-share-copy">Copy the message</button>
+    </div>
+    <p id="gu-share-note" class="small" aria-live="polite"></p>
+    <p class="small muted">Only the game&rsquo;s address goes out, with no name, no results
+       and no tracking, so nobody is told who shared it. What the game keeps is on its
+       <a href="privacy.html">notice for families</a>.</p>
   </div>
 
   <p class="small muted" id="gu-version"></p>

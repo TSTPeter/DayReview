@@ -44,6 +44,16 @@ jobs:
       - name: The support experiment does what its registration says
         run: node tests/test_supports.mjs
 
+      # The letter snake's rules, played without a screen: the board holds what it should, a
+      # wrong letter always comes back, and every word of the term can be eaten in order.
+      - name: The letter snake's rules
+        run: node tests/test_snake.mjs
+
+      # Fill the gap blanks one word in its dictation sentence, so each of the term's
+      # words has to be in its own sentence exactly once, as a whole word.
+      - name: Every word is in its sentence exactly once
+        run: node tests/test_gap.mjs
+
       # If words.py or sentences.py changed and export.py was not re-run, the front end
       # silently serves stale data. Cheap to catch, confusing to debug.
       - name: web/data is in step with the word model

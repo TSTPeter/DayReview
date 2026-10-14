@@ -126,6 +126,8 @@ async function boot() {
     week: () => weekly.scheduledWeek(app.term, today()),
     weeksSoFar: () => app.term.filter((w) => w.set_on <= today()),
     entryFor: (word) => app.byWord.get(word) || app.authored.get(word) || makeEntry(word),
+    // The sentence she heard in the dictation, for Fill the gap.
+    sentenceFor: (word) => app.sentences[word] || null,
     markedUp: (word, d) => markedUp(normalise(word), d.attempt, d.type === "hyphen" ? word : ""),
   });
   wire();
@@ -972,6 +974,8 @@ async function submitPaper() {
 // --------------------------------------------------------------- 6. grown-up view
 
 async function showGrownUp() {
+  $("#gu-share-send").hidden = !navigator.share;
+  $("#gu-share-note").textContent = "";
   const attempts = await store.allAttempts();
   const marks = attempts.map((a) => {
     const entry = app.byWord.get(a.word);
@@ -1125,7 +1129,9 @@ async function paintGamesSummary() {
   $("#gu-games-summary").textContent = log.length
     ? `Last 7 days: ${count("jigsaw")} jigsaw, ${count("match")} root match, `
       + `${count("sort")} pattern sort, ${count("hangman")} hangman, `
-      + `${count("hunt")} hidden words and ${count("bonus")} bonus rounds, `
+      + `${count("hunt")} hidden words, ${count("gap")} fill the gap, `
+      + `${count("lcw")} look cover write, ${count("tiles")} letter tiles, `
+      + `${count("cross")} crosswords and ${count("bonus")} bonus rounds, `
       + `touching ${words.size} words; ${sessions} dictation sessions. `
       + `${pts.earned || 0} points earned in all.`
     : "No games played yet.";
@@ -1148,6 +1154,54 @@ function delayedAccuracy(attempts) {
   return { d7: bucket(5, 14), d28: bucket(21, 42) };
 }
 
+// --------------------------------------------------------------- sharing
+
+// What sharing sends: the game's address and a plain sentence. Never her name, her words,
+// her garden or a tracking parameter, and nobody is told who shared it (docs/16-dpia.md).
+// The first sentence is for a child to send to a friend; the second is the message a
+// grown-up can send to another parent, which says what the game keeps.
+const SHARE = {
+  url: "https://www.tsttalent.com/Spelling",
+  friends: "A spelling game for Year 5 and 6. It works on a phone or tablet.",
+  parents: "A spelling game for Years 5 and 6. Words are read out in a sentence and typed "
+    + "from memory, and they come back over the following weeks so they stick. There are "
+    + "games too. It runs in a browser on a phone or tablet, works offline once opened, and "
+    + "keeps what a child types on their own device. What it keeps: "
+    + "https://www.tsttalent.com/Spelling/privacy.html",
+};
+
+async function sendShare(text, noteSel) {
+  try {
+    await navigator.share({ title: "Spelling", text, url: SHARE.url });
+    $(noteSel).textContent = "";
+  } catch (e) {
+    // Closing the sheet is her choice and needs no comment; anything else gets the other way.
+    $(noteSel).textContent = e && e.name === "AbortError" ? "" : "That did not open. Copy it instead.";
+  }
+}
+
+async function copyShare(text, noteSel) {
+  const all = `${text}\n${SHARE.url}`;
+  let ok = false;
+  try {
+    await navigator.clipboard.writeText(all);
+    ok = true;
+  } catch { /* not a secure page, or not allowed: try the older way */ }
+  if (!ok) {
+    const area = document.createElement("textarea");
+    area.value = all;
+    area.setAttribute("readonly", "");
+    area.style.cssText = "position:fixed;top:0;left:0;opacity:0";
+    document.body.append(area);
+    area.select();
+    try { ok = document.execCommand("copy"); } catch { ok = false; }
+    area.remove();
+  }
+  $(noteSel).textContent = ok
+    ? "Copied. Paste it into a message."
+    : "Copying did not work here. Press and hold the address on screen to copy it.";
+}
+
 // --------------------------------------------------------------- wiring
 
 function wire() {
@@ -1157,13 +1211,16 @@ function wire() {
   $("#btn-week").onclick = showWeek;
   $("#btn-games").onclick = () => games.openHub();
   $("#btn-share").onclick = () => {
-    // The iPad's own share sheet, where there is one, with the address and nothing more.
+    // The device's own share sheet, where there is one, and copying where there is not.
     $("#share-send").hidden = !navigator.share;
+    $("#share-note").textContent = "";
     show("share");
   };
-  $("#share-send").onclick = () => navigator.share({
-    title: "Spelling", text: "A spelling game", url: "https://www.tsttalent.com/Spelling",
-  }).catch(() => {});
+  $("#share-send").onclick = () => sendShare(SHARE.friends, "#share-note");
+  $("#share-copy").onclick = () => copyShare(SHARE.friends, "#share-note");
+  $("#gu-share-text").textContent = `${SHARE.parents}\n${SHARE.url}`;
+  $("#gu-share-send").onclick = () => sendShare(SHARE.parents, "#gu-share-note");
+  $("#gu-share-copy").onclick = () => copyShare(SHARE.parents, "#gu-share-note");
   $("#share-back").onclick = async () => { await refreshHome(); show("home"); };
   $("#games-home").onclick = async () => { await refreshHome(); show("home"); };
   $("#opt-name-save").onclick = async () => {

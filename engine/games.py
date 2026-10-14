@@ -8,7 +8,8 @@ WHAT IS HERE, AND WHAT IT RESTS ON.
             the reveal screen can show "How it is built" for a school word instead
             of hiding the card (docs/12 hid it because a GUESSED root told to a child
             is worse than none; these are not guessed, see SOURCES).
-  MEANINGS  one plain definition per word, for the jigsaw and the game-show clues.
+  MEANINGS  one plain definition per word: the jigsaw's clue, and the clue in fill the
+            gap, the crossword and the bonus-round games.
             None contains the word, or its root spelled out, or the definition
             would hand over the spelling.
   CLUES     the national curriculum's rule for each pattern word, quoted where the
@@ -657,6 +658,7 @@ def term_entries():
 
 
 def build(weeks, curated, sentences, noun_verb_pairs):
+    import crossword
     import wordblocks
     words = {}
     for week in weeks:
@@ -673,13 +675,18 @@ def build(weeks, curated, sentences, noun_verb_pairs):
                 "origin": {"lang": entry["lang"], "root": entry["root"], "gloss": entry["gloss"]},
             }
     per_week = {}
+    meanings = {w: c["meaning"] for w, c in words.items()}
+    earlier = []
     for week in weeks:
         per_week[week["id"]] = {
             "roots": [{"part": part, "means": means, "from": source, "words": ws}
                       for part, means, source, ws in ROOTS.get(week["id"], [])],
             "sort": sort_deck(week["id"], weeks, sentences, noun_verb_pairs),
             "blocks": wordblocks.week_blocks(week["id"], week["words"]),
+            # This week's words first, earlier weeks' to fill: engine/crossword.py.
+            "crosswords": crossword.week_puzzles(week["id"], week["words"], earlier, meanings),
         }
+        earlier += [w for w in week["words"] if w not in earlier]
     return {
         "generated_by": "engine/games.py",
         "review_note": "Written offline. Read these before a child does. See engine/games.py.",

@@ -2473,6 +2473,233 @@
       [0,0,0,1,0]
      ]
     }
+   ],
+   "crosswords": [
+    {
+     "rows": 11,
+     "cols": 11,
+     "grid": [
+      "..achieve..",
+      "..g......d.",
+      "o.g.frantic",
+      "b.r...c..s.",
+      "spectacular",
+      "t.s...o..s.",
+      "i.s...r..t.",
+      "n.i...d..r.",
+      "a.v...i..o.",
+      "t.e...n..u.",
+      "e.....g..s."
+     ],
+     "entries": [
+      {
+       "n": 1,
+       "dir": "a",
+       "row": 0,
+       "col": 2,
+       "word": "achieve",
+       "clue": "To succeed in doing something through effort."
+      },
+      {
+       "n": 1,
+       "dir": "d",
+       "row": 0,
+       "col": 2,
+       "word": "aggressive",
+       "clue": "Ready to attack or fight."
+      },
+      {
+       "n": 2,
+       "dir": "d",
+       "row": 1,
+       "col": 9,
+       "word": "disastrous",
+       "clue": "Going terribly wrong."
+      },
+      {
+       "n": 3,
+       "dir": "d",
+       "row": 2,
+       "col": 0,
+       "word": "obstinate",
+       "clue": "Refusing to change your mind, however hard others try."
+      },
+      {
+       "n": 4,
+       "dir": "a",
+       "row": 2,
+       "col": 4,
+       "word": "frantic",
+       "clue": "Wild with worry or hurry."
+      },
+      {
+       "n": 5,
+       "dir": "d",
+       "row": 2,
+       "col": 6,
+       "word": "according",
+       "clue": "As someone or something says."
+      },
+      {
+       "n": 6,
+       "dir": "a",
+       "row": 4,
+       "col": 0,
+       "word": "spectacular",
+       "clue": "Amazing to look at."
+      }
+     ]
+    },
+    {
+     "rows": 11,
+     "cols": 11,
+     "grid": [
+      ".a......h..",
+      ".calamitous",
+      ".c..g...s..",
+      ".o..g...t..",
+      ".m..r...i..",
+      "amateur.l..",
+      ".o..s...e..",
+      ".d..s......",
+      ".achieve...",
+      ".t..v......",
+      "desperate.."
+     ],
+     "entries": [
+      {
+       "n": 1,
+       "dir": "d",
+       "row": 0,
+       "col": 1,
+       "word": "accommodate",
+       "clue": "To have enough room for people or things."
+      },
+      {
+       "n": 2,
+       "dir": "d",
+       "row": 0,
+       "col": 8,
+       "word": "hostile",
+       "clue": "Unfriendly and ready to fight."
+      },
+      {
+       "n": 3,
+       "dir": "a",
+       "row": 1,
+       "col": 1,
+       "word": "calamitous",
+       "clue": "Causing terrible damage."
+      },
+      {
+       "n": 4,
+       "dir": "d",
+       "row": 1,
+       "col": 4,
+       "word": "aggressive",
+       "clue": "Ready to attack or fight."
+      },
+      {
+       "n": 5,
+       "dir": "a",
+       "row": 5,
+       "col": 0,
+       "word": "amateur",
+       "clue": "Someone who does something for fun rather than as a job."
+      },
+      {
+       "n": 6,
+       "dir": "a",
+       "row": 8,
+       "col": 1,
+       "word": "achieve",
+       "clue": "To succeed in doing something through effort."
+      },
+      {
+       "n": 7,
+       "dir": "a",
+       "row": 10,
+       "col": 0,
+       "word": "desperate",
+       "clue": "Willing to try anything because things are so bad."
+      }
+     ]
+    },
+    {
+     "rows": 11,
+     "cols": 11,
+     "grid": [
+      "marvellous.",
+      ".c.........",
+      "accompany..",
+      ".o....m....",
+      ".m..frantic",
+      ".m....t....",
+      "hostile....",
+      ".d....u....",
+      ".awkward...",
+      ".t.........",
+      ".e........."
+     ],
+     "entries": [
+      {
+       "n": 1,
+       "dir": "a",
+       "row": 0,
+       "col": 0,
+       "word": "marvellous",
+       "clue": "Wonderful."
+      },
+      {
+       "n": 2,
+       "dir": "d",
+       "row": 0,
+       "col": 1,
+       "word": "accommodate",
+       "clue": "To have enough room for people or things."
+      },
+      {
+       "n": 3,
+       "dir": "a",
+       "row": 2,
+       "col": 0,
+       "word": "accompany",
+       "clue": "To go somewhere with someone."
+      },
+      {
+       "n": 4,
+       "dir": "d",
+       "row": 2,
+       "col": 6,
+       "word": "amateur",
+       "clue": "Someone who does something for fun rather than as a job."
+      },
+      {
+       "n": 5,
+       "dir": "a",
+       "row": 4,
+       "col": 4,
+       "word": "frantic",
+       "clue": "Wild with worry or hurry."
+      },
+      {
+       "n": 6,
+       "dir": "a",
+       "row": 6,
+       "col": 0,
+       "word": "hostile",
+       "clue": "Unfriendly and ready to fight."
+      },
+      {
+       "n": 7,
+       "dir": "a",
+       "row": 8,
+       "col": 1,
+       "word": "awkward",
+       "clue": "Clumsy, or uncomfortable and embarrassing."
+      }
+     ]
+    }
    ]
   },
   "week-2026-09-21": {
@@ -2940,6 +3167,232 @@
      ],
      "tilings": [
       [0,0,0,0,0]
+     ]
+    }
+   ],
+   "crosswords": [
+    {
+     "rows": 11,
+     "cols": 11,
+     "grid": [
+      ".......l..d",
+      ".appreciate",
+      "..r....c..v",
+      "..o..p.e..i",
+      ".apparent.s",
+      "..h..a.s..e",
+      "..e..c.e...",
+      "..s..t.....",
+      "..y..i.....",
+      ".....c.....",
+      "advice....."
+     ],
+     "entries": [
+      {
+       "n": 1,
+       "dir": "d",
+       "row": 0,
+       "col": 7,
+       "word": "license",
+       "clue": "To give official permission (doing)."
+      },
+      {
+       "n": 2,
+       "dir": "d",
+       "row": 0,
+       "col": 10,
+       "word": "devise",
+       "clue": "To think up a plan or an idea (doing)."
+      },
+      {
+       "n": 3,
+       "dir": "a",
+       "row": 1,
+       "col": 1,
+       "word": "appreciate",
+       "clue": "To be grateful for something."
+      },
+      {
+       "n": 4,
+       "dir": "d",
+       "row": 1,
+       "col": 2,
+       "word": "prophesy",
+       "clue": "To say what will happen in the future (doing)."
+      },
+      {
+       "n": 5,
+       "dir": "d",
+       "row": 3,
+       "col": 5,
+       "word": "practice",
+       "clue": "Time spent doing something to get better at it (a thing)."
+      },
+      {
+       "n": 6,
+       "dir": "a",
+       "row": 4,
+       "col": 1,
+       "word": "apparent",
+       "clue": "Clear to see or understand."
+      },
+      {
+       "n": 7,
+       "dir": "a",
+       "row": 10,
+       "col": 0,
+       "word": "advice",
+       "clue": "Words that help someone decide what to do (a thing)."
+      }
+     ]
+    },
+    {
+     "rows": 11,
+     "cols": 11,
+     "grid": [
+      "......a....",
+      ".....advice",
+      "......v....",
+      "..p.l.i.a..",
+      "..r.i.s.t..",
+      "..ancient..",
+      "..c.e...a..",
+      "..t.n...c..",
+      "..i.c...h..",
+      "desperate..",
+      "..e.....d.."
+     ],
+     "entries": [
+      {
+       "n": 1,
+       "dir": "d",
+       "row": 0,
+       "col": 6,
+       "word": "advise",
+       "clue": "To tell someone what you think they should do (doing)."
+      },
+      {
+       "n": 2,
+       "dir": "a",
+       "row": 1,
+       "col": 5,
+       "word": "advice",
+       "clue": "Words that help someone decide what to do (a thing)."
+      },
+      {
+       "n": 3,
+       "dir": "d",
+       "row": 3,
+       "col": 2,
+       "word": "practise",
+       "clue": "To do something again and again to get better (doing)."
+      },
+      {
+       "n": 4,
+       "dir": "d",
+       "row": 3,
+       "col": 4,
+       "word": "licence",
+       "clue": "A document that allows you to do something (a thing)."
+      },
+      {
+       "n": 5,
+       "dir": "d",
+       "row": 3,
+       "col": 8,
+       "word": "attached",
+       "clue": "Fixed or joined on to something."
+      },
+      {
+       "n": 6,
+       "dir": "a",
+       "row": 5,
+       "col": 2,
+       "word": "ancient",
+       "clue": "Very, very old."
+      },
+      {
+       "n": 7,
+       "dir": "a",
+       "row": 9,
+       "col": 0,
+       "word": "desperate",
+       "clue": "Willing to try anything because things are so bad."
+      }
+     ]
+    },
+    {
+     "rows": 10,
+     "cols": 11,
+     "grid": [
+      "..........d",
+      "..available",
+      ".p..c.i...v",
+      ".r..c.c...i",
+      ".o..o.e...c",
+      "apparent..e",
+      ".h..d.c....",
+      ".e.license.",
+      ".c..n......",
+      ".y..g......"
+     ],
+     "entries": [
+      {
+       "n": 1,
+       "dir": "d",
+       "row": 0,
+       "col": 10,
+       "word": "device",
+       "clue": "A gadget made to do a job (a thing)."
+      },
+      {
+       "n": 2,
+       "dir": "a",
+       "row": 1,
+       "col": 2,
+       "word": "available",
+       "clue": "Free to be used or had."
+      },
+      {
+       "n": 3,
+       "dir": "d",
+       "row": 1,
+       "col": 4,
+       "word": "according",
+       "clue": "As someone or something says."
+      },
+      {
+       "n": 4,
+       "dir": "d",
+       "row": 1,
+       "col": 6,
+       "word": "licence",
+       "clue": "A document that allows you to do something (a thing)."
+      },
+      {
+       "n": 5,
+       "dir": "d",
+       "row": 2,
+       "col": 1,
+       "word": "prophecy",
+       "clue": "A statement of what will happen in the future (a thing)."
+      },
+      {
+       "n": 6,
+       "dir": "a",
+       "row": 5,
+       "col": 0,
+       "word": "apparent",
+       "clue": "Clear to see or understand."
+      },
+      {
+       "n": 7,
+       "dir": "a",
+       "row": 7,
+       "col": 3,
+       "word": "license",
+       "clue": "To give official permission (doing)."
+      }
      ]
     }
    ]
@@ -3467,6 +3920,234 @@
      ],
      "tilings": [
       [0,0,0,0,0]
+     ]
+    }
+   ],
+   "crosswords": [
+    {
+     "rows": 10,
+     "cols": 9,
+     "grid": [
+      "observant",
+      "...x....o",
+      "p..p.c..l",
+      "relevance",
+      "o..c.t..r",
+      "p..t.e..a",
+      "h.bargain",
+      "e..n.o..t",
+      "c..c.r...",
+      "y..y.y..."
+     ],
+     "entries": [
+      {
+       "n": 1,
+       "dir": "a",
+       "row": 0,
+       "col": 0,
+       "word": "observant",
+       "clue": "Good at noticing things."
+      },
+      {
+       "n": 2,
+       "dir": "d",
+       "row": 0,
+       "col": 3,
+       "word": "expectancy",
+       "clue": "The feeling that something is about to happen."
+      },
+      {
+       "n": 3,
+       "dir": "d",
+       "row": 0,
+       "col": 8,
+       "word": "tolerant",
+       "clue": "Willing to accept people and ideas that differ from yours."
+      },
+      {
+       "n": 4,
+       "dir": "d",
+       "row": 2,
+       "col": 0,
+       "word": "prophecy",
+       "clue": "A statement of what will happen in the future (a thing)."
+      },
+      {
+       "n": 5,
+       "dir": "d",
+       "row": 2,
+       "col": 5,
+       "word": "category",
+       "clue": "A group of things that are alike."
+      },
+      {
+       "n": 6,
+       "dir": "a",
+       "row": 3,
+       "col": 0,
+       "word": "relevance",
+       "clue": "How closely something is connected to what matters."
+      },
+      {
+       "n": 7,
+       "dir": "a",
+       "row": 6,
+       "col": 2,
+       "word": "bargain",
+       "clue": "Something bought for less than it is worth."
+      }
+     ]
+    },
+    {
+     "rows": 11,
+     "cols": 10,
+     "grid": [
+      "....m.....",
+      "t...a....h",
+      "observance",
+      "l...v....s",
+      "e.b.e.a..i",
+      "r.relevant",
+      "a.u.l.e..a",
+      "n.i.o.r..n",
+      "c.s.u.a..t",
+      "e.e.s.g...",
+      "......e..."
+     ],
+     "entries": [
+      {
+       "n": 1,
+       "dir": "d",
+       "row": 0,
+       "col": 4,
+       "word": "marvellous",
+       "clue": "Wonderful."
+      },
+      {
+       "n": 2,
+       "dir": "d",
+       "row": 1,
+       "col": 0,
+       "word": "tolerance",
+       "clue": "Being able to put up with something."
+      },
+      {
+       "n": 3,
+       "dir": "d",
+       "row": 1,
+       "col": 9,
+       "word": "hesitant",
+       "clue": "Unsure, and slow to act or speak."
+      },
+      {
+       "n": 4,
+       "dir": "a",
+       "row": 2,
+       "col": 0,
+       "word": "observance",
+       "clue": "Keeping to a rule or a custom."
+      },
+      {
+       "n": 5,
+       "dir": "d",
+       "row": 4,
+       "col": 2,
+       "word": "bruise",
+       "clue": "A dark mark on the skin from a bump."
+      },
+      {
+       "n": 6,
+       "dir": "d",
+       "row": 4,
+       "col": 6,
+       "word": "average",
+       "clue": "Normal or usual; not special."
+      },
+      {
+       "n": 7,
+       "dir": "a",
+       "row": 5,
+       "col": 2,
+       "word": "relevant",
+       "clue": "Connected to what is being talked about."
+      }
+     ]
+    },
+    {
+     "rows": 13,
+     "cols": 9,
+     "grid": [
+      "....r....",
+      ".category",
+      "....l....",
+      "....e....",
+      "relevance",
+      ".x..a....",
+      ".p..n....",
+      "hesitancy",
+      ".c.......",
+      ".t.......",
+      ".awkward.",
+      ".n.......",
+      ".tolerant"
+     ],
+     "entries": [
+      {
+       "n": 1,
+       "dir": "d",
+       "row": 0,
+       "col": 4,
+       "word": "relevant",
+       "clue": "Connected to what is being talked about."
+      },
+      {
+       "n": 2,
+       "dir": "a",
+       "row": 1,
+       "col": 1,
+       "word": "category",
+       "clue": "A group of things that are alike."
+      },
+      {
+       "n": 3,
+       "dir": "a",
+       "row": 4,
+       "col": 0,
+       "word": "relevance",
+       "clue": "How closely something is connected to what matters."
+      },
+      {
+       "n": 4,
+       "dir": "d",
+       "row": 4,
+       "col": 1,
+       "word": "expectant",
+       "clue": "Waiting eagerly for something to happen."
+      },
+      {
+       "n": 5,
+       "dir": "a",
+       "row": 7,
+       "col": 0,
+       "word": "hesitancy",
+       "clue": "Being slow to act because you are unsure."
+      },
+      {
+       "n": 6,
+       "dir": "a",
+       "row": 10,
+       "col": 1,
+       "word": "awkward",
+       "clue": "Clumsy, or uncomfortable and embarrassing."
+      },
+      {
+       "n": 7,
+       "dir": "a",
+       "row": 12,
+       "col": 1,
+       "word": "tolerant",
+       "clue": "Willing to accept people and ideas that differ from yours."
+      }
      ]
     }
    ]
@@ -4088,6 +4769,232 @@
       [0,0,0,0,0]
      ]
     }
+   ],
+   "crosswords": [
+    {
+     "rows": 11,
+     "cols": 11,
+     "grid": [
+      "innocent...",
+      ".....x....c",
+      "d....c....o",
+      "existence.n",
+      "c....l....f",
+      "e....l.d..i",
+      "n....e.e..d",
+      "communicate",
+      "y....t.e..n",
+      ".......n..t",
+      ".......t..."
+     ],
+     "entries": [
+      {
+       "n": 1,
+       "dir": "a",
+       "row": 0,
+       "col": 0,
+       "word": "innocent",
+       "clue": "Not guilty of doing anything wrong."
+      },
+      {
+       "n": 2,
+       "dir": "d",
+       "row": 0,
+       "col": 5,
+       "word": "excellent",
+       "clue": "Extremely good."
+      },
+      {
+       "n": 3,
+       "dir": "d",
+       "row": 1,
+       "col": 10,
+       "word": "confident",
+       "clue": "Sure that you can do something."
+      },
+      {
+       "n": 4,
+       "dir": "d",
+       "row": 2,
+       "col": 0,
+       "word": "decency",
+       "clue": "Behaving in a good, kind and fair way."
+      },
+      {
+       "n": 5,
+       "dir": "a",
+       "row": 3,
+       "col": 0,
+       "word": "existence",
+       "clue": "Being real, or being alive."
+      },
+      {
+       "n": 6,
+       "dir": "d",
+       "row": 5,
+       "col": 7,
+       "word": "decent",
+       "clue": "Good, kind and fair."
+      },
+      {
+       "n": 7,
+       "dir": "a",
+       "row": 7,
+       "col": 0,
+       "word": "communicate",
+       "clue": "To share information or ideas."
+      }
+     ]
+    },
+    {
+     "rows": 11,
+     "cols": 10,
+     "grid": [
+      "..decent..",
+      "....o.....",
+      ".community",
+      "....m..n..",
+      "confidence",
+      "....t..o..",
+      "....t..c..",
+      ".excellent",
+      "....e..n..",
+      ".......c..",
+      "..cemetery"
+     ],
+     "entries": [
+      {
+       "n": 1,
+       "dir": "a",
+       "row": 0,
+       "col": 2,
+       "word": "decent",
+       "clue": "Good, kind and fair."
+      },
+      {
+       "n": 2,
+       "dir": "d",
+       "row": 0,
+       "col": 4,
+       "word": "committee",
+       "clue": "A group of people chosen to make decisions."
+      },
+      {
+       "n": 3,
+       "dir": "a",
+       "row": 2,
+       "col": 1,
+       "word": "community",
+       "clue": "The people living in one place."
+      },
+      {
+       "n": 4,
+       "dir": "d",
+       "row": 2,
+       "col": 7,
+       "word": "innocence",
+       "clue": "Being free from guilt, or not knowing about bad things."
+      },
+      {
+       "n": 5,
+       "dir": "a",
+       "row": 4,
+       "col": 0,
+       "word": "confidence",
+       "clue": "The feeling of being sure you can do something."
+      },
+      {
+       "n": 6,
+       "dir": "a",
+       "row": 7,
+       "col": 1,
+       "word": "excellent",
+       "clue": "Extremely good."
+      },
+      {
+       "n": 7,
+       "dir": "a",
+       "row": 10,
+       "col": 2,
+       "word": "cemetery",
+       "clue": "A place where people are buried."
+      }
+     ]
+    },
+    {
+     "rows": 10,
+     "cols": 11,
+     "grid": [
+      ".......e..e",
+      "....c..x..x",
+      "....o..i..c",
+      "decent.s..e",
+      "....f..t..l",
+      "committee.l",
+      "....d..n..e",
+      "competition",
+      "....n.....c",
+      "existence.e"
+     ],
+     "entries": [
+      {
+       "n": 1,
+       "dir": "d",
+       "row": 0,
+       "col": 7,
+       "word": "existent",
+       "clue": "Real, and still there."
+      },
+      {
+       "n": 2,
+       "dir": "d",
+       "row": 0,
+       "col": 10,
+       "word": "excellence",
+       "clue": "Being very, very good at something."
+      },
+      {
+       "n": 3,
+       "dir": "d",
+       "row": 1,
+       "col": 4,
+       "word": "confident",
+       "clue": "Sure that you can do something."
+      },
+      {
+       "n": 4,
+       "dir": "a",
+       "row": 3,
+       "col": 0,
+       "word": "decent",
+       "clue": "Good, kind and fair."
+      },
+      {
+       "n": 5,
+       "dir": "a",
+       "row": 5,
+       "col": 0,
+       "word": "committee",
+       "clue": "A group of people chosen to make decisions."
+      },
+      {
+       "n": 6,
+       "dir": "a",
+       "row": 7,
+       "col": 0,
+       "word": "competition",
+       "clue": "A contest to see who is best."
+      },
+      {
+       "n": 7,
+       "dir": "a",
+       "row": 9,
+       "col": 0,
+       "word": "existence",
+       "clue": "Being real, or being alive."
+      }
+     ]
+    }
    ]
   },
   "week-2026-10-12": {
@@ -4601,6 +5508,234 @@
       [0,0,0,0,0]
      ]
     }
+   ],
+   "crosswords": [
+    {
+     "rows": 13,
+     "cols": 11,
+     "grid": [
+      ".expectant.",
+      ".....o.....",
+      ".....n.c...",
+      "correspond.",
+      ".....c.n...",
+      ".....i.v...",
+      "controversy",
+      ".....u.n...",
+      ".....s.i...",
+      ".......e...",
+      ".tolerance.",
+      ".......c...",
+      ".conscience"
+     ],
+     "entries": [
+      {
+       "n": 1,
+       "dir": "a",
+       "row": 0,
+       "col": 1,
+       "word": "expectant",
+       "clue": "Waiting eagerly for something to happen."
+      },
+      {
+       "n": 2,
+       "dir": "d",
+       "row": 0,
+       "col": 5,
+       "word": "conscious",
+       "clue": "Awake and aware."
+      },
+      {
+       "n": 3,
+       "dir": "d",
+       "row": 2,
+       "col": 7,
+       "word": "convenience",
+       "clue": "Being easy and useful."
+      },
+      {
+       "n": 4,
+       "dir": "a",
+       "row": 3,
+       "col": 0,
+       "word": "correspond",
+       "clue": "To write letters to each other."
+      },
+      {
+       "n": 5,
+       "dir": "a",
+       "row": 6,
+       "col": 0,
+       "word": "controversy",
+       "clue": "A big disagreement about something."
+      },
+      {
+       "n": 6,
+       "dir": "a",
+       "row": 10,
+       "col": 1,
+       "word": "tolerance",
+       "clue": "Being able to put up with something."
+      },
+      {
+       "n": 7,
+       "dir": "a",
+       "row": 12,
+       "col": 1,
+       "word": "conscience",
+       "clue": "The feeling inside that tells you right from wrong."
+      }
+     ]
+    },
+    {
+     "rows": 11,
+     "cols": 11,
+     "grid": [
+      "p.....c....",
+      "r.c.c.o....",
+      "a.o.o.n....",
+      "controversy",
+      "t.s.r.e....",
+      "i.c.e.n...d",
+      "s.i.s.i...e",
+      "e.e.p.e...v",
+      "..n.o.n...i",
+      "..conscious",
+      "..e.d.e...e"
+     ],
+     "entries": [
+      {
+       "n": 1,
+       "dir": "d",
+       "row": 0,
+       "col": 0,
+       "word": "practise",
+       "clue": "To do something again and again to get better (doing)."
+      },
+      {
+       "n": 2,
+       "dir": "d",
+       "row": 0,
+       "col": 6,
+       "word": "convenience",
+       "clue": "Being easy and useful."
+      },
+      {
+       "n": 3,
+       "dir": "d",
+       "row": 1,
+       "col": 2,
+       "word": "conscience",
+       "clue": "The feeling inside that tells you right from wrong."
+      },
+      {
+       "n": 4,
+       "dir": "d",
+       "row": 1,
+       "col": 4,
+       "word": "correspond",
+       "clue": "To write letters to each other."
+      },
+      {
+       "n": 5,
+       "dir": "a",
+       "row": 3,
+       "col": 0,
+       "word": "controversy",
+       "clue": "A big disagreement about something."
+      },
+      {
+       "n": 6,
+       "dir": "d",
+       "row": 5,
+       "col": 10,
+       "word": "devise",
+       "clue": "To think up a plan or an idea (doing)."
+      },
+      {
+       "n": 7,
+       "dir": "a",
+       "row": 9,
+       "col": 2,
+       "word": "conscious",
+       "clue": "Awake and aware."
+      }
+     ]
+    },
+    {
+     "rows": 10,
+     "cols": 11,
+     "grid": [
+      "..cemetery.",
+      "..o........",
+      "convenience",
+      "..s....x...",
+      "..conscious",
+      "..i....s...",
+      "..e....t...",
+      "controversy",
+      "..c....n...",
+      "..expectant"
+     ],
+     "entries": [
+      {
+       "n": 1,
+       "dir": "a",
+       "row": 0,
+       "col": 2,
+       "word": "cemetery",
+       "clue": "A place where people are buried."
+      },
+      {
+       "n": 1,
+       "dir": "d",
+       "row": 0,
+       "col": 2,
+       "word": "conscience",
+       "clue": "The feeling inside that tells you right from wrong."
+      },
+      {
+       "n": 2,
+       "dir": "a",
+       "row": 2,
+       "col": 0,
+       "word": "convenience",
+       "clue": "Being easy and useful."
+      },
+      {
+       "n": 3,
+       "dir": "d",
+       "row": 2,
+       "col": 7,
+       "word": "existent",
+       "clue": "Real, and still there."
+      },
+      {
+       "n": 4,
+       "dir": "a",
+       "row": 4,
+       "col": 2,
+       "word": "conscious",
+       "clue": "Awake and aware."
+      },
+      {
+       "n": 5,
+       "dir": "a",
+       "row": 7,
+       "col": 0,
+       "word": "controversy",
+       "clue": "A big disagreement about something."
+      },
+      {
+       "n": 6,
+       "dir": "a",
+       "row": 9,
+       "col": 2,
+       "word": "expectant",
+       "clue": "Waiting eagerly for something to happen."
+      }
+     ]
+    }
    ]
   },
   "week-2026-10-19": {
@@ -5089,6 +6224,236 @@
       [0,0,0,0,0],
       [0,1,0,0,1],
       [1,0,0,0,2]
+     ]
+    }
+   ],
+   "crosswords": [
+    {
+     "rows": 11,
+     "cols": 11,
+     "grid": [
+      "relevance..",
+      ".......u...",
+      ".....c.r.d.",
+      ".determined",
+      ".....i.o.s.",
+      ".....t.s.p.",
+      "..definite.",
+      ".....c.t.r.",
+      ".....i.y.a.",
+      ".....s...t.",
+      "...average."
+     ],
+     "entries": [
+      {
+       "n": 1,
+       "dir": "a",
+       "row": 0,
+       "col": 0,
+       "word": "relevance",
+       "clue": "How closely something is connected to what matters."
+      },
+      {
+       "n": 2,
+       "dir": "d",
+       "row": 0,
+       "col": 7,
+       "word": "curiosity",
+       "clue": "Wanting to know or learn about things."
+      },
+      {
+       "n": 3,
+       "dir": "d",
+       "row": 2,
+       "col": 5,
+       "word": "criticise",
+       "clue": "To say what is wrong with something."
+      },
+      {
+       "n": 4,
+       "dir": "d",
+       "row": 2,
+       "col": 9,
+       "word": "desperate",
+       "clue": "Willing to try anything because things are so bad."
+      },
+      {
+       "n": 5,
+       "dir": "a",
+       "row": 3,
+       "col": 1,
+       "word": "determined",
+       "clue": "Having decided firmly to do something."
+      },
+      {
+       "n": 6,
+       "dir": "a",
+       "row": 6,
+       "col": 2,
+       "word": "definite",
+       "clue": "Certain and fixed."
+      },
+      {
+       "n": 7,
+       "dir": "a",
+       "row": 10,
+       "col": 3,
+       "word": "average",
+       "clue": "Normal or usual; not special."
+      }
+     ]
+    },
+    {
+     "rows": 13,
+     "cols": 11,
+     "grid": [
+      "..d........",
+      "..e........",
+      "..f........",
+      "..i........",
+      "innocence..",
+      "..i....u...",
+      "..t.d..r...",
+      ".determined",
+      "....v..o...",
+      "criticise..",
+      "....s..i...",
+      "desperate..",
+      ".......y..."
+     ],
+     "entries": [
+      {
+       "n": 1,
+       "dir": "d",
+       "row": 0,
+       "col": 2,
+       "word": "definite",
+       "clue": "Certain and fixed."
+      },
+      {
+       "n": 2,
+       "dir": "a",
+       "row": 4,
+       "col": 0,
+       "word": "innocence",
+       "clue": "Being free from guilt, or not knowing about bad things."
+      },
+      {
+       "n": 3,
+       "dir": "d",
+       "row": 4,
+       "col": 7,
+       "word": "curiosity",
+       "clue": "Wanting to know or learn about things."
+      },
+      {
+       "n": 4,
+       "dir": "d",
+       "row": 6,
+       "col": 4,
+       "word": "devise",
+       "clue": "To think up a plan or an idea (doing)."
+      },
+      {
+       "n": 5,
+       "dir": "a",
+       "row": 7,
+       "col": 1,
+       "word": "determined",
+       "clue": "Having decided firmly to do something."
+      },
+      {
+       "n": 6,
+       "dir": "a",
+       "row": 9,
+       "col": 0,
+       "word": "criticise",
+       "clue": "To say what is wrong with something."
+      },
+      {
+       "n": 7,
+       "dir": "a",
+       "row": 11,
+       "col": 0,
+       "word": "desperate",
+       "clue": "Willing to try anything because things are so bad."
+      }
+     ]
+    },
+    {
+     "rows": 12,
+     "cols": 11,
+     "grid": [
+      "...advise..",
+      "....e......",
+      ".e..s......",
+      ".x..p......",
+      ".c..e...d..",
+      "determined.",
+      ".l..a...f..",
+      ".l..t...i..",
+      ".expectancy",
+      ".n......i..",
+      ".curiosity.",
+      ".e......e.."
+     ],
+     "entries": [
+      {
+       "n": 1,
+       "dir": "a",
+       "row": 0,
+       "col": 3,
+       "word": "advise",
+       "clue": "To tell someone what you think they should do (doing)."
+      },
+      {
+       "n": 2,
+       "dir": "d",
+       "row": 0,
+       "col": 4,
+       "word": "desperate",
+       "clue": "Willing to try anything because things are so bad."
+      },
+      {
+       "n": 3,
+       "dir": "d",
+       "row": 2,
+       "col": 1,
+       "word": "excellence",
+       "clue": "Being very, very good at something."
+      },
+      {
+       "n": 4,
+       "dir": "d",
+       "row": 4,
+       "col": 8,
+       "word": "definite",
+       "clue": "Certain and fixed."
+      },
+      {
+       "n": 5,
+       "dir": "a",
+       "row": 5,
+       "col": 0,
+       "word": "determined",
+       "clue": "Having decided firmly to do something."
+      },
+      {
+       "n": 6,
+       "dir": "a",
+       "row": 8,
+       "col": 1,
+       "word": "expectancy",
+       "clue": "The feeling that something is about to happen."
+      },
+      {
+       "n": 7,
+       "dir": "a",
+       "row": 10,
+       "col": 1,
+       "word": "curiosity",
+       "clue": "Wanting to know or learn about things."
+      }
      ]
     }
    ]

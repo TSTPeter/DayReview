@@ -70,7 +70,7 @@ for Peter to settle (`docs/13`, "Still open").
 | 10. Geolocation | None | |
 | 11. Parental controls | The grown-up view. When sync is on, her welcome page tells her: "Your grown-up can see your totals, but never the words you write." When the microphone listens, a meter shows it, and the browser shows its own sign | |
 | 12. Profiling | The experiment assigns help at random, which is not profiling. A later adaptive phase would be, and would be switched on deliberately and documented | |
-| 13. Nudge techniques | Sharing earns nothing and is never suggested; the privacy switches are in the grown-up view only | |
+| 13. Nudge techniques | Sharing earns nothing, counts nothing and is never prompted: it is one labelled button on the welcome page that she has to choose to press, and no game, message or reward mentions it. The privacy switches are in the grown-up view only | Watch that it stays that way: a "share your score" prompt would be a nudge |
 | 14. Connected toys and devices | The microphone listens on the tablet only (`web/js/voice.js`) | |
 | 15. Online tools | Export and delete-everything in the grown-up view | |
 
@@ -91,7 +91,16 @@ for Peter to settle (`docs/13`, "Still open").
 - **The experiment.** Help is assigned at random and logged on the tablet. Only the
   tallies per arm can leave it. Pre-registered in `experiments/`, and it starts only
   once the quotations have been reviewed.
-- **Sharing.** The address only, with no tracking parameter and no reward.
+- **Sharing.** The address and one plain sentence, with no tracking parameter and no
+  reward. On 6 October Peter asked for a "Share this with your friends" function built in
+  for the student and the parent, because the first one was a small link at the foot of the
+  welcome page that he could not find. It is now a labelled button on the welcome page that
+  opens the device's own share sheet where there is one, copies the link where there is
+  not, and shows the QR code; and the grown-up view has a message to send to another
+  parent. Nothing else changed: the text is fixed in the app (`SHARE` in `web/js/app.js`),
+  carries no name, no result and no parameter, and nobody is told who shared it. The
+  device's share sheet is the operating system's, so what it suggests (contacts, apps) is
+  outside this service's control, and the notice for families says so.
 
 ## Actions
 

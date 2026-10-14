@@ -23,7 +23,7 @@ section of that date below.
 | A syllable jigsaw | **A word-part jigsaw** | Syllables hide the decision these lists turn on. *ob-ser-vant* splits the *-ant*; *observ + ant* puts the choice on its own piece |
 | Etymology matching with swirly lines | **As asked: root match** | Rests on less than it looks (below). Built as a meaning game and labelled as one |
 | Hangman, Wheel of Fortune | **Not built** on 28 September. Hangman **built on 30 September**, when Peter asked for it again | Guessing a letter at a time practises guessing letters, not recalling spellings. That was judgement, not a finding, so his second ask wins, and the design below meets the objection part way |
-| Jeopardy | **The bonus round** | Every square is a typed spelling, marked by the real classifier |
+| Jeopardy | **The bonus round** (replaced on 6 October by four games, because it "just isn't fun") | Every square was a typed spelling, marked by the real classifier |
 | Coloured bits of words making a pattern | **The pattern sort**, and one colour code in every game | See below |
 | Points that unlock a daily quiz | **Points open the bonus round** | Locking the dictation behind games would mean a games-only day had no dictation at all, and dictation is the part with the strongest evidence behind it |
 
@@ -81,6 +81,9 @@ plus judgement.
 
 ### Bonus round
 
+*Replaced on 6 October 2026 by four games, one at random: see the last section. What
+follows is what the game-show board was.*
+
 A game-show board: this week's list, last week's and the week before's, worth 5, 10
 and 15. The clue is the meaning, the first letter and the length. She **types** the
 word, the real classifier marks it, and a miss shows her attempt against the word with
@@ -97,13 +100,16 @@ Older weeks are on the board on purpose: a round is spaced retrieval of the term
   (d = -0.28, against -0.40 for engagement-contingent; `docs/02`). Nothing is given
   for turning up, finishing, or time spent.
 - **Every 50 opens one bonus round.** A jigsaw word is 10, a match or a sort card 5,
-  a bonus square 5, 10 or 15, a hangman or hidden word 10. The number 50, about one
-  game's worth, is a guess.
+  a bonus square 5, 10 or 15, a hangman or hidden word 10, and a fill-the-gap sentence,
+  a look-cover-write word, a letter-tiles word or a crossword answer 10, and in the
+  bonus round a race card, a chest or a snake word 10 and a detective case 15, 10 or 5.
+  The number 50, about one game's worth, is a guess.
 - **Hangman and hidden words pay for the word, not the first go.** Misses are part of
   hangman and searching is the whole of hidden words, so a word solved or found earns
   10, and a hint halves it to 5. Still performance-contingent.
 - **Bonus-round points count too.** A good bonus round can earn the next one. The
-  loop points at typed recall, the most useful practice after dictation. Judgement.
+  loop points at typed recall, the most useful practice after dictation. Judgement. That
+  was true of the board and is true of the four games that replaced it.
 - **Points never go down.** A wrong answer earns nothing and costs nothing.
 - **They live on the games screens only.** The browser suite sweeps every practice
   screen for points language, and does it again after she has earned some.
@@ -124,13 +130,16 @@ made by Peter. See the note added there.
   letter, and a trace in progress is ink, which no part uses.
 - **Nothing touches the scheduler or the attempt log.** The games are extra practice.
   The fixed sequence stays the default, which is `CLAUDE.md`'s rule.
+- **The growing background belongs to the card-by-card games only:** the pattern sort,
+  and the bonus round and any new game where she answers one card at a time. Hangman,
+  hidden words, the jigsaw and root match stay plain (`docs/11`, 6 October).
 - **The games follow the term's calendar,** because their content is written per week.
 
 ## The content, and who has checked it
 
 `engine/games.py` holds all of it and `tests/test_games.py` holds it to its own rules:
 every piece joins back into its word, no meaning contains its word or a long piece of
-it, no two words share a meaning (a game-show clue would have two right answers), and
+it, no two words share a meaning (a clue would have two right answers), and
 every sort card completes to exactly its full text.
 
 It also gives the 52 term words that have no curated entry a written-up one: parts,
@@ -280,7 +289,7 @@ to the conventions. What changed, and what each part rests on:
 | **The support after a miss** is the word's arm in the experiment: where it comes from, a real sentence that uses it, saying it aloud, or all three. Before the experiment starts, it is where it comes from plus saying it aloud | `experiments/2026-10-support-types.md` |
 | **Say it aloud.** If the support includes it and an adult has switched the microphone on, the game listens for her voice and ends the pause when it hears her | The production effect: words said aloud are remembered better than words read silently, but only when some are said and others are not ([MacLeod et al. 2010](https://doi.org/10.1037/a0018785)). Saying a word as it is spelt helps children spell it ([Hilte and Reitsma 2006](https://doi.org/10.1007/s11881-006-0013-3)). Both are recognition and spelling studies, not studies of this game |
 | **Run sounds** for right answers in a row at the first go, at 3, 5, 7 and 9, and polyphony from 11 | Performance-contingent reward (d = -0.28), the least harmful expected class. Peter's call; see `docs/11` |
-| **A background that grows** white on white with the run, and steps back two levels on a miss | Judgement, kept subtle because of `docs/02`'s coherence finding. See `docs/11` |
+| **A background that grows** white on white with each card right at the first go, and takes back one layer on a miss (two until 6 October) | Judgement, kept subtle because of `docs/02`'s coherence finding. See `docs/11` |
 
 **Beatrix's three-in-a-row sound did not exist.** The special sound she noticed was
 the unlock sting, three rising notes, which plays when her points pass a multiple of
@@ -294,3 +303,139 @@ can send audio away to be transcribed (`docs/06`, `docs/16`).
 **The other games get the support too.** A wrong jigsaw check (once per word), a
 hangman word that runs out of petals, and a wrong bonus answer all show the word's
 support. Hidden words and root match have no wrong answer on a word to attach it to.
+
+## 6 October 2026: four more games
+
+Peter asked for "a few more games". Offered four, he chose all four: **fill the gap,
+look cover write, letter tiles and the mini crossword.** Each answers `docs/01`'s
+non-negotiables in the same way: she types or taps, a miss is marked against the word
+with its rule and its support, no misspelling is left on screen as something to look at,
+and nothing reaches the scheduler or the attempt log. The first three answer one card at
+a time, so they have the growing background (`docs/11`); the crossword is a grid and does
+not.
+
+| Game | What she does | Points | Rests on |
+|---|---|---|---|
+| **Fill the gap** | A sentence from her dictation set with the word missing. She types it. The meaning, the first letter and the length are shown, never the word | 10 a sentence at the first go | Retrieval, typed and marked, in a sentence she has heard: KS2's standard is spelling in her own writing, and explicit instruction transfers to free writing (Graham and Santangelo 2014, ES 0.94, `docs/01`). That a cloze transfers to her own writing is judgement |
+| **Look, cover, write** | The word appears in its parts and she says it. She taps Cover when she is ready, writes it from memory, and checks. A word she missed comes round once more | 10 a word at the first go, nothing for the second look | The school's own method. A meta-analysis found the cover-copy-compare family effective for spelling and for maths, strongest when combined with other evidence-based components ([Joseph et al. 2012](https://onlinelibrary.wiley.com/doi/abs/10.1002/pits.20622); the abstract gives no figures). A small controlled trial with 55 seven-year-olds found look, say, cover, write, check, fix improved the words taught, though rule-based teaching transferred better to new words ([Dymock and Nicholson 2017](https://eric.ed.gov/?id=EJ1163271)). So what is supported is check-and-retry on the words practised, not transfer. The retrieval in the middle is what `docs/01` backs; the look is preparation, so nothing counts down |
+| **Letter tiles** | The word's letters, jumbled. She taps them into the slots and checks. What is right stays, the rest go back, and she is told how many were right. After three misses the word is shown | 10 a word at the first go | Judgement, and the little evidence leans the other way. It is a classroom activity ([Cunningham and Cunningham 1992](https://eric.ed.gov/?id=EJ451254), a teachers' guide with no controlled data), and the one controlled comparison found, with first-graders, had children spell better after writing words by hand than after typing them or arranging letter tiles ([Cunningham and Stanovich 1990](https://doi.org/10.1037/0022-0663.82.1.159)). It is here for variety and because it is quick, and it earns no more than the jigsaw |
+| **Mini crossword** | Clues are meanings; the answers are words from the term. She types a whole answer, and the squares it fills are the hint for the answers that cross it | 10 an answer at the first go | Judgement. Retrieval of a word from its meaning, with a cue, is practice `docs/01` supports. This build found no controlled evidence on crosswords and children's spelling. It is here because it is a puzzle she may enjoy, and it says so |
+
+**Rules these four keep, and the one place they do not.**
+
+- **One attempt a word.** A second go straight after seeing the answer would be copying,
+  not recall. A typed answer is marked, shown, and left. The exception is look cover
+  write, where a miss comes round once more at the end of the round for no points,
+  because a miss, then feedback, then a second retrieval is the sequence retrieval
+  practice relies on. That is judgement about how to use the miss, not a finding about
+  this game.
+- **A tile or a square never shows a wrong letter.** Tiles that are in the wrong place go
+  back to the tray. Crossword answers are typed whole and never into a square, so the grid
+  only ever holds right letters, and a missed answer is filled in with the right word.
+- **Letter tiles always has a hyphen tile,** a spare in any word that has none, so its
+  presence never gives a hyphen away. Hangman has the same rule.
+- **Nothing counts down.** In look cover write the cover goes on when she taps it.
+
+**What they share.** One typed-answer box (`web/js/answer.js`) built once: the same
+classifier as the dictation, the same marked feedback, the rule and the support after a
+miss. Each game is a small module that games.js hands the shared parts (`points`, the log,
+the background), so none repeats them.
+
+**The crossword's content is built offline** (`engine/crossword.py`) and held to its rules
+by `tests/test_crossword.py`: every run of letters, across or down, is exactly one answer, so
+nothing is spelt by accident; every answer crosses another; the grid is at most 11 squares
+wide so a square stays readable on a phone; and every clue is the word's meaning, which the
+game's own tests already hold to not giving the word away. Each week has three puzzles. This
+week's words come first because the test is on Friday, and the rest of each puzzle is earlier
+weeks' words, so it is also spaced retrieval of the term. The hyphen weeks (12 and 19 October)
+have only five plain words of their own, and a hyphen cannot sit in a square, so those two
+weeks' puzzles are mostly older words. A crossword would also have to give the hyphen away,
+which is the thing those weeks are about. Fill the gap needs each word in its sentence once,
+as a whole word, and `tests/test_gap.mjs` checks all 88.
+
+**What is logged** (`game_log`, on the device, and counted in the grown-up view beside the
+dictation sessions): the game, the week, each word, whether it was right at the first go, the
+error type, and for tiles the misses and whether the word had to be shown.
+
+**Games in general.** A meta-analysis of serious games found they helped learning (d = 0.29)
+and retention (d = 0.36) but were not reliably more motivating (d = 0.26, not significant),
+and that they did better alongside other instruction and over several sessions
+([Wouters et al. 2013](https://doi.org/10.1037/a0031311)). That is how these are used: extra
+practice beside the dictation, never instead of it, and not claimed to be more motivating.
+
+**What was left out, and why.** A Wordle-style guessing game and a "spot the mistake" game both
+leave misspellings on screen as the thing to look at, which `docs/01` rules out (the DysEggxia
+point: never display a wrong spelling as the object of attention, or only as a separate,
+labelled exercise outside the main loop). That rule is a precaution, not a finding about her.
+Adults spell worse after reading misspellings ([Jacoby and Hollingshead 1990](https://doi.org/10.1037/h0084259);
+[Brown 1988](https://doi.org/10.1037/0022-0663.80.4.488)), but the one study found in
+fifth-graders saw exposure to correct spellings help and exposure to misspellings do no
+significant harm to the group as a whole, though a few pupils were badly affected
+([Bradley and King 1992](https://doi.org/10.1080/10862969209547789)). So the evidence for
+children is mixed, and a proofreading game could be added as a separate, labelled exercise if
+Peter wants one. Wheel of Fortune is hangman with a spinner, and the spin adds luck, not
+spelling (judgement).
+
+**Still open.**
+
+- **Nobody has played them on a phone or an iPad.** The browser suite plays every game with
+  a mouse and a phone-sized touch screen, and the phone suite taps through each of them on a
+  Pixel 7 and a Galaxy S8. A child's thumbs are different.
+- **The crossword on a small phone** has squares about 29 px wide for an 11-wide puzzle. It
+  is read and chosen from the clue list, which has large rows, but it is the tightest screen.
+- **Three misses before the tiles show the word** is a guess.
+- **Novelty.** Gamified engagement is documented to decline after the first weeks
+  (`docs/15`, "Still open"), and ten games is a lot to choose from. Judge them at eight weeks.
+- **The meanings the clues use are unreviewed,** as the rest of the games' content is.
+  The sentences Fill the gap uses were reviewed by Peter.
+
+## 6 October 2026: the bonus round, four games at random
+
+Peter: the game-show board "just isn't fun". Asked what should replace it, he chose the
+word detective, the race against a paper snail and the treasure chests, wanted one of them to
+turn up at random each time, and asked for something crazier, "like some kind of game where
+you have to eat letters as though you were pacman or snake or something". So there are four.
+
+**How it works.** Points open it, every 50, as before, and the points earned inside count
+too, so a good round can earn the next one. Which of the four turns up is picked at random and
+is never the one before it (the last kind is kept on the device). Nothing about which one
+comes depends on how she did or says anything is coming, so it is variety and not a reward.
+The words are about half from this week and the rest from the two weeks before, so a round is
+still spaced retrieval of the term so far, as the board was.
+
+| Game | What she does | Points | Rests on |
+|---|---|---|---|
+| **Word detective** | A mystery word. The first clue is its meaning. She types a guess; a wrong one is cleared at once and the next clue opens by itself, and she can ask for the next whenever she likes: where it comes from, then its first letter and length. Five cases a round | 15, 10 or 5 by the clue she was on; nothing for a lost case | Judgement: graded cues for retrieval, typed, with the last wrong guess marked against the word. Costed help because learners often use on-demand help poorly ([Aleven et al. 2003](https://journals.sagepub.com/doi/10.3102/00346543073003277), a review of tutoring systems). That the cost should be points is judgement |
+| **Race the paper snail** | Six typed cards, each the meaning, the first letter and the length. A card right at the first go moves her two squares along a track of ten; the snail moves one after every card whatever happens. Five right crosses the line first; there is no timer | 10 a card at the first go | Judgement. A rival that crawls at a fixed pace is a familiar frame, and nothing here compares her with another child (`docs/16`). The typed recall inside is what `docs/01` supports |
+| **Treasure chests** | Six locked chests, one after another. The word is typed; a right answer opens the chest to show a paper animal. A missed chest stays shut and the word is marked against what she typed | 10 a chest at the first go | Judgement. It comes one chest at a time, with nothing to choose and no board to find her way round, which is what the old board had. The animals are not kept: nothing is collected from one day to the next (`docs/11`) |
+| **Letter snake** | The crazy one. A board of letters, a paper snake, and a word to eat in order: the word's own letters, a spare hyphen, and a few spares (the letters of the near miss, two from the word, a vowel). She steers by swipe, by tapping where she wants to go, by the arrows, or in a step a tap. The wrong letter is a miss, goes back on the board, and shrinks the snake a little. She can type the whole word at any time. Five words a round | 10 for a word with no wrong letter and no hint; 5 with a hint or one or two wrong letters; nothing beyond | Judgement, and it is the weakest of the games for learning. Choosing the next letter from a board is closer to hangman than to recall, so, as in hangman, typing the whole word is always there, and that is the way to finish early and the one part of it with evidence behind it (`docs/01`) |
+
+**What the snake does so that steering is not the game.** The edges wrap round, so there is no
+wall to hit. The body is paper and can pass over itself, so there is nothing to collide with, and
+it may turn straight back, so a head boxed in by letters can always get out. No letter ever has a
+letter on all four sides, so none is out of reach without eating another first. Nothing counts
+down, and it waits in the middle until she first turns. It pauses when the page is hidden. With
+the device set to reduce motion it moves one square a tap and not on its own, and anyone can
+switch to that. The rules are in `web/js/snakecore.js`, which has no screen in it, so
+`tests/test_snake.mjs` plays it: the board holds exactly the right letters, a wrong letter always
+comes back, and each of the term's 88 words can be eaten in order with no wrong letter.
+
+**Where it does not belong.** It is a bonus round only, one in four, opened by points. It has no
+run sounds. Like every card-by-card game it has the growing background, one layer for a word with
+no wrong letter and one taken back at the first miss.
+
+**What is logged** (`game_log`, game `bonus`, with the kind): each word, whether it was right,
+and, for the detective, how many clues the case took; for the snake, the misses, the hint and
+whether the word was typed; for the race, where she and the snail ended.
+
+**Still open.**
+
+- **Nobody has played any of these on a phone or an iPad.** The browser suite plays all four with
+  a mouse, and the phone suite steers the snake by tap and by swipe on a Pixel 7 and a Galaxy S8,
+  but a child's thumbs are different. The snake is the one most likely to need changing.
+- **Whether the snake is fun, and whether it is too slow or too fast,** is for the child playing it to say.
+  A square every 0.42 seconds is a guess.
+- **The race is easy to win,** by design: four right in six leaves her ahead. If it stops
+  mattering, the snail's pace is one constant.
+- **Novelty,** as for all of them. Judge them at eight weeks.
+
