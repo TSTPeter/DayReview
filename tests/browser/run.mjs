@@ -2006,8 +2006,10 @@ if (!liveWeek) {
     await g.waitForSelector("#det-next:not([hidden])");
     const verdict = (await g.textContent("#det-verdict")).trim();
     if (i === 3) {
+      // Her guess is marked as letters only, so a hyphen she typed is not among them: in a
+      // hyphen week "co-operat" is shown as "cooperat" and a mark for the missing letter.
       check("a case lost shows her last guess against the word, the rule and the word's support",
-            (await g.textContent("#det-marked")).startsWith(word.slice(0, -1)) && (await g.textContent("#det-why")).startsWith(word)
+            (await g.textContent("#det-marked")).startsWith(word.slice(0, -1).replace(/-/g, "")) && (await g.textContent("#det-why")).startsWith(word)
             && (await g.locator("#det-support .support").count()) === 1 && !/\+\d/.test(verdict), verdict);
     } else {
       check(`case ${i + 1} is worth what its clues cost`, new RegExp(`^Case solved!\\s+\\+${[15, 10, 5, 0, 15][i]}$`).test(verdict), verdict);

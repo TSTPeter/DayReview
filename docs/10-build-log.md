@@ -467,3 +467,39 @@ What to distrust:
 - **The race is easy to win by design:** four right in six leaves her ahead.
 - **The detective's origin clue is the games' own, unreviewed,** like the meanings.
 
+## 14 October 2026: main went red in the first hyphen week
+
+CI on the merge of PR #10 failed one check. The cause was in the test, not the game.
+
+- **What failed.** "A case lost shows her last guess against the word, the rule and the word's
+  support", in the word detective. The game shows her guess as letters only, so "co-operat" appears
+  as "cooperat" with a mark for the missing letter. The test expected the hyphen she had typed. It
+  fails for every one of the term's 20 hyphenated words and for none of the other 68. The list for
+  the week of 12 October is ten hyphenated words out of fifteen, so the check fails on about two
+  runs in five, and more often in the week of 19 October.
+- **Why it got through.** This log said on 6 October that CI plays only today's week and that
+  each week's content has to be tried before it arrives. I wrote the new games' tests in a week
+  with no hyphenated words and did not run them in one. What found it was running the finished
+  suite against the copy about to go to ProductionSite, on the first morning of the hyphen weeks.
+- **Fixed, and checked more widely.** The check now compares against her letters without the
+  hyphen. The browser suite and the phone test pass with `TODAY=` set to each of the term's six
+  weeks. Separately, every one of the 88 words was played on the real screens through the
+  detective (solved, and lost), the race and the chests (right, and wrong) and the snake (eaten
+  in order, and typed), and every word of both hyphen weeks through the letter tiles: solved at
+  the first go, solved after a miss, and revealed after three misses. The suite's own tiles test
+  never plays a miss on a hyphenated word, because its decoy is the spare hyphen, which a
+  hyphenated word does not have. Nothing failed on a hyphenated word.
+- **One imperfection measured, not fixed.** The sweep failed once, on one snake board for
+  *licence*, where the path-finder could not reach a needed letter without eating another first.
+  Measured properly, that happens on about one board in 2,000: 18 of 35,200 simulated boards,
+  400 for each word of the term, played by a path-finder that never eats a wrong letter. Reaching
+  such a letter costs a miss, and the snake can still finish. Boards already refuse a
+  letter shut in on four sides. Refusing a board whose empty squares are split in two, and placing
+  a returning wrong letter so that it does not split them, would close the gap.
+
+What to distrust:
+
+- CI still plays one date. From now on that date is a hyphen week, because the latest list is a
+  hyphenated one, so CI no longer plays a plain week at all. A second pass on a fixed plain date
+  (`TODAY=2026-10-05`) would cover both for a few more CI minutes. That is Peter's call.
+
