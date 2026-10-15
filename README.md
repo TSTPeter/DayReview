@@ -46,7 +46,9 @@ TODAY=2026-10-12 node tests/browser/run.mjs    # play another week of the term, 
 ```
 
 The games follow the school's calendar, so each week has different content. CI plays
-today's; try next Monday's before it arrives (`TODAY=` takes any date in the term).
+today's; try next Monday's before it arrives (`TODAY=` takes any date in the term). Anything
+that touches the games should be run in a plain week (`TODAY=2026-10-05`) and in a hyphen
+week (`TODAY=2026-10-12`): a test that only ever met plain words failed on 14 October.
 
 `package.json` exists only for that harness. The app ships no dependencies: `web/` is
 vanilla JS and `engine/` is pure Python with an empty import list.
